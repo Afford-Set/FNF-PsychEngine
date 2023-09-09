@@ -88,8 +88,8 @@ class HScript extends SScript
 		set('Character', Character);
 		set('Alphabet', Alphabet);
 		set('Note', Note);
-		set('CustomSubState', psychlua.CustomSubState);
-		set('CustomSubstate', psychlua.CustomSubState);
+		set('CustomSubState', CustomSubState);
+		set('CustomSubstate', CustomSubState);
 		#if (!flash && sys)
 		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
