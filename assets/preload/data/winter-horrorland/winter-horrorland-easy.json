@@ -1973,7 +1973,7 @@
 			}
 		],
 		"player2": "monster-christmas",
-		"stage": null,
+		"stage": "mallEvil",
 		"needsVoices": true,
 		"bpm": 159,
 		"speed": 1

@@ -233,7 +233,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		{
 			if (name != 'NO ANIMATIONS')
 			{
-				var anim:AnimationData = findAnimationByName(name);
+				var anim:Character.AnimArray = findAnimationByName(name);
 
 				if (anim != null)
 				{
@@ -308,7 +308,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 				}
 			}
 
-			var newAnim:AnimationData = {
+			var newAnim:Character.AnimArray = {
 				anim: animationInputText.text,
 				name: animationNameInputText.text,
 				fps: Math.round(animationNameFramerate.value),
@@ -471,7 +471,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		updatePresence();
 	}
 
-	function findAnimationByName(name:String):AnimationData
+	function findAnimationByName(name:String):Character.AnimArray
 	{
 		for (anim in char.animationsArray)
 		{
@@ -701,7 +701,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 
 	function updateAnimText():Void
 	{
-		var curAnim:AnimationData = char.animationsArray[curAnim];
+		var curAnim:Character.AnimArray = char.animationsArray[curAnim];
 
 		animOffsetTxt.text = 'Animation: ' + curAnim.anim + ' [' + curAnim.offsets[0] + ', ' + curAnim.offsets[1] + ']';
 		animOffsetTxt.text = animOffsetTxt.text.toUpperCase();

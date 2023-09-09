@@ -3851,7 +3851,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "limo",
 		"player2": "mom-car",
 		"needsVoices": true,
 		"bpm": 180,

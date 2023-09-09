@@ -2,9 +2,8 @@ package;
 
 typedef SwagSection =
 {
-	var sectionNotes:Array<Dynamic>;
-	var sectionBeats:Float;
-	var typeOfSection:Int;
+	var sectionNotes:Array<Array<Dynamic>>;
+	var ?sectionBeats:Float;
 	var mustHitSection:Bool;
 	var gfSection:Bool;
 	var bpm:Float;
@@ -14,11 +13,10 @@ typedef SwagSection =
 
 class Section
 {
-	public var sectionNotes:Array<Dynamic> = [];
+	public var sectionNotes:Array<Array<Dynamic>> = [];
 
-	public var sectionBeats:Float = 4;
+	public var sectionBeats:Null<Float> = 4;
 	public var gfSection:Bool = false;
-	public var typeOfSection:Int = 0;
 	public var mustHitSection:Bool = true;
 
 	/**
@@ -26,7 +24,7 @@ class Section
 	 */
 	public static var COPYCAT:Int = 0;
 
-	public function new(sectionBeats:Float = 4):Void
+	public function new(sectionBeats:Null<Float> = 4):Void
 	{
 		this.sectionBeats = sectionBeats;
 		Debug.logInfo('test created section: ' + sectionBeats);

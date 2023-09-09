@@ -2500,7 +2500,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "mall",
 		"player2": "parents-christmas",
 		"needsVoices": true,
 		"bpm": 100,

@@ -1328,7 +1328,7 @@
 			}
 		],
 		"player2": "pico",
-		"stage": null,
+		"stage": "philly",
 		"needsVoices": true,
 		"bpm": 175,
 		"speed": 1

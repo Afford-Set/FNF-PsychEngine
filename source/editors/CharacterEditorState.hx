@@ -697,7 +697,7 @@ class CharacterEditorState extends MusicBeatUIState
 		{
 			var selectedAnimation:Int = Std.parseInt(pressed);
 
-			var anim:AnimationData = char.animationsArray[selectedAnimation];
+			var anim:AnimArray = char.animationsArray[selectedAnimation];
 			animationInputText.text = anim.anim;
 			animationNameInputText.text = anim.name;
 			animationLoopCheckBox.checked = anim.loop;
@@ -766,7 +766,7 @@ class CharacterEditorState extends MusicBeatUIState
 				}
 			}
 
-			var newAnim:AnimationData = {
+			var newAnim:AnimArray = {
 				anim: animationInputText.text,
 				name: animationNameInputText.text,
 				fps: Math.round(animationNameFramerate.value),
@@ -970,7 +970,7 @@ class CharacterEditorState extends MusicBeatUIState
 			lastAnim = char.animation.curAnim.name;
 		}
 
-		var anims:Array<AnimationData> = char.animationsArray.copy();
+		var anims:Array<AnimArray> = char.animationsArray.copy();
 
 		if (Paths.fileExists('images/' + char.imageFile + '/Animation.json', TEXT)) {
 			char.frames = Paths.getAnimateAtlas(char.imageFile);
@@ -1128,7 +1128,7 @@ class CharacterEditorState extends MusicBeatUIState
 		cameraFollowPointer.setPosition(x, y);
 	}
 
-	function findAnimationByName(name:String):AnimationData
+	function findAnimationByName(name:String):AnimArray
 	{
 		for (anim in char.animationsArray)
 		{

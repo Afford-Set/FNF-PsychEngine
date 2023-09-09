@@ -827,7 +827,7 @@ class ChartingState extends MusicBeatUIState
 		check_altAnim.name = 'check_altAnim';
 
 		check_changeBPM = new FlxUICheckBox(10, stepperBeats.y + 30, null, null, 'Change BPM', 100);
-		check_changeBPM.checked = _song.notes[curSec].changeBPM;
+		check_changeBPM.checked = _song.notes[curSec].changeBPM == true;
 		check_changeBPM.name = 'check_changeBPM';
 
 		stepperSectionBPM = new FlxUINumericStepper(10, check_changeBPM.y + 20, 1, Conductor.bpm, 0, 999, 1);
@@ -1839,7 +1839,7 @@ class ChartingState extends MusicBeatUIState
 		{
 			if (_song.notes[i] != null)
 			{
-				if (_song.notes[i].changeBPM) {
+				if (_song.notes[i].changeBPM == true) {
 					daBPM = _song.notes[i].bpm;
 				}
 
@@ -2991,7 +2991,7 @@ class ChartingState extends MusicBeatUIState
 		nextRenderedNotes.clear();
 		nextRenderedSustains.clear();
 
-		if (_song.notes[curSec].changeBPM && _song.notes[curSec].bpm > 0) {
+		if (_song.notes[curSec].changeBPM == true && _song.notes[curSec].bpm > 0) {
 			Conductor.bpm = _song.notes[curSec].bpm;
 		}
 		else
@@ -3000,7 +3000,7 @@ class ChartingState extends MusicBeatUIState
 	
 			for (i in 0...curSec)
 			{
-				if (_song.notes[i].changeBPM) {
+				if (_song.notes[i].changeBPM == true) {
 					daBPM = _song.notes[i].bpm;
 				}
 			}
@@ -3190,7 +3190,6 @@ class ChartingState extends MusicBeatUIState
 			mustHitSection: true,
 			sectionNotes: [],
 			gfSection: false,
-			typeOfSection: 0,
 			altAnim: false
 		};
 
@@ -3206,7 +3205,6 @@ class ChartingState extends MusicBeatUIState
 			mustHitSection: mustHitSection,
 			sectionNotes: [],
 			gfSection: gfSection,
-			typeOfSection: 0,
 			altAnim: altAnim
 		};
 

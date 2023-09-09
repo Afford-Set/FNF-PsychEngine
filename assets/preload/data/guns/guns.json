@@ -4359,7 +4359,7 @@
 			}
 		],
 		"player2": "tankman",
-		"stage": null,
+		"stage": "tank",
 		"needsVoices": true,
 		"bpm": 185,
 		"speed": 2

@@ -208,7 +208,7 @@ class ControlsSubState extends MusicBeatSubState
 				var gottenKey:Null<FlxKey> = savKey[n];
 
 				var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
-				key = CoolUtil.getKeyName(newKey);
+				key = InputFormatter.getKeyName(newKey);
 			}
 			else
 			{
@@ -216,7 +216,7 @@ class ControlsSubState extends MusicBeatSubState
 				var gottenKey:Null<FlxGamepadInputID> = savKey[n];
 
 				var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
-				key = CoolUtil.getGamepadName(newKey);
+				key = InputFormatter.getGamepadName(newKey);
 			}
 
 			var attach:Alphabet = new Alphabet(textX + 210, 248, key, false);
@@ -426,7 +426,8 @@ class ControlsSubState extends MusicBeatSubState
 					ClientPrefs.keyBinds.get(curOption[2])[altNum] = NONE;
 					ClientPrefs.clearInvalidKeys(curOption[2]);
 
-					updateBind(Math.floor(curSelected * 2) + altNum, onKeyboardMode ? CoolUtil.getKeyName(NONE) : CoolUtil.getGamepadName(NONE));
+					updateBind(Math.floor(curSelected * 2) + altNum, onKeyboardMode ? InputFormatter.getKeyName(NONE) : InputFormatter.getGamepadName(NONE));
+
 					FlxG.sound.play(Paths.getSound('cancelMenu'));
 					closeBinding();
 				}
@@ -517,7 +518,7 @@ class ControlsSubState extends MusicBeatSubState
 							var gottenKey:Null<FlxKey> = savKey[n];
 
 							var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
-							key = CoolUtil.getKeyName(newKey);
+							key = InputFormatter.getKeyName(newKey);
 						}
 						else
 						{
@@ -525,7 +526,7 @@ class ControlsSubState extends MusicBeatSubState
 							var gottenKey:Null<FlxGamepadInputID> = savKey[n];
 
 							var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
-							key = CoolUtil.getGamepadName(newKey);
+							key = InputFormatter.getGamepadName(newKey);
 						}
 
 						updateBind(Math.floor(curSelected * 2) + n, key);

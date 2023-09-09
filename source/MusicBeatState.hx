@@ -151,7 +151,7 @@ class MusicBeatState extends FlxState
 
 	function getBeatsOnSection():Float
 	{
-		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null && PlayState.SONG.notes[curSection].sectionBeats > 0) {
+		if (PlayState.SONG != null && PlayState.SONG.notes[curSection] != null && PlayState.SONG.notes[curSection].sectionBeats != null && PlayState.SONG.notes[curSection].sectionBeats > 0) {
 			return PlayState.SONG.notes[curSection].sectionBeats;
 		}
 

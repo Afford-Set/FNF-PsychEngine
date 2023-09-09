@@ -1393,7 +1393,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "philly",
 		"player2": "pico",
 		"needsVoices": true,
 		"bpm": 165,

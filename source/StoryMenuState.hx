@@ -65,7 +65,7 @@ class StoryMenuState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
-		persistentUpdate = true;
+		persistentUpdate = persistentDraw = true;
 
 		grpWeekText = new FlxTypedGroup<MenuItem>();
 		add(grpWeekText);
@@ -359,6 +359,9 @@ class StoryMenuState extends MusicBeatState
 
 						PlayState.campaignScore = 0;
 						PlayState.campaignMisses = 0;
+
+						var diffName:String = CoolUtil.difficultyStuff[PlayState.storyDifficulty][1];
+						Debug.logInfo('Loading song "' + PlayState.SONG.songName + '" on difficulty "' + diffName + '" into week "' + curWeek.weekName + '".');
 
 						FlxG.sound.play(Paths.getSound('confirmMenu'));
 

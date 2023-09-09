@@ -2657,7 +2657,7 @@
 			}
 		],
 		"gfVersion": "gf-tankmen",
-		"stage": null,
+		"stage": "tank",
 		"events": [],
 		"needsVoices": true,
 		"speed": 1.8,

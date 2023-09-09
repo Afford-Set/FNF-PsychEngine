@@ -36,7 +36,7 @@ class GameOverSubState extends MusicBeatSubState
 	public static var shakeDuration:Float = 0.3; // Duration of shaking
 	public static var fadeDurationStart:Float = 0.85; // Duration of fade in on start of game over screen
 	public static var fadeDurationMicDown:Float = 0.85; // Duration of fade in then finished timer with duration from variable `flashStart`
-	public static var fadeDurationConfirm:Float = 1; // Duration of fade in then on confirm to end game over screen
+	public static var fadeDurationConfirm:Float = 1.4; // Duration of fade in then on confirm to end game over screen
 	public static var confirmFadeOutDuration:Float = 2.3; // Duration of fade out then on finished timer with duration from variable `startConfirmFadeOut`
 	public static var colorOnFadeOut:FlxColor = FlxColor.BLACK; // Color of fade out then on confirm to end game over screen
 	public static var startConfirmFadeOut:Float = 0.7; // Time of timer then on confirm to end game over screen
@@ -60,7 +60,7 @@ class GameOverSubState extends MusicBeatSubState
 		shakeDuration = 0.3;
 		fadeDurationStart = 0.85;
 		fadeDurationMicDown = 0.85;
-		fadeDurationConfirm = 1;
+		fadeDurationConfirm = 1.4;
 		confirmFadeOutDuration = 2;
 		colorOnFadeOut = FlxColor.BLACK;
 		startConfirmFadeOut = 0.7;

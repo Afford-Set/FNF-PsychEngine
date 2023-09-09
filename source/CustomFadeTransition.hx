@@ -3,7 +3,6 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
-import flixel.FlxSubState;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -11,7 +10,7 @@ import flixel.util.FlxGradient;
 
 using StringTools;
 
-class CustomFadeTransition extends FlxSubState
+class CustomFadeTransition extends MusicBeatSubState
 {
 	public static var nextCamera:FlxCamera;
 

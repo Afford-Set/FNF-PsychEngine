@@ -1837,7 +1837,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "schoolEvil",
 		"player2": "spirit",
 		"needsVoices": true,
 		"bpm": 190,

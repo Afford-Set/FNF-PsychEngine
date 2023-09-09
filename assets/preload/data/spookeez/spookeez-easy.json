@@ -1808,7 +1808,7 @@
 		"validScore": true,
 		"speed": 1,
 		"events": [],
-		"stage": null,
+		"stage": "spooky",
 		"gfVersion": null,
 		"needsVoices": true,
 		"bpm": 150

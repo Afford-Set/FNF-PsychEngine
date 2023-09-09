@@ -1,8 +1,5 @@
 package;
 
-import haxe.EnumFlags;
-import haxe.Exception;
-
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
@@ -18,10 +15,17 @@ import psychlua.HScript;
 import psychlua.FunkinLua;
 
 #if CRASH_HANDLER
+#if desktop
 import sys.io.File;
+import sys.FileSystem;
+#elseif html5
+import js.Browser;
+import js.Lib as JSLib;
+#end
 import haxe.io.Path;
 import haxe.CallStack;
-import sys.FileSystem;
+import haxe.EnumFlags;
+import haxe.Exception;
 import openfl.events.UncaughtErrorEvent;
 #end
 
@@ -114,7 +118,7 @@ class Main extends Sprite
 		variables.width = Math.ceil(stageWidth / zoom);
 		variables.height = Math.ceil(stageHeight / zoom);
 
-		ClientPrefs.loadPrefs();
+		ClientPrefs.loadDefaultPrefs();
 		ClientPrefs.loadControls();
 
 		Debug.onInitProgram();
@@ -272,12 +276,13 @@ class Main extends Sprite
 			switch (stackItem)
 			{
 				case FilePos(s, file, line, column): errMsg += file + ' (line ' + line + ')\n';
-				default: Sys.println(stackItem);
+				default: #if sys Sys.println(stackItem); #end
 			}
 		}
 
 		errMsg += '\nUncaught Error: ' + message + '\nPlease report this error to the GitHub page: https://github.com/null4ik-2j6k/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng';
 
+		#if (sys && desktop)
 		if (!FileSystem.exists('./crash/')) {
 			FileSystem.createDirectory('./crash/');
 		}
@@ -294,12 +299,17 @@ class Main extends Sprite
 		#else
 		Debug.displayAlert('Error!', errMsg);
 		#end
+		#elseif html5
+		Browser.alert('Error!\n\n' + errMsg);
+		#end
 
 		#if DISCORD_ALLOWED
 		DiscordClient.shutdown();
 		#end
 
+		#if (sys && desktop)
 		Sys.exit(1);
+		#end
 	}
 	#end
 }

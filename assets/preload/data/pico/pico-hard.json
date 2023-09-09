@@ -1901,7 +1901,7 @@
 		"speed": 1.6,
 		"gfVersion": null,
 		"events": [],
-		"stage": null,
+		"stage": "philly",
 		"needsVoices": true,
 		"bpm": 150
 	}

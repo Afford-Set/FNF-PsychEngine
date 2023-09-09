@@ -252,7 +252,7 @@ class PlayState extends MusicBeatState
 
 	var doof:DialogueBox = null;
 
-	override function create():Void
+	override public function create():Void
 	{
 		Paths.clearStoredMemory();
 
@@ -394,8 +394,6 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		isCameraOnForcedPos = true;
-
 		var mode:String = Paths.formatToSongPath(ClientPrefs.cutscenesOnMode);
 		allowPlayCutscene = mode.contains(gameMode) || ClientPrefs.cutscenesOnMode == 'Everywhere';
 
@@ -404,7 +402,7 @@ class PlayState extends MusicBeatState
 			skipArrowStartTween = true;
 
 			if (prevCamFollow != null && prevCamFollowPos != null) {
-				isCameraOnForcedPos = false;
+				cameraMovementSection();
 			}
 		}
 
@@ -447,16 +445,18 @@ class PlayState extends MusicBeatState
 					FlxTween.tween(whiteScreen, {alpha: 0}, 1,
 					{
 						startDelay: 0.1,
-						ease: FlxEase.linear,
 						onComplete: function(twn:FlxTween):Void
 						{
-							cameraMovementSection();
+							new FlxTimer().start(0.5, function(tmr:FlxTimer):Void
+							{
+								cameraMovementSection();
 
-							remove(whiteScreen);
-							whiteScreen.destroy();
-			
-							camHUD.visible = true;
-							startCountdown();
+								remove(whiteScreen);
+								whiteScreen.destroy();
+				
+								camHUD.visible = true;
+								startCountdown();
+							});
 						}
 					});
 				}
@@ -2321,8 +2321,6 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
-
-		isCameraOnForcedPos = false;
 		cameraMovementSection();
 
 		previousFrameTime = FlxG.game.ticks;
@@ -2667,7 +2665,7 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	override function openSubState(subState:FlxSubState):Void
+	override public function openSubState(subState:FlxSubState):Void
 	{
 		if (paused)
 		{
@@ -2676,30 +2674,12 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.pause();
 				vocals.pause();
 			}
-
-			if (startTimer != null && !startTimer.finished) startTimer.active = false;
-			if (finishTimer != null && !finishTimer.finished) finishTimer.active = false;
-			if (songSpeedTween != null) songSpeedTween.active = false;
-
-			var chars:Array<Character> = [boyfriend, gf, dad];
-	
-			for (char in chars)
-			{
-				if (char != null && char.colorTween != null) {
-					char.colorTween.active = false;
-				}
-			}
-
-			#if LUA_ALLOWED
-			for (tween in modchartTweens) tween.active = false;
-			for (timer in modchartTimers) timer.active = false;
-			#end
 		}
 
 		super.openSubState(subState);
 	}
 
-	override function closeSubState():Void
+	override public function closeSubState():Void
 	{
 		if (paused)
 		{
@@ -2711,21 +2691,24 @@ class PlayState extends MusicBeatState
 			if (finishTimer != null && !finishTimer.finished) finishTimer.active = true;
 			if (songSpeedTween != null) songSpeedTween.active = true;
 
-			var chars:Array<Character> = [boyfriend, gf, dad];
-
-			for (char in chars)
+			FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
 			{
-				if (char != null && char.colorTween != null) {
-					char.colorTween.active = true;
-				}
-			}
+				if (!tmr.finished) tmr.active = true;
+			});
 
-			#if LUA_ALLOWED
-			for (tween in modchartTweens) tween.active = true;
-			for (timer in modchartTimers) timer.active = true;
-			#end
+			FlxG.sound.list.forEachAlive(function(sud:FlxSound):Void
+			{
+				@:privateAccess
+				if (sud._paused) sud.resume();
+			});
+
+			FlxTween.globalManager.forEach(function(twn:FlxTween):Void
+			{
+				if (!twn.finished) twn.active = true;
+			});
 
 			paused = false;
+			callOnScripts('onResume');
 
 			#if DISCORD_ALLOWED
 			resetRPC(startTimer != null && startTimer.finished);
@@ -2735,40 +2718,7 @@ class PlayState extends MusicBeatState
 		super.closeSubState();
 	}
 
-	public function resume():Void
-	{
-		if (camGame != null) {
-			camGame.active = true;
-		}
-
-		if (camHUD != null) {
-			camHUD.active = true;
-		}
-
-		if (cameraTwn != null && !cameraTwn.finished) {
-			cameraTwn.active = true;
-		}
-
-		FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
-		{
-			if (!tmr.finished) tmr.active = true;
-		});
-
-		FlxG.sound.list.forEachAlive(function(sud:FlxSound):Void
-		{
-			@:privateAccess
-			if (sud._paused) sud.resume();
-		});
-
-		FlxTween.globalManager.forEach(function(twn:FlxTween):Void
-		{
-			if (!twn.finished) twn.active = true;
-		});
-
-		callOnScripts('onResume');
-	}
-
-	override function onFocus():Void
+	override public function onFocus():Void
 	{
 		#if DISCORD_ALLOWED
 		if (health > 0 && !paused) resetRPC(Conductor.songPosition > 0.0);
@@ -2777,7 +2727,7 @@ class PlayState extends MusicBeatState
 		super.onFocus();
 	}
 	
-	override function onFocusLost():Void
+	override public function onFocusLost():Void
 	{
 		#if DISCORD_ALLOWED
 		if (health > 0 && !paused && !ClientPrefs.autoPause) DiscordClient.changePresence(detailsPausedText, SONG.songName + " - " + storyDifficultyText, iconP2.character);
@@ -2825,7 +2775,7 @@ class PlayState extends MusicBeatState
 
 	var limoSpeed:Float = 0;
 
-	override function update(elapsed:Float):Void
+	override public function update(elapsed:Float):Void
 	{
 		callOnScripts('onUpdate', [elapsed]);
 
@@ -3070,15 +3020,17 @@ class PlayState extends MusicBeatState
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, CoolUtil.boundTo(1 - (elapsed * 3.125 * camZoomingDecay * playbackRate), 0, 1));
 		}
 
+		if (!ClientPrefs.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong) // RESET = Quick Game Over Screen
+		{
+			health = 0;
+			Debug.logInfo("RESET = True");
+		}
+
 		doDeathCheck();
 
 		FlxG.watch.addQuick('secShit', curSection);
 		FlxG.watch.addQuick('beatShit', curBeat);
 		FlxG.watch.addQuick('stepShit', curStep);
-
-		if (!ClientPrefs.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong) { // RESET = Quick Game Over Screen
-			health = 0;
-		}
 
 		if (unspawnNotes[0] != null)
 		{
@@ -3193,14 +3145,6 @@ class PlayState extends MusicBeatState
 
 	private function unactiveShit():Void
 	{
-		if (camGame != null) {
-			camGame.active = false;
-		}
-
-		if (camHUD != null) {
-			camHUD.active = false;
-		}
-
 		FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
 		{
 			if (!tmr.finished) tmr.active = false;
@@ -4031,6 +3975,8 @@ class PlayState extends MusicBeatState
 
 		if (ret != FunkinLua.Function_Stop && !transitioning)
 		{
+			Debug.logInfo('Finished song "' + SONG.songName + '".');
+
 			#if !switch
 			if (!usedPractice)
 			{
@@ -4065,7 +4011,7 @@ class PlayState extends MusicBeatState
 
 					storyPlaylist.shift();
 
-					if (storyPlaylist.length <= 0)
+					if (storyPlaylist.length < 1)
 					{
 						Paths.loadTopMod(); #if DISCORD_ALLOWED
 						DiscordClient.resetClientID();
@@ -4096,6 +4042,7 @@ class PlayState extends MusicBeatState
 
 						firstSong = null;
 
+						Debug.logInfo('Finished week "' + WeekData.getCurrentWeek().weekName + '".');
 						FlxG.switchState(new StoryMenuState());
 					}
 					else
@@ -4112,6 +4059,11 @@ class PlayState extends MusicBeatState
 						FlxG.sound.music.stop();
 
 						cancelMusicFadeTween();
+
+						var diffName:String = CoolUtil.difficultyStuff[PlayState.lastDifficulty][1];
+						var weekName:String = WeekData.getCurrentWeek().weekName;
+
+						Debug.logInfo('Loading song "' + SONG.songName + '" on difficulty "' + diffName + '" into week "' + weekName + '".');
 
 						LoadingState.loadAndSwitchState(new PlayState(), true);
 					}
@@ -4869,7 +4821,7 @@ class PlayState extends MusicBeatState
 		grpNoteSplashes.add(splash);
 	}
 
-	override function destroy():Void
+	override public function destroy():Void
 	{
 		#if LUA_ALLOWED
 		while (luaArray.length > 0)
@@ -5067,7 +5019,8 @@ class PlayState extends MusicBeatState
 	{
 		if (FlxG.sound.music.time >= -ClientPrefs.noteOffset)
 		{
-			if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > (20 * playbackRate) || (SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > (20 * playbackRate))) {
+			if (Math.abs(FlxG.sound.music.time - Conductor.songPosition) > (20 * playbackRate)
+				|| (SONG.needsVoices && Math.abs(vocals.time - Conductor.songPosition) > (20 * playbackRate))) {
 				resyncVocals();
 			}
 		}
@@ -5175,7 +5128,7 @@ class PlayState extends MusicBeatState
 				camHUD.zoom += 0.03 * camZoomingMult;
 			}
 
-			if (SONG.notes[curSection].changeBPM)
+			if (SONG.notes[curSection].changeBPM == true)
 			{
 				Conductor.bpm = SONG.notes[curSection].bpm;
 

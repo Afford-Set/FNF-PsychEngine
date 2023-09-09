@@ -294,7 +294,7 @@ class WeekData
 						}
 						#end
 
-						if ((PlayState.gameMode == 'story' && PlayState.isStoryMode && !weekFile.hideStoryMode) || (PlayState.gameMode == 'freeplay' && !PlayState.isStoryMode && !weekFile.hideFreeplay))
+						if (weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay)))
 						{
 							weeksLoaded.set(sexList[i], weekFile);
 							weeksList.push(sexList[i]);
@@ -318,7 +318,7 @@ class WeekData
 					var path:String = directory + daWeek + '.json';
 
 					if (FileSystem.exists(path)) {
-						addWeek(daWeek, path, directories[i], i, originalLength);
+						addWeek(daWeek, path, directories[i], i, originalLength, isStoryMode);
 					}
 				}
 
@@ -327,7 +327,7 @@ class WeekData
 					var path:String = Path.join([directory, file]);
 
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json')) {
-						addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength);
+						addWeek(file.substr(0, file.length - 5), path, directories[i], i, originalLength, isStoryMode);
 					}
 				}
 			}
@@ -335,7 +335,7 @@ class WeekData
 		#end
 	}
 
-	private static function addWeek(weekToCheck:String, path:String, directory:String, i:Int, originalLength:Int)
+	private static function addWeek(weekToCheck:String, path:String, directory:String, i:Int, originalLength:Int, isStoryMode:Null<Bool> = false):Void
 	{
 		if (!weeksLoaded.exists(weekToCheck))
 		{
@@ -352,7 +352,7 @@ class WeekData
 					#end
 				}
 
-				if ((PlayState.gameMode == 'story' && PlayState.isStoryMode && !weekFile.hideStoryMode) || (PlayState.gameMode == 'freeplay' && !PlayState.isStoryMode && !weekFile.hideFreeplay))
+				if (weekFile != null && (isStoryMode == null || (isStoryMode && !weekFile.hideStoryMode) || (!isStoryMode && !weekFile.hideFreeplay)))
 				{
 					weeksLoaded.set(weekToCheck, weekFile);
 					weeksList.push(weekToCheck);

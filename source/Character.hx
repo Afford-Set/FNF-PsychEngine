@@ -8,10 +8,20 @@ import flixel.tweens.FlxTween;
 
 using StringTools;
 
+typedef AnimArray =
+{
+	var anim:String;
+	var name:String;
+	var fps:Int;
+	var loop:Bool;
+	var indices:Array<Int>;
+	var offsets:Array<Int>;
+}
+
 typedef CharacterFile =
 {
 	var name:String;
-	var animations:Array<AnimationData>;
+	var animations:Array<AnimArray>;
 	var image:String;
 	var scale:Float;
 	var skip_dance:Bool;
@@ -49,7 +59,7 @@ class Character extends FlxSprite
 	public var skipDance:Bool = false;
 
 	public var healthIcon:String = 'face';
-	public var animationsArray:Array<AnimationData> = [];
+	public var animationsArray:Array<AnimArray> = [];
 
 	public var positionArray:Array<Float> = [0, 0];
 	public var cameraPosition:Array<Float> = [0, 0];

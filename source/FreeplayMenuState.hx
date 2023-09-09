@@ -449,6 +449,11 @@ class FreeplayMenuState extends MusicBeatState
 					colorTween.cancel();
 				}
 
+				var diffName:String = CoolUtil.difficultyStuff[PlayState.lastDifficulty][1];
+				var weekName:String = WeekData.getCurrentWeek().weekName;
+
+				Debug.logInfo('Loading song "' + PlayState.SONG.songName + '" on difficulty "' + diffName + '" into week "' + weekName + '".');
+
 				LoadingState.loadAndSwitchState(new PlayState(), true);
 
 				#if (DISCORD_ALLOWED && MODS_ALLOWED)

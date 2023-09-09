@@ -18,11 +18,11 @@
 	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
 	<set name="SWF_VERSION" value="11.8" />
 
-	<!-- ______________________ NULL ENGINE CUSTOMIZATION ______________________ -->
+	<!-- ______________________ PSYCH ENGINE CUSTOMIZATION ______________________ -->
 
 	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS -->
 
-	<define name="CRASH_HANDLER" if="desktop release" />
+	<define name="CRASH_HANDLER" if="desktop release || html5 release" />
 	<define name="CHECK_FOR_UPDATES" if="officialBuild"/>
 
 	<define name="ACHIEVEMENTS_ALLOWED" />
@@ -120,8 +120,6 @@
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
 
-	<haxelib name="format" />
-
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="web" />
 	<haxelib name="SScript" if="HSCRIPT_ALLOWED" />
 	<haxelib name="linc_luajit" if="LUA_ALLOWED" />
@@ -167,11 +165,11 @@
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
 
 	<!--Used for Izzy Engine's crash handler-->
-	<haxedef name="HXCPP_STACK_LINE" if="CRASH_HANDLER" />
-	<haxedef name="HXCPP_STACK_TRACE" if="CRASH_HANDLER" />
-	<haxedef name="HXCPP_CHECK_POINTER" if="CRASH_HANDLER" />
+	<haxedef name="HXCPP_STACK_LINE" if="CRASH_HANDLER desktop" />
+	<haxedef name="HXCPP_STACK_TRACE" if="CRASH_HANDLER desktop" />
+	<haxedef name="HXCPP_CHECK_POINTER" if="CRASH_HANDLER desktop" />
 
-	<haxedef name="MINIMP3_IMPLEMENTATION" />
+	<haxedef name="HXC_LIBVLC_LOGGING" if="VIDEOS_ALLOWED debug" unless="web"/>
 
 	<!--Macro fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />

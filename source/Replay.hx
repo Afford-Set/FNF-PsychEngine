@@ -36,9 +36,7 @@ typedef ReplayFile =
 	var difficulty:Int;
 	var difficulties:Array<Dynamic>;
 
-	var songWeekID:Int;
 	var songWeekTag:String;
-	var songWeekName:String;
 
 	var keyPresses:Array<KeySaveEvent>;
 	var keyReleases:Array<KeySaveEvent>;
@@ -97,9 +95,7 @@ class Replay
 			difficulty: diff,
 			difficulties: difficulties,
 
-			songWeekID: week,
 			songWeekTag: WeekData.weeksList[week],
-			songWeekName: WeekData.getFromFileName(WeekData.weeksList[week]).weekName,
 
 			keyPresses: presses,
 			keyReleases: releases,

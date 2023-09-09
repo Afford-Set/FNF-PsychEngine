@@ -2918,7 +2918,6 @@
 				"mustHitSection": true
 			},
 			{
-				"typeOfSection": 0,
 				"sectionNotes": [],
 				"altAnim": false,
 				"gfSection": false,
@@ -2951,7 +2950,7 @@
 		"events": [],
 		"gfVersion": "pico-speaker",
 		"needsVoices": true,
-		"stage": null,
+		"stage": "tank",
 		"bpm": 178
 	}
 }

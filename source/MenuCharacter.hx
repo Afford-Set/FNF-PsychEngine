@@ -1,13 +1,14 @@
 package;
 
-import flixel.FlxSprite;
 import haxe.Json;
+import flixel.FlxSprite;
+import Character.AnimArray;
 
 typedef MenuCharacterFile =
 {
 	var position:Array<Float>;
 	var image:String;
-	var animations:Array<AnimationData>;
+	var animations:Array<AnimArray>;
 	var scale:Float;
 	var flipX:Bool;
 	var no_antialiasing:Bool;
@@ -24,7 +25,7 @@ class MenuCharacter extends FlxSprite
 
 	public var positionArray:Array<Float> = [0, 0];
 	public var imageFile:String = ''; // Used on Menu Character Editor
-	public var animationsArray:Array<AnimationData> = [];
+	public var animationsArray:Array<AnimArray> = [];
 	public var jsonScale:Float = 1;
 	public var noAntialiasing:Bool = false;
 	public var originalFlipX:Bool = false;

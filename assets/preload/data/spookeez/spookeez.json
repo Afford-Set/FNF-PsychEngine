@@ -2154,7 +2154,7 @@
 		"speed": 1.7,
 		"events": [],
 		"gfVersion": null,
-		"stage": null,
+		"stage": "spooky",
 		"needsVoices": true,
 		"bpm": 150
 	}

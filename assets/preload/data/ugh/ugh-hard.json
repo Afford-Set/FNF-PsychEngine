@@ -2949,7 +2949,7 @@
 		"speed": 2.3,
 		"events": [],
 		"gfVersion": "gf-tankmen",
-		"stage": null,
+		"stage": "tank",
 		"needsVoices": true,
 		"bpm": 160
 	}

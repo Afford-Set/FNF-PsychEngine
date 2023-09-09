@@ -93,10 +93,20 @@ class LoadingState extends MusicBeatState
 
 	function checkLoadSong(path:String):Void
 	{
-		if (!Assets.cache.hasSound(path))
+		if (!isSoundLoaded(path))
 		{
 			var callback:Void->Void = callbacks.add("song:" + path);
-			Paths.loadSound(path).onComplete(function(_:Sound):Void callback());
+
+			Paths.loadSound(path).onComplete(function(_:Sound):Void
+			{
+				Debug.logInfo('loaded path: ' + path);
+				callback();
+			})
+			.onError(function(error:Dynamic):Void
+			{
+				Debug.logError('error: ' + error);
+				callback();
+			});
 		}
 	}
 
@@ -108,7 +118,17 @@ class LoadingState extends MusicBeatState
 			if (LimeAssets.libraryPaths.exists(library))
 			{
 				var callback:Void->Void = callbacks.add("library:" + library);
-				Assets.loadLibrary(library).onComplete(function(_:AssetLibrary):Void callback());
+
+				Assets.loadLibrary(library).onComplete(function(_:AssetLibrary):Void
+				{
+					Debug.logInfo('loaded library: ' + library);
+					callback();
+				})
+				.onError(function(error:Dynamic):Void
+				{
+					Debug.logError('error: ' + error);
+					callback();
+				});
 			}
 			else {
 				Debug.logError("Missing library: " + library);
@@ -177,6 +197,8 @@ class LoadingState extends MusicBeatState
 		if (weekDir != null && weekDir.length > 0 && weekDir != '') directory = weekDir;
 		Paths.currentLevel = directory;
 
+		Debug.logInfo('Setting asset folder to ' + directory);
+
 		var loaded:Bool = isLibraryLoaded('shared');
 
 		if (PlayState.SONG != null) {
@@ -199,7 +221,7 @@ class LoadingState extends MusicBeatState
 
 	static function isSoundLoaded(path:String):Bool
 	{
-		return Paths.currentTrackedSounds.exists(path);
+		return #if PRELOAD_ALL Paths.currentTrackedSounds.exists(path) #else Assets.cache.hasSound(path) #end;
 	}
 
 	static function isLibraryLoaded(library:String):Bool
@@ -207,14 +229,7 @@ class LoadingState extends MusicBeatState
 		return Assets.getLibrary(library) != null;
 	}
 
-	override function destroy():Void
-	{
-		super.destroy();
-
-		callbacks = null;
-	}
-
-	public static function initSongsManifest():Future<AssetLibrary>
+	static function initSongsManifest():Future<AssetLibrary>
 	{
 		var id:String = 'songs';
 		var promise:Promise<AssetLibrary> = new Promise<AssetLibrary>();

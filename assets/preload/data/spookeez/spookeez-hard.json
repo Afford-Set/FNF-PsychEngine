@@ -2353,7 +2353,7 @@
 		"validScore": true,
 		"speed": 2.4,
 		"events": [],
-		"stage": null,
+		"stage": "spooky",
 		"gfVersion": null,
 		"needsVoices": true,
 		"bpm": 150

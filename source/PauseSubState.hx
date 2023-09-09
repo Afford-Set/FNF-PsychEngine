@@ -361,11 +361,7 @@ class PauseSubState extends MusicBeatSubState
 
 			switch (daSelected)
 			{
-				case 'Resume':
-				{
-					close();
-					PlayState.instance.resume();
-				}
+				case 'Resume': close();
 				case 'Restart Song': restartSong();
 				case 'Change Difficulty':
 				{
@@ -405,13 +401,11 @@ class PauseSubState extends MusicBeatSubState
 						}
 
 						close();
-						PlayState.instance.resume();
 					}
 				}
 				case 'End Song':
 				{
 					close();
-					PlayState.instance.resume();
 
 					PlayState.instance.notes.clear();
 					PlayState.instance.unspawnNotes = [];

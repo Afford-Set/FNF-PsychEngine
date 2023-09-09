@@ -561,25 +561,37 @@ class Note extends FlxSprite
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
 			var swagRect:FlxRect = clipRect;
-			if (swagRect == null) swagRect = new FlxRect(0, 0, frameWidth, frameHeight);
+			if (swagRect == null) swagRect = new FlxRect(0, 0, width / scale.x, height / scale.y);
 
 			if (myStrum.downScroll)
 			{
-				if (y - offset.y * scale.y + height >= center)
-				{
-					swagRect.width = frameWidth;
-					swagRect.height = (center - y) / scale.y;
-					swagRect.y = frameHeight - swagRect.height;
+				var result:Int = Std.int((y + height) - center);
+
+				if (result > 0) {
+					swagRect.y = result / scale.y;
 				}
 			}
-			else if (y + offset.y * scale.y <= center)
+			else
 			{
-				swagRect.y = (center - y) / scale.y;
-				swagRect.width = width / scale.x;
-				swagRect.height = (height / scale.y) - swagRect.y;
+				var result:Int = Std.int(center - y);
+
+				if (result > 0) {
+					swagRect.y = result / scale.y;
+				}
 			}
 
 			clipRect = swagRect;
 		}
+	}
+
+	@:noCompletion
+	override function set_clipRect(rect:FlxRect):FlxRect
+	{
+		clipRect = rect;
+
+		if (frames != null)
+			frame = frames.frames[animation.frameIndex];
+
+		return rect;
 	}
 }

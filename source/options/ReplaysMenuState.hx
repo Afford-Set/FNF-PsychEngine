@@ -31,6 +31,7 @@ class ReplaysMenuState extends MusicBeatState
 	{
 		PlayState.gameMode = 'replay';
 		PlayState.isStoryMode = false;
+		WeekData.reloadWeekFiles(null);
 
 		#if DISCORD_ALLOWED
 		DiscordClient.changePresence("In the Replays Menu"); // Updating Discord Rich Presence
@@ -44,8 +45,19 @@ class ReplaysMenuState extends MusicBeatState
 
 		#if REPLAYS_ALLOWED
 		#if sys
-		for (i in FileSystem.readDirectory(Paths.getPreloadPath('replays/'))) {
-			songs.push(Replay.loadReplay(i));
+		for (i in FileSystem.readDirectory(Paths.getPreloadPath('replays/')))
+		{
+			var replay:Replay = Replay.loadReplay(i);
+			var week:String = replay.songWeekTag;
+
+			if (WeekData.weeksList.contains(week))
+			{
+				var weekData:WeekData = WeekData.weeksLoaded.get(week);
+
+				replay.songWeekID = WeekData.weeksList.indexOf(week);
+				replay.songWeekName = weekData.weekName;
+				songs.push(replay);
+			}
 		}
 		#end
 
@@ -55,14 +67,9 @@ class ReplaysMenuState extends MusicBeatState
 				songID: null,
 				songName: null,
 				speed: -1,
-	
 				difficulty: -1,
 				difficulties: [],
-	
-				songWeekID: -1,
 				songWeekTag: null,
-				songWeekName: null,
-	
 				keyPresses: [],
 				keyReleases: [],
 				date: null,
@@ -196,6 +203,9 @@ class ReplaysMenuState extends MusicBeatState
 					}
 
 					PlayState.lastDifficulty = curSong.difficulty;
+
+					var diffName:String = CoolUtil.difficultyStuff[PlayState.lastDifficulty][1];
+					Debug.logInfo('Loading song "' + PlayState.SONG.songName + '" on difficulty "' + diffName + '" into week "' + curSong.songWeekName + '".');
 
 					LoadingState.loadAndSwitchState(new PlayState(), true);
 

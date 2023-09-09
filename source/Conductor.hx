@@ -14,17 +14,16 @@ typedef BPMChangeEvent =
 class Conductor
 {
 	public static var bpm(default, set):Float = 100;
-	public static var crochet:Float = ((60 / bpm) * 1000); // beats in milliseconds
+	public static var crochet:Float = calculateCrochet(bpm); // beats in milliseconds
 	public static var stepCrochet:Float = crochet / 4; // steps in milliseconds
 	public static var songPosition:Float = 0;
-	public static var offset:Float = 0;
 
-	public static var safeFrames:Float;
-	public static var safeZoneOffset:Float; // is calculated in create(), is safeFrames in milliseconds
+	public static var safeFrames:Float = -1;
+	public static var safeZoneOffset:Float = 0; // is calculated in create(), is safeFrames in milliseconds
 
 	public static var bpmChangeMap:Array<BPMChangeEvent> = [];
 
-	public static function judgeNote(arr:Array<Rating>, diff:Float = 0):Rating // die
+	public static function judgeNote(arr:Array<Rating> = null, diff:Float = 0):Rating // die
 	{
 		if (arr == null || arr.length < 1) arr = Rating.loadDefault();
 		var data:Array<Rating> = arr;
@@ -123,7 +122,7 @@ class Conductor
 
 		for (i in 0...song.notes.length)
 		{
-			if (song.notes[i].changeBPM && song.notes[i].bpm != curBPM)
+			if (song.notes[i].changeBPM == true && song.notes[i].bpm != curBPM)
 			{
 				curBPM = song.notes[i].bpm;
 
@@ -141,13 +140,15 @@ class Conductor
 			totalSteps += deltaSteps;
 			totalPos += ((60 / curBPM) * 1000 / 4) * deltaSteps;
 		}
+
+		Debug.logInfo("new BPM map BUDDY " + bpmChangeMap);
 	}
 
 	static function getSectionBeats(song:SwagSong, section:Int):Float
 	{
 		var val:Float = 4;
 
-		if (song.notes[section] != null) {
+		if (song.notes[section] != null && song.notes[section].sectionBeats != null && song.notes[section].sectionBeats > 0) {
 			val = song.notes[section].sectionBeats;
 		}
 

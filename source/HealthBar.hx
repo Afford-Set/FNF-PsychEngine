@@ -19,7 +19,7 @@ class HealthBar extends FlxSpriteGroup
 	public var valueFunction:Void->Float = function():Float return 0;
 
 	public var percent(default, set):Float = 0;
-	public var bounds:Bounds = {min: 0, max: 1};
+	public var bounds:Dynamic = {min: 0, max: 1};
 
 	public var leftToRight(default, set):Bool = true;
 	public var barCenter(default, null):Float = 0;

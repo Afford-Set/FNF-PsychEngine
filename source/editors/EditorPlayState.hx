@@ -270,8 +270,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		if (FlxG.sound.music.time >= -ClientPrefs.noteOffset)
 		{
-			if (Math.abs(FlxG.sound.music.time - (Conductor.songPosition - Conductor.offset)) > (20 * playbackRate)
-				|| (PlayState.SONG.needsVoices && Math.abs(vocals.time - (Conductor.songPosition - Conductor.offset)) > (20 * playbackRate))) {
+			if (Math.abs(FlxG.sound.music.time - Conductor.songPosition) > (20 * playbackRate)
+				|| (PlayState.SONG.needsVoices && Math.abs(vocals.time - Conductor.songPosition) > (20 * playbackRate))) {
 				resyncVocals();
 			}
 		}
@@ -303,7 +303,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		if (PlayState.SONG.notes[curSection] != null)
 		{
-			if (PlayState.SONG.notes[curSection].changeBPM) {
+			if (PlayState.SONG.notes[curSection].changeBPM == true) {
 				Conductor.bpm = PlayState.SONG.notes[curSection].bpm;
 			}
 		}

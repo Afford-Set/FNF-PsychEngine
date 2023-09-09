@@ -10,59 +10,75 @@ typedef SwagSong =
 {
 	var songID:String;
 	var songName:String;
-
+	var notes:Array<SwagSection>;
+	var events:Array<Dynamic>;
 	var bpm:Float;
 	var needsVoices:Bool;
 	var speed:Float;
-
-	var notes:Array<SwagSection>;
-	var events:Array<Dynamic>;
 
 	var player1:String;
 	var player2:String;
 	var gfVersion:String;
 	var stage:String;
 
-	@:optional var arrowSkin:String;
-	@:optional var arrowSkin2:String;
-	@:optional var splashSkin:String;
-	@:optional var splashSkin2:String;
+	var ?disableNoteRGB:Bool;
 
-	@:optional var disableNoteRGB:Bool;
+	var ?arrowSkin:String;
+	var ?arrowSkin2:String;
+	var ?splashSkin:String;
+	var ?splashSkin2:String;
 }
 
 class Song
 {
-	private static function onLoadJson(songJson:Dynamic, events:Bool = false):SwagSong // Convert old charts to newest format
-	{
-		if (!events)
-		{
-			var song:String = songJson.song;
+	@:deprecated("`song` is deprecated. Use `songID` or `songName` instead.")
+	public var song:String;
+	public var songID:String;
+	public var songName:String;
+	public var notes:Array<SwagSection>;
+	public var events:Array<Dynamic>;
+	public var bpm:Float;
+	public var needsVoices:Bool = true;
+	public var arrowSkin:String;
+	public var arrowSkin2:String;
+	public var splashSkin:String;
+	public var splashSkin2:String;
+	public var disableNoteRGB:Bool = false;
+	public var speed:Float = 1;
+	public var stage:String;
+	public var player1:String = 'bf';
+	public var player2:String = 'dad';
+	public var gfVersion:String = 'gf';
 
-			if (song != null)
-			{
-				if (songJson.songID == null) {
-					songJson.songID = Paths.formatToSongPath(song);
-				}
-		
-				if (songJson.songName == null) {
-					songJson.songName = CoolUtil.formatToName(song);
-				}
+	private static function onLoadJson(songJson:Dynamic):SwagSong // Convert old charts to newest format
+	{
+		var song:String = songJson.song;
+
+		if (song != null)
+		{
+			if (songJson.songID == null) {
+				songJson.songID = Paths.formatToSongPath(song);
 			}
 	
-			if (songJson.arrowSkin2 == null) {
-				songJson.arrowSkin2 = songJson.arrowSkin;
+			if (songJson.songName == null) {
+				songJson.songName = CoolUtil.formatToName(song);
 			}
-	
-			if (songJson.splashSkin2 == null) {
-				songJson.splashSkin2 = songJson.splashSkin2;
-			}
-	
-			if (songJson.gfVersion == null)
-			{
-				songJson.gfVersion = songJson.player3;
-				songJson.player3 = null;
-			}
+		}
+
+		songJson.song = null;
+
+		if (songJson.arrowSkin2 == null) {
+			songJson.arrowSkin2 = songJson.arrowSkin;
+		}
+
+		if (songJson.splashSkin2 == null) {
+			songJson.splashSkin2 = songJson.splashSkin2;
+		}
+
+		if (songJson.gfVersion == null)
+		{
+			songJson.gfVersion = songJson.player3;
+			songJson.player3 = null;
 		}
 
 		if (songJson.events == null)
@@ -74,7 +90,7 @@ class Song
 				var sec:SwagSection = songJson.notes[secNum];
 
 				var i:Int = 0;
-				var notes:Array<Dynamic> = sec.sectionNotes;
+				var notes:Array<Array<Dynamic>> = sec.sectionNotes;
 				var len:Int = notes.length;
 
 				while (i < len)
@@ -95,6 +111,13 @@ class Song
 		return cast songJson;
 	}
 
+	public function new(song, notes, bpm):Void
+	{
+		this.songID = song;
+		this.notes = notes;
+		this.bpm = bpm;
+	}
+
 	public static function loadFromJson(jsonInput:String, ?folder:String = 'tutorial'):SwagSong
 	{
 		var formattedFolder:String = Paths.formatToSongPath(folder);
@@ -110,7 +133,7 @@ class Song
 		var songJson:Dynamic = parseJSONshit(rawJson);
 		if (jsonInput != 'events') StageData.loadDirectory(songJson);
 
-		return onLoadJson(songJson, jsonInput == 'events');
+		return onLoadJson(songJson);
 	}
 
 	public static function parseJSONshit(rawJson:String):SwagSong

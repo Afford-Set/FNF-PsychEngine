@@ -2176,7 +2176,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "spooky",
 		"player2": "monster",
 		"needsVoices": true,
 		"bpm": 95,

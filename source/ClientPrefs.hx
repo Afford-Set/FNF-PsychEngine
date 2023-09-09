@@ -20,7 +20,6 @@ class ClientPrefs
 {
 	public static var defaultPrefs(default, null):Map<String, Dynamic> = [];
 	public static var prefBlackList(default, never):Array<String> = [
-		'initialized',
 		'defaultPrefs',
 		'prefBlackList',
 		'keyBinds',
@@ -93,87 +92,77 @@ class ClientPrefs
 		}
 
 		FlxG.save.flush();
+
+		Debug.logInfo("Settings saved!");
 	}
 
-	static var initialized:Bool = false;
+	public static function loadDefaultPrefs():Void
+	{
+		for (field in Type.getClassFields(ClientPrefs))
+		{
+			var defaultValue:Dynamic = Reflect.getProperty(ClientPrefs, field);
+
+			if (Type.typeof(defaultValue) != TFunction && !prefBlackList.contains(field)) {
+				defaultPrefs.set(field, defaultValue);
+			}
+		}
+	}
 
 	public static function loadPrefs():Void
 	{
-		var startLoad:Void->Void = function():Void
+		for (field in Type.getClassFields(ClientPrefs))
 		{
-			FlxG.save.bind('funkin', CoolUtil.getSavePath());
-
-			for (field in Type.getClassFields(ClientPrefs))
+			if (Type.typeof(Reflect.getProperty(ClientPrefs, field)) != TFunction && !prefBlackList.contains(field))
 			{
-				if (Type.typeof(Reflect.getProperty(ClientPrefs, field)) != TFunction && !prefBlackList.contains(field))
+				var valueFromSave:Dynamic = Reflect.getProperty(FlxG.save.data, field);
+
+				if (valueFromSave != null) {
+					Reflect.setProperty(ClientPrefs, field, valueFromSave);
+				}
+
+				switch (field)
 				{
-					var valueFromSave:Dynamic = Reflect.getProperty(FlxG.save.data, field);
-
-					if (valueFromSave != null) {
-						Reflect.setProperty(ClientPrefs, field, valueFromSave);
-					}
-
-					switch (field)
+					case 'fullScreen': FlxG.fullscreen = fullScreen;
+					case 'framerate':
 					{
-						case 'fullScreen': FlxG.fullscreen = fullScreen;
-						case 'framerate':
+						if (framerate > FlxG.drawFramerate)
 						{
-							if (framerate > FlxG.drawFramerate)
-							{
-								FlxG.updateFramerate = framerate;
-								FlxG.drawFramerate = framerate;
-							}
-							else
-							{
-								FlxG.drawFramerate = framerate;
-								FlxG.updateFramerate = framerate;
-							}
+							FlxG.updateFramerate = framerate;
+							FlxG.drawFramerate = framerate;
 						}
-						case 'autoPause': FlxG.autoPause = autoPause;
-						case 'safeFrames':
+						else
 						{
-							Conductor.safeFrames = ClientPrefs.safeFrames;
-							Conductor.safeZoneOffset = (Conductor.safeFrames / 60) * 1000;
+							FlxG.drawFramerate = framerate;
+							FlxG.updateFramerate = framerate;
 						}
-						case 'discordRPC':
-						{
-							#if DISCORD_ALLOWED
-							DiscordClient.check();
-							#end
-						}
+					}
+					case 'autoPause': FlxG.autoPause = autoPause;
+					case 'safeFrames':
+					{
+						Conductor.safeFrames = ClientPrefs.safeFrames;
+						Conductor.safeZoneOffset = (Conductor.safeFrames / 60) * 1000;
+					}
+					case 'discordRPC':
+					{
+						#if DISCORD_ALLOWED
+						DiscordClient.check();
+						#end
 					}
 				}
 			}
-
-			if (FlxG.save.data.volume != null) {
-				FlxG.sound.volume = FlxG.save.data.volume;
-			}
-
-			if (FlxG.save.data.mute != null) {
-				FlxG.sound.muted = FlxG.save.data.mute;
-			}
 		}
 
-		if (!initialized)
-		{
-			for (field in Type.getClassFields(ClientPrefs))
-			{
-				var defaultValue:Dynamic = Reflect.getProperty(ClientPrefs, field);
-
-				if (Type.typeof(defaultValue) != TFunction && !prefBlackList.contains(field)) {
-					defaultPrefs.set(field, defaultValue);
-				}
-			}
-
-			initialized = true;
-			return FlxG.signals.postGameStart.add(startLoad);
+		if (FlxG.save.data.volume != null) {
+			FlxG.sound.volume = FlxG.save.data.volume;
 		}
 
-		return startLoad();
+		if (FlxG.save.data.mute != null) {
+			FlxG.sound.muted = FlxG.save.data.mute;
+		}
 	}
 
 	#if LUA_ALLOWED
-	public static function implementPrefsForLua(lua:FunkinLua):Void // Some settings, no jokes
+	public static function implementPrefsForLua(lua:FunkinLua):Void // Some settings for lua, no jokes
 	{
 		lua.set('downscroll', downScroll);
 		lua.set('middlescroll', middleScroll);

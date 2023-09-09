@@ -57,15 +57,26 @@
 			]
 		},
 		{
-			"loop": false,
 			"offsets": [
 				0,
 				0
 			],
-			"anim": "singUP",
+			"indices": [],
 			"fps": 24,
-			"name": "GF IDLE",
-			"indices": []
+			"anim": "sad",
+			"loop": false,
+			"name": "GF SAD"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"indices": [],
+			"fps": 24,
+			"anim": "cheer",
+			"loop": false,
+			"name": "GF CHEER"
 		}
 	],
 	"no_antialiasing": true,
@@ -86,5 +97,5 @@
 		80
 	],
 	"sing_duration": 4,
-	"scale": 5.99999999999999
+	"scale": 6
 }

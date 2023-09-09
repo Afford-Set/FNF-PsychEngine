@@ -491,7 +491,6 @@
 				"mustHitSection": true
 			},
 			{
-				"typeOfSection": 0,
 				"sectionNotes": [],
 				"bpm": 100,
 				"changeBPM": false,

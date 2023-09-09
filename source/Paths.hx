@@ -174,14 +174,14 @@ class Paths
 
 			if (currentLevel != 'shared')
 			{
-				var levelPath = getLibraryPath(file, currentLevel);
+				levelPath = getLibraryPathForce(file, currentLevel);
 
 				if (OpenFlAssets.exists(levelPath, type)) {
 					return levelPath;
 				}
 			}
 
-			levelPath = getLibraryPath(file, 'shared');
+			levelPath = getLibraryPathForce(file, 'shared');
 
 			if (OpenFlAssets.exists(levelPath, type)) {
 				return levelPath;
@@ -193,12 +193,12 @@ class Paths
 
 	public static function getLibraryPath(file:String = '', library:String = 'preload'):String
 	{
-		return (library == 'preload' || library == 'default') ? getPreloadPath(file) : getLibraryPathForce(file, library);
+		return if (library == "preload" || library == "default") getPreloadPath(file) else getLibraryPathForce(file, library);
 	}
 
 	public static function getLibraryPathForce(file:String = '', library:String):String
 	{
-		return '$library:' + getPreloadPath(library + '/' + file);
+		return '$library:assets/$library/$file';
 	}
 
 	public static function getPreloadPath(file:String = ''):String
@@ -420,7 +420,12 @@ class Paths
 			return currentTrackedAssets.get(path);
 		}
 
-		if (!getFileLocation) {
+		if (!getFileLocation)
+		{
+			if (ClientPrefs.naughtyness) {
+				Debug.logError('oh no its returning null NOOOO');
+			}
+
 			Debug.logError('Could not find a image asset with key "$key".');
 		}
 
@@ -896,7 +901,7 @@ class Paths
 
 	private static function set_currentLevel(value:String):String
 	{
-		if (value != null && value.length > 0) {
+		if (value != null && value.length > 0 && value != 'preload' && value != 'default') {
 			return currentLevel = formatToSongPath(value);
 		}
 

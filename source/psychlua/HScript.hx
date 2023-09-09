@@ -85,7 +85,6 @@ class HScript extends SScript
 		set('Paths', Paths);
 		set('Conductor', Conductor);
 		set('ClientPrefs', ClientPrefs);
-		set('ClientPrefs', ClientPrefs);
 		set('Character', Character);
 		set('Alphabet', Alphabet);
 		set('Note', Note);

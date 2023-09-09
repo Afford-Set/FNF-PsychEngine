@@ -1736,10 +1736,10 @@
 				"bpm": 144,
 				"sectionBeats": 4,
 				"changeBPM": false,
-				"mustHitSection": true
+				"mustHitSection": false
 			}
 		],
-		"stage": null,
+		"stage": "school",
 		"player2": "senpai",
 		"needsVoices": true,
 		"bpm": 144,

@@ -2574,7 +2574,7 @@
 				"mustHitSection": true
 			}
 		],
-		"stage": null,
+		"stage": "school",
 		"player2": "senpai-angry",
 		"needsVoices": true,
 		"bpm": 120,
