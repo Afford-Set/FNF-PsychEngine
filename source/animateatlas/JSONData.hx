@@ -4,7 +4,8 @@ package animateatlas;
  * All data needed for the json importer + some extra for after parsing.
  * Stolen mostly from https://github.com/TomByrne/Starling-Extension-Adobe-Animate-Hx/blob/master/hx/src/starling/extensions/animate/AnimationAtlasData.hx
  */
-typedef AnimationData = {
+typedef AnimationData =
+{
 	?ANIMATION:SymbolData,
 	?SYMBOL_DICTIONARY:{
 		Symbols:Array<SymbolData>
@@ -14,7 +15,8 @@ typedef AnimationData = {
 	}
 }
 
-typedef AtlasData = {
+typedef AtlasData =
+{
 	?ATLAS:{
 		SPRITES:Array<SpriteDummy>
 	},
@@ -28,11 +30,13 @@ typedef AtlasData = {
 	}
 }
 
-typedef SpriteDummy = {
+typedef SpriteDummy =
+{
 	SPRITE:SpriteData
 }
 
-typedef SpriteData = {
+typedef SpriteData =
+{
 	name:String,
 	x:Int,
 	y:Int,
@@ -41,36 +45,42 @@ typedef SpriteData = {
 	rotated:Bool
 }
 
-typedef SymbolData = {
+typedef SymbolData =
+{
 	?name:String,
 	SYMBOL_name:String,
 	?TIMELINE:SymbolTimelineData
 }
 
-typedef SymbolTimelineData = {
+typedef SymbolTimelineData =
+{
 	?sortedForRender:Bool,
 	LAYERS:Array<LayerData>
 }
 
-typedef LayerData = {
+typedef LayerData =
+{
 	Layer_name:String,
 	Frames:Array<LayerFrameData>,
 	FrameMap:Map<Int, LayerFrameData>
 }
 
-typedef LayerFrameData = {
+typedef LayerFrameData =
+{
 	index:Int,
 	?name:String,
 	duration:Int,
 	elements:Array<ElementData>
 }
 
-typedef ElementData = {
+typedef ElementData =
+{
 	?ATLAS_SPRITE_instance:Dynamic,
 	?SYMBOL_Instance:SymbolInstanceData
 }
 
-typedef SymbolInstanceData = {
+typedef SymbolInstanceData =
+{
 	SYMBOL_name:String,
 	Instance_Name:String,
 	bitmap:BitmapPosData,
@@ -85,7 +95,8 @@ typedef SymbolInstanceData = {
 	?filters:FilterData
 }
 
-typedef ColorData = {
+typedef ColorData =
+{
 	mode:String,
 
 	?RedMultiplier:Float,
@@ -98,17 +109,20 @@ typedef ColorData = {
 	?AlphaOffset:Float
 }
 
-typedef BitmapPosData = {
+typedef BitmapPosData =
+{
 	name:String,
 	Position:PointData,
 }
 
-typedef PointData = {
+typedef PointData =
+{
 	x:Int,
 	y:Int
 }
 
-typedef Matrix3DData = {
+typedef Matrix3DData =
+{
 	m00:Float,
 	m01:Float,
 	m02:Float,
@@ -126,8 +140,10 @@ typedef Matrix3DData = {
 	m32:Float,
 	m33:Float,
 }
+
 //tryna add more support gimme a sec
-typedef FilterData = {
+typedef FilterData =
+{
 	?BlurFilter: {
 		blurX:Float,
 		blurY:Float,
@@ -144,11 +160,10 @@ typedef FilterData = {
 		knockout: Bool,
 		inner: Bool
 	}
-
-
 }
 
-typedef Decomposed3DData = {
+typedef Decomposed3DData =
+{
 	Position:{x:Float, y:Float, z:Float},
 	Rotation:{x:Float, y:Float, z:Float},
 	Scaling:{x:Float, y:Float, z:Float},

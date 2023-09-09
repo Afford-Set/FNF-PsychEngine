@@ -56,17 +56,17 @@ function onCountdownStarted()
 
 function onCountdownTick(tick:Countdown, counter:Int)
 {
-	switch(tick)
+	switch (tick)
 	{
-		case Countdown.THREE:
+		case Countdown.THREE | 'three':
 			//counter equals to 0
-		case Countdown.TWO:
+		case Countdown.TWO | 'two':
 			//counter equals to 1
-		case Countdown.ONE:
+		case Countdown.ONE | 'one':
 			//counter equals to 2
-		case Countdown.GO:
+		case Countdown.GO | 'go':
 			//counter equals to 3
-		case Countdown.START:
+		case Countdown.START | 'start':
 			//counter equals to 4, this has no visual indication or anything, it's pretty much at nearly the exact time the song starts playing
 	}
 }

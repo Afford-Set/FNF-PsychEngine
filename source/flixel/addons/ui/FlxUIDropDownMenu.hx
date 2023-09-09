@@ -1,5 +1,6 @@
 package flixel.addons.ui;
 
+import flixel.util.FlxColor;
 import flash.geom.Rectangle;
 import flixel.addons.ui.interfaces.IFlxUIClickable;
 import flixel.addons.ui.interfaces.IFlxUIWidget;
@@ -441,7 +442,7 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 				else if (FlxG.mouse.wheel < 0 || FlxG.keys.justPressed.DOWN) {
 					// Go down
 					currentScroll++;
-					if(currentScroll >= list.length) currentScroll = list.length-1;
+					if(currentScroll >= list.length) currentScroll = list.length - 1;
 					updateButtonPositions();
 				}
 			}
@@ -454,16 +455,13 @@ class FlxUIDropDownMenu extends FlxUIGroup implements IFlxUIWidget implements IF
 		#end
 	}
 
-	function mouseOverlapping()
+	function mouseOverlapping():Bool
 	{
 		var mousePoint = FlxG.mouse.getScreenPosition(camera);
 		var objPoint = this.getScreenPosition(null, camera);
-		if(mousePoint.x >= objPoint.x && mousePoint.y >= objPoint.y &&
-			mousePoint.x < objPoint.x + this.width && mousePoint.y < objPoint.y + this.height)
-		{
-			return true;
-		}
-		return false;
+
+		return mousePoint.x >= objPoint.x && mousePoint.y >= objPoint.y &&
+			mousePoint.x < objPoint.x + this.width && mousePoint.y < objPoint.y + this.height;
 	}
 
 	override public function destroy():Void

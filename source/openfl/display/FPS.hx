@@ -4,6 +4,7 @@ import haxe.Timer;
 import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
+import flixel.math.FlxMath;
 #if gl_stats
 import openfl.display._internal.stats.Context3DStats;
 import openfl.display._internal.stats.DrawCallContext;
@@ -31,6 +32,9 @@ class FPS extends TextField
 	**/
 	public var currentFPS(default, null):Int;
 
+	private var memoryMegas:Float = 0;
+	private var memoryTotal:Float = 0;
+
 	@:noCompletion private var cacheCount:Int;
 	@:noCompletion private var currentTime:Float;
 	@:noCompletion private var times:Array<Float>;
@@ -48,7 +52,6 @@ class FPS extends TextField
 		defaultTextFormat = new TextFormat("_sans", 14, color);
 		autoSize = LEFT;
 		multiline = true;
-		text = "FPS: ";
 
 		cacheCount = 0;
 		currentTime = 0;
@@ -77,20 +80,28 @@ class FPS extends TextField
 
 		var currentCount = times.length;
 		currentFPS = Math.round((currentCount + cacheCount) / 2);
-		if (currentFPS > ClientPrefs.data.framerate) currentFPS = ClientPrefs.data.framerate;
+		if (currentFPS > ClientPrefs.framerate) currentFPS = ClientPrefs.framerate;
 
-		if (currentCount != cacheCount /*&& visible*/)
+		if (currentCount != cacheCount)
 		{
-			text = "FPS: " + currentFPS;
-			var memoryMegas:Float = 0;
+			text = '';
+			if (ClientPrefs.fpsCounter) text += "FPS: " + currentFPS + "\n";
 			
 			#if openfl
 			memoryMegas = Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1));
-			text += "\nMemory: " + memoryMegas + " MB";
+			if (memoryMegas > memoryTotal) memoryTotal = memoryMegas;
+
+			if (ClientPrefs.memoryCounter) text += 'Memory: ' + memoryMegas + " / " + memoryTotal + " MB";
 			#end
 
+			if (text != null || text != '')
+			{
+				if (Main.fpsCounter != null)
+					Main.fpsCounter.visible = true;
+			}
+
 			textColor = 0xFFFFFFFF;
-			if (memoryMegas > 3000 || currentFPS <= ClientPrefs.data.framerate / 2)
+			if (memoryMegas > 3000 || currentFPS <= ClientPrefs.framerate / 2)
 			{
 				textColor = 0xFFFF0000;
 			}

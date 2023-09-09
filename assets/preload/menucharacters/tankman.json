@@ -1,0 +1,23 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "M Tankman Idle"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "Menu_Tankman",
+	"position": [
+		155,
+		120
+	],
+	"flipX": false,
+	"scale": 1
+}

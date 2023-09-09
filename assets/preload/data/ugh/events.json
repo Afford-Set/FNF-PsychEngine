@@ -1,11 +1,16 @@
 {
 	"song": {
-		"speed": 2.3,
-		"stage": "tank",
-		"player1": "bf",
-		"player2": "tankman",
-		"player3": null,
 		"events": [
+			[
+				5625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
 			[
 				9375,
 				[
@@ -115,15 +120,37 @@
 						""
 					]
 				]
+			],
+			[
+				41625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
+			[
+				49125,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
+			],
+			[
+				77625,
+				[
+					[
+						"Play Animation",
+						"singUP-alt",
+						"dad"
+					]
+				]
 			]
-		],
-		"notes": [],
-		"splashSkin": null,
-		"validScore": false,
-		"gfVersion": "gf-tankmen",
-		"bpm": 160,
-		"arrowSkin": null,
-		"needsVoices": true,
-		"song": "Ugh"
+		]
 	}
 }

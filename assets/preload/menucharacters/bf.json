@@ -1,0 +1,34 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "M BF Idle"
+		},
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "confirm",
+			"indices": [],
+			"name": "M bf HEY"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "Menu_BF",
+	"position": [
+		480,
+		85
+	],
+	"flipX": false,
+	"scale": 1
+}

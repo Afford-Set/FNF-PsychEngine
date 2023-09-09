@@ -1,31 +1,32 @@
 package animateatlas.displayobject;
 
-import openfl.filters.GlowFilter;
-import openfl.filters.BlurFilter;
-import openfl.display.PixelSnapping;
 import openfl.geom.Point;
-import openfl.display.BitmapData;
+import openfl.geom.Matrix;
+import openfl.errors.Error;
 import openfl.display.Bitmap;
 import openfl.display.Sprite;
-import openfl.errors.ArgumentError;
 import openfl.geom.Rectangle;
-import openfl.errors.Error;
+import openfl.display.FrameLabel;
+import openfl.filters.GlowFilter;
+import openfl.filters.BlurFilter;
+import openfl.display.BitmapData;
+import openfl.geom.ColorTransform;
+import openfl.errors.ArgumentError;
+import openfl.display.PixelSnapping;
+import animateatlas.JSONData.LayerData;
+import animateatlas.JSONData.ColorData;
+import animateatlas.JSONData.FilterData;
+import animateatlas.JSONData.SymbolData;
 import animateatlas.JSONData.ElementData;
 import animateatlas.HelperEnums.LoopMode;
-import animateatlas.HelperEnums.SymbolType;
-import openfl.display.FrameLabel;
-import animateatlas.JSONData.SymbolData;
-import animateatlas.JSONData.SymbolInstanceData;
-import animateatlas.JSONData.LayerData;
-import animateatlas.JSONData.BitmapPosData;
 import animateatlas.JSONData.Matrix3DData;
+import animateatlas.HelperEnums.SymbolType;
+import animateatlas.JSONData.BitmapPosData;
 import animateatlas.JSONData.LayerFrameData;
-import animateatlas.JSONData.ColorData;
-import openfl.geom.Matrix;
-import openfl.geom.ColorTransform;
-import animateatlas.JSONData.FilterData;
+import animateatlas.JSONData.SymbolInstanceData;
 
-class SpriteSymbol extends Sprite {
+class SpriteSymbol extends Sprite
+{
 	public var currentLabel(get, never):String;
 	public var currentFrame(get, set):Int;
 	public var type(get, set):String;
@@ -56,8 +57,10 @@ class SpriteSymbol extends Sprite {
 
 	private static var sMatrix:Matrix = new Matrix();
 
-	private function new(data:SymbolData, library:SpriteAnimationLibrary, texture:BitmapData) {
+	private function new(data:SymbolData, library:SpriteAnimationLibrary, texture:BitmapData)
+	{
 		super();
+
 		_data = data;
 		_library = library;
 		_composedFrame = -1;
@@ -72,15 +75,19 @@ class SpriteSymbol extends Sprite {
 		createLayers();
 
 		// Create FrameMap caches if don't exist
-		for (layer in data.TIMELINE.LAYERS) {
+		for (layer in data.TIMELINE.LAYERS)
+		{
 			if (layer.FrameMap != null)
 				return;
 
 			var map = new Map();
 
-			for (i in 0...layer.Frames.length) {
+			for (i in 0...layer.Frames.length)
+			{
 				var frame = layer.Frames[i];
-				for (j in 0...frame.duration) {
+
+				for (j in 0...frame.duration)
+				{
 					map.set(i + j, frame);
 				}
 			}
@@ -89,7 +96,8 @@ class SpriteSymbol extends Sprite {
 		}
 	}
 
-	public function reset():Void {
+	public function reset():Void
+	{
 		sMatrix.identity();
 		transform.matrix = sMatrix.clone();
 		alpha = 1.0;
@@ -97,16 +105,20 @@ class SpriteSymbol extends Sprite {
 		_composedFrame = -1;
 	}
 
-	public function nextFrame():Void {
-		if (_loopMode != LoopMode.SINGLE_FRAME) {
+	public function nextFrame():Void
+	{
+		if (_loopMode != LoopMode.SINGLE_FRAME)
+		{
 			currentFrame += 1;
 		}
 
 		moveMovieclip_MovieClips(1);
 	}
 
-	public function prevFrame():Void {
-		if (_loopMode != LoopMode.SINGLE_FRAME) {
+	public function prevFrame():Void
+	{
+		if (_loopMode != LoopMode.SINGLE_FRAME)
+		{
 			currentFrame -= 1;
 		}
 
@@ -114,23 +126,29 @@ class SpriteSymbol extends Sprite {
 	}
 
 	/** Moves all movie clips n frames, recursively. */
-	private function moveMovieclip_MovieClips(direction:Int = 1):Void {
-		if (_type == SymbolType.MOVIE_CLIP) {
+	private function moveMovieclip_MovieClips(direction:Int = 1):Void
+	{
+		if (_type == SymbolType.MOVIE_CLIP)
+		{
 			currentFrame += direction;
 		}
 
-		for (l in 0..._numLayers) {
+		for (l in 0..._numLayers)
+		{
 			var layer:Sprite = getLayer(l);
 			var numElements:Int = layer.numChildren;
 
-			for (e in 0...numElements) {
+			for (e in 0...numElements)
+			{
 				(try cast(layer.getChildAt(e), SpriteSymbol) catch (e:Dynamic) null).moveMovieclip_MovieClips(direction);
 			}
 		}
 	}
 
-	public function update():Void {
-		for (i in 0..._numLayers) {
+	public function update():Void
+	{
+		for (i in 0..._numLayers)
+		{
 			updateLayer(i);
 		}
 
@@ -138,20 +156,24 @@ class SpriteSymbol extends Sprite {
 	}
 
 	@:access(animateatlas)
-	private function updateLayer(layerIndex:Int):Void {
+	private function updateLayer(layerIndex:Int):Void
+	{
 		var layer:Sprite = getLayer(layerIndex);
 		var frameData:LayerFrameData = getFrameData(layerIndex, _currentFrame);
 		var elements:Array<ElementData> = (frameData != null) ? frameData.elements : null;
 		var numElements:Int = (elements != null) ? elements.length : 0;
-		for (i in 0...numElements) {
+
+		for (i in 0...numElements)
+		{
 			var elementData:SymbolInstanceData = elements[i].SYMBOL_Instance;
 
-			if (elementData == null) {
+			if (elementData == null)
+			{
 				continue;
 			}
 
-			// this is confusing but needed :(
-			var oldSymbol:SpriteSymbol = (layer.numChildren > i) ? try
+
+			var oldSymbol:SpriteSymbol = (layer.numChildren > i) ? try // this is confusing but needed :(
 				cast(layer.getChildAt(i), SpriteSymbol)
 			catch (e:Dynamic)
 				null : null;
@@ -281,7 +303,6 @@ class SpriteSymbol extends Sprite {
 				//filters.push(blur);
 			}
 			if (data.GlowFilter != null){
-				//trace('GLOW' + data.GlowFilter);
 				//glow = new GlowFilter();
 				//glow.blurX = data.GlowFilter.blurX;
 				//glow.blurY = data.GlowFilter.blurY;

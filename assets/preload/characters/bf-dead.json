@@ -1,4 +1,5 @@
 {
+	"name": "Boyfriend",
 	"animations": [
 		{
 			"offsets": [
@@ -16,7 +17,7 @@
 				37,
 				5
 			],
-			"loop": true,
+			"loop": false,
 			"fps": 24,
 			"anim": "deathLoop",
 			"indices": [],

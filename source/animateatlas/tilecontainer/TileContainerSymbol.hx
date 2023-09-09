@@ -1,28 +1,29 @@
 package animateatlas.tilecontainer;
 
-import openfl.display.Tileset;
-import animateatlas.JSONData.PointData;
-import openfl.errors.ArgumentError;
-import openfl.geom.Rectangle;
+import openfl.geom.Matrix;
 import openfl.errors.Error;
+import openfl.display.Tile;
+import openfl.geom.Rectangle;
+import openfl.display.Tileset;
+import openfl.display.FrameLabel;
+import openfl.geom.ColorTransform;
+import openfl.errors.ArgumentError;
+import openfl.display.TileContainer;
+import animateatlas.JSONData.ColorData;
+import animateatlas.JSONData.PointData;
+import animateatlas.JSONData.LayerData;
+import animateatlas.JSONData.SymbolData;
 import animateatlas.JSONData.ElementData;
 import animateatlas.HelperEnums.LoopMode;
-import animateatlas.HelperEnums.SymbolType;
-import openfl.display.FrameLabel;
-import animateatlas.JSONData.SymbolData;
-import animateatlas.JSONData.SymbolInstanceData;
-import animateatlas.JSONData.LayerData;
-import animateatlas.JSONData.BitmapPosData;
 import animateatlas.JSONData.Matrix3DData;
+import animateatlas.HelperEnums.SymbolType;
+import animateatlas.JSONData.BitmapPosData;
 import animateatlas.JSONData.LayerFrameData;
-import animateatlas.JSONData.ColorData;
-import openfl.geom.Matrix;
-import openfl.geom.ColorTransform;
 import openfl.display.DisplayObjectContainer;
-import openfl.display.TileContainer;
-import openfl.display.Tile;
+import animateatlas.JSONData.SymbolInstanceData;
 
-class TileContainerSymbol extends TileContainer {
+class TileContainerSymbol extends TileContainer
+{
 	public var currentLabel(get, never):String;
 	public var currentFrame(get, set):Int;
 	public var type(get, set):String;

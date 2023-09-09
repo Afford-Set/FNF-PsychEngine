@@ -1,26 +1,27 @@
 package animateatlas.tilecontainer;
 
 import openfl.display.Tileset;
-import haxe.Constraints.Constructible;
 import openfl.display.BitmapData;
-import animateatlas.JSONData.AnimationData;
-import animateatlas.JSONData.ElementData;
-import animateatlas.JSONData.LayerFrameData;
+import openfl.errors.ArgumentError;
+import haxe.Constraints.Constructible;
 import animateatlas.JSONData.LayerData;
-import animateatlas.JSONData.SymbolTimelineData;
-import animateatlas.JSONData.Matrix3DData;
 import animateatlas.JSONData.AtlasData;
 import animateatlas.JSONData.SymbolData;
 import animateatlas.JSONData.SpriteData;
 import animateatlas.HelperEnums.LoopMode;
+import animateatlas.JSONData.ElementData;
+import animateatlas.JSONData.Matrix3DData;
 import animateatlas.HelperEnums.SymbolType;
-import openfl.errors.ArgumentError;
+import animateatlas.JSONData.AnimationData;
+import animateatlas.JSONData.LayerFrameData;
+import animateatlas.JSONData.SymbolTimelineData;
 
 /**
  * Since we can extract symbols from the exported timeline and instance them separatedly, this keeps track of all symbols.
  * Also, this is a "more readable" way of understanding the AnimationData
  */
-class TileAnimationLibrary {
+class TileAnimationLibrary
+{
 	public var frameRate:Float;
 
 	private var _atlas:Map<String, SpriteData>;
@@ -69,7 +70,7 @@ class TileAnimationLibrary {
 		return new TileContainerMovieClip(getSymbol(symbol));
 	}
 
-	public function getAnimationNames(prefix:String = ""):Array<String> {
+	public function getAnimationNames(prefix:String = ''):Array<String> {
 		var out = new Array<String>();
 
 		for (name in _symbolData.keys()) {

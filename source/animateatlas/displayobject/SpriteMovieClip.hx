@@ -5,7 +5,8 @@ import animateatlas.HelperEnums.LoopMode;
 import animateatlas.HelperEnums.SymbolType;
 
 @:access(animateatlas.displayobject.SpriteSymbol)
-class SpriteMovieClip extends Sprite {
+class SpriteMovieClip extends Sprite
+{
 	public var framerate(get, set):Float;
 	public var currentLabel(get, set):String;
 	public var currentFrame(get, set):Int;

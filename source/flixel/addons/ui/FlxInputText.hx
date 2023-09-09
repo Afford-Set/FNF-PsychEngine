@@ -1,5 +1,8 @@
 package flixel.addons.ui;
 
+import flixel.util.FlxTimer;
+import flixel.util.FlxColor;
+import flixel.text.FlxText;
 import lime.system.Clipboard;
 import flash.errors.Error;
 import flash.events.KeyboardEvent;

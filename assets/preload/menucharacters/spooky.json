@@ -1,0 +1,23 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": true,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "M Spooky Kids Idle"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "Menu_Spooky_Kids",
+	"position": [
+		150,
+		110
+	],
+	"flipX": false,
+	"scale": 1
+}

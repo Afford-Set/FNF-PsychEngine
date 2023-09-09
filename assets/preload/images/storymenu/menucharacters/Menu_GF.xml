@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TextureAtlas imagePath="Menu_GF.png">
+	<!-- Created with Adobe Animate version 23.0.0.407 -->
+	<!-- http://www.adobe.com/products/animate.html -->
+	<SubTexture name="M gf HEY0000" x="1" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0001" x="343" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0002" x="685" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0003" x="1027" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0004" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0005" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0006" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0007" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0008" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0009" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0010" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0011" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0012" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0013" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0014" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0015" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0016" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0017" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0018" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0019" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M gf HEY0020" x="1369" y="1" width="341" height="323"/>
+	<SubTexture name="M GF Idle0000" x="1" y="325" width="341" height="324"/>
+	<SubTexture name="M GF Idle0001" x="343" y="325" width="341" height="324"/>
+	<SubTexture name="M GF Idle0002" x="685" y="325" width="341" height="324"/>
+	<SubTexture name="M GF Idle0003" x="1027" y="325" width="341" height="324"/>
+	<SubTexture name="M GF Idle0004" x="1369" y="325" width="341" height="324"/>
+	<SubTexture name="M GF Idle0005" x="1" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0006" x="343" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0007" x="685" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0008" x="685" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0009" x="685" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0010" x="1027" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0011" x="1027" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0012" x="1027" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0013" x="1369" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0014" x="1369" y="650" width="341" height="324"/>
+	<SubTexture name="M GF Idle0015" x="1" y="975" width="341" height="324"/>
+	<SubTexture name="M GF Idle0016" x="343" y="975" width="341" height="324"/>
+	<SubTexture name="M GF Idle0017" x="685" y="975" width="341" height="324"/>
+	<SubTexture name="M GF Idle0018" x="1027" y="975" width="341" height="324"/>
+	<SubTexture name="M GF Idle0019" x="1369" y="975" width="341" height="324"/>
+	<SubTexture name="M GF Idle0020" x="1" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0021" x="343" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0022" x="685" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0023" x="685" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0024" x="685" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0025" x="1027" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0026" x="1027" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0027" x="1027" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0028" x="1369" y="1300" width="341" height="324"/>
+	<SubTexture name="M GF Idle0029" x="1369" y="1300" width="341" height="324"/>
+</TextureAtlas>

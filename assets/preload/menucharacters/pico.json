@@ -1,0 +1,23 @@
+{
+	"animations": [
+		{
+			"offsets": [
+				0,
+				0
+			],
+			"loop": false,
+			"fps": 24,
+			"anim": "idle",
+			"indices": [],
+			"name": "M Pico Idle"
+		}
+	],
+	"no_antialiasing": false,
+	"image": "Menu_Pico",
+	"position": [
+		160,
+		150
+	],
+	"flipX": false,
+	"scale": 1
+}
