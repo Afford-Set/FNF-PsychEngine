@@ -64,12 +64,6 @@ class NotesSubState extends MusicBeatSubState
 	{
 		super();
 
-		var bg:FlxSprite = new FlxSprite();
-		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
-		bg.alpha = 0.6;
-		bg.scrollFactor.set();
-		add(bg);
-
 		modeBG = new FlxSprite(215, 85);
 		modeBG.makeGraphic(315, 115, FlxColor.BLACK);
 		modeBG.visible = false;

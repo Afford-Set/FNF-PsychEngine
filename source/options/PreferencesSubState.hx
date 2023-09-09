@@ -589,85 +589,85 @@ class PreferencesSubState extends MusicBeatSubState
 				}
 			}
 
-			if (curOption.canChange)
+			var usesCheckbox:Bool = curOption.type == 'bool';
+			var alphabet:Alphabet = grpOptions.members[curSelected];
+
+			if ((controls.ACCEPT_P || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(alphabet))) && nextAccept <= 0)
 			{
-				var usesCheckbox:Bool = curOption.type == 'bool';
-				var alphabet:Alphabet = grpOptions.members[curSelected];
-
-				if ((controls.ACCEPT_P || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(alphabet))) && nextAccept <= 0)
+				if (curOption == defaultValue)
 				{
-					if (curOption == defaultValue)
+					var finishThing:Void->Void = function():Void
 					{
-						var finishThing:Void->Void = function():Void
+						for (i in 0...optionsArray.length)
 						{
-							for (i in 0...optionsArray.length)
+							var leOption:Option = optionsArray[i];
+							leOption.value = leOption.defaultValue;
+
+							if (leOption.type != 'bool')
 							{
-								var leOption:Option = optionsArray[i];
-								leOption.value = leOption.defaultValue;
-
-								if (leOption.type != 'bool')
-								{
-									if (leOption.type == 'string') {
-										leOption.curOption = leOption.options.indexOf(leOption.value);
-									}
-
-									updateTextFrom(leOption);
+								if (leOption.type == 'string') {
+									leOption.curOption = leOption.options.indexOf(leOption.value);
 								}
 
-								if (!leOption.ignoreChangeOnReset) {
-									leOption.change();
-								}
+								updateTextFrom(leOption);
 							}
 
-							FlxG.sound.play(Paths.getSound('cancelMenu'));
-							reloadCheckboxes();
-
-							flickering = false;
+							if (!leOption.ignoreChangeOnReset) {
+								leOption.change();
+							}
 						}
 
-						if (ClientPrefs.flashingLights)
-						{
-							flickering = true;
+						FlxG.sound.play(Paths.getSound('cancelMenu'));
+						reloadCheckboxes();
 
-							FlxFlicker.flicker(alphabet, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
-								finishThing();
-							});
-
-							FlxG.sound.play(Paths.getSound('confirmMenu'));
-						}
-						else {
-							finishThing();
-						}
+						flickering = false;
 					}
-					else if (usesCheckbox && !unselectableCheck(curSelected))
+
+					if (ClientPrefs.flashingLights)
 					{
-						var finishThing:Void->Void = function():Void
-						{
-							FlxG.sound.play(Paths.getSound('scrollMenu'));
-		
-							curOption.value = (curOption.value == true) ? false : true;
-							curOption.change();
+						flickering = true;
 
-							reloadCheckboxes();
-							flickering = false;
-						}
-
-						if (ClientPrefs.flashingLights)
-						{
-							flickering = true;
-
-							FlxFlicker.flicker(alphabet, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
-								finishThing();
-							});
-
-							FlxG.sound.play(Paths.getSound('confirmMenu'));
-						}
-						else {
+						FlxFlicker.flicker(alphabet, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
 							finishThing();
-						}
+						});
+
+						FlxG.sound.play(Paths.getSound('confirmMenu'));
+					}
+					else {
+						finishThing();
 					}
 				}
+				else if (usesCheckbox && !unselectableCheck(curSelected) && curOption.canChange)
+				{
+					var finishThing:Void->Void = function():Void
+					{
+						FlxG.sound.play(Paths.getSound('scrollMenu'));
+	
+						curOption.value = (curOption.value == true) ? false : true;
+						curOption.change();
 
+						reloadCheckboxes();
+						flickering = false;
+					}
+
+					if (ClientPrefs.flashingLights)
+					{
+						flickering = true;
+
+						FlxFlicker.flicker(alphabet, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
+							finishThing();
+						});
+
+						FlxG.sound.play(Paths.getSound('confirmMenu'));
+					}
+					else {
+						finishThing();
+					}
+				}
+			}
+
+			if (curOption.canChange)
+			{
 				if (!usesCheckbox && !unselectableCheck(curSelected) && curOption != defaultValue)
 				{
 					if (controls.UI_LEFT || controls.UI_RIGHT)

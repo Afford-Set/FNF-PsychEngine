@@ -613,6 +613,7 @@ class PlayState extends MusicBeatState
 			case 'story': detailsText = "Story Mode: " + WeekData.getCurrentWeek().weekName;
 			case 'freeplay': detailsText = "Freeplay";
 			case 'replay': detailsText = "Replay";
+			default: detailsText = "Unknown";
 		}
 
 		detailsPausedText = "Paused - " + detailsText; // String for when the game is paused
@@ -842,7 +843,7 @@ class PlayState extends MusicBeatState
 				resetFastCar();
 
 				var limo:BGSprite = new BGSprite('limo/limoDrive', -120, 550, 1, 1, ['Limo stage'], true);
-				addBehindGF(limo); // Shitty layering but whatev it works LOL
+				addBehindDad(limo); // Shitty layering but whatev it works LOL
 			}
 			case 'mall': // Week 5 - Cocoa, Eggnog
 			{

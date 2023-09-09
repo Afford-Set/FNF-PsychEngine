@@ -199,12 +199,14 @@ class MasterEditorMenu extends MusicBeatState
 			case 'Dialogue Portrait Editor': return LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), true);
 			case 'Chart Editor':
 			{
-				PlayState.gameMode = 'freeplay';
-				PlayState.storyWeek = 1;
-				PlayState.storyDifficulty = 1;
-				PlayState.lastDifficulty = 1;
-				PlayState.isStoryMode = false;
-				PlayState.chartingMode = true;
+				if (PlayState.SONG == null)
+				{
+					PlayState.gameMode = 'default';
+					PlayState.storyWeek = 1;
+					PlayState.storyDifficulty = 1;
+					PlayState.lastDifficulty = 1;
+					PlayState.isStoryMode = false;
+				}
 
 				return LoadingState.loadAndSwitchState(new ChartingState(), true);
 			}
