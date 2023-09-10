@@ -8,6 +8,11 @@ import Discord.DiscordClient;
 import psychlua.FunkinLua;
 #end
 
+#if mobile
+import mobile.MobileControls;
+import mobile.flixel.FlxMobileControlsID;
+#end
+
 import flixel.FlxG;
 import flixel.util.FlxSave;
 import flixel.util.FlxColor;
@@ -226,8 +231,32 @@ class ClientPrefs
 		'pause'			=> [START]
 	];
 
+	#if mobile
+	public static var mobileBinds:Map<String, Array<FlxMobileControlsID>> =
+	[
+		'note_left'		=> [LEFT],
+		'note_down'		=> [DOWN],
+		'note_up'		=> [UP],
+		'note_right'	=> [RIGHT],
+
+		'ui_left'		=> [LEFT],
+		'ui_down'		=> [DOWN],
+		'ui_up'			=> [UP],
+		'ui_right'		=> [RIGHT],
+
+		'reset'			=> [NONE],
+		'accept'		=> [A],
+		'back'			=> [B],
+		'pause'			=> [NONE]
+	];
+	#end
+
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
+
+	#if mobile
+	public static var defaultPads:Map<String, Array<FlxMobileControlsID>> = null;
+	#end
 
 	public static function resetKeys(?controller:Null<Bool> = null):Void //Null = both, False = Keyboard, True = Controller
 	{
@@ -253,6 +282,11 @@ class ClientPrefs
 
 		while (keyBind != null && keyBind.contains(NONE)) keyBind.remove(NONE);
 		while (gamepadBind != null && gamepadBind.contains(NONE)) gamepadBind.remove(NONE);
+
+		#if mobile
+		var mobileBind:Array<FlxMobileControlsID> = mobileBinds.get(key);
+		while (mobileBind != null && mobileBind.contains(NONE)) mobileBind.remove(NONE);
+		#end
 	}
 
 	public static function loadControls():Void
@@ -261,6 +295,10 @@ class ClientPrefs
 
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
+
+		#if mobile
+		defaultPads = mobileBinds.copy();
+		#end
 	}
 
 	public static function saveBinds():Void
@@ -268,7 +306,8 @@ class ClientPrefs
 		var save:FlxSave = new FlxSave();
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
-		save.data.gamepad = gamepadBinds;
+		save.data.gamepad = gamepadBinds; #if mobile
+		save.data.mobile = mobileBinds; #end
 		save.flush();
 	}
 
@@ -296,6 +335,17 @@ class ClientPrefs
 					if (gamepadBinds.exists(control)) gamepadBinds.set(control, keys);
 				}
 			}
+
+			#if mobile
+			if (save.data.mobile != null)
+			{
+				var loadedControls:Map<String, Array<FlxMobileControlsID>> = save.data.mobile;
+
+				for (control => keys in loadedControls){
+					if (mobileBinds.exists(control)) mobileBinds.set(control, keys);
+				}
+			}
+			#end
 
 			reloadVolumeKeys();
 		}

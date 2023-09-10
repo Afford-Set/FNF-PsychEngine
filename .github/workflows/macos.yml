@@ -2,7 +2,7 @@ name: MacOS
 on: [push, pull_request]
 
 jobs:
-  Build:
+  Release:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,3 +22,24 @@ jobs:
         with:
           name: MacOS Build
           path: export/release/macos/bin
+
+  Debug:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: latest
+      - name: Install Haxelib
+        run: |
+          haxelib setup ~/haxelib
+          haxelib install hxcpp > /dev/null --quiet
+          haxelib install hmm --quiet
+          haxelib run hmm install
+      - name: Compile
+        run: haxelib run openfl build mac -debug
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: MacOS Build
+          path: export/debug/macos/bin

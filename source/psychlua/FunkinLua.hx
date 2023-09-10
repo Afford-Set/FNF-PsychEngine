@@ -1993,12 +1993,22 @@ class FunkinLua
 		return 'linux';
 		#elseif mac
 		return 'mac';
-		#elseif html5
+		#elseif hl
+		return 'hashlink';
+		#elseif (html5 || emscripten)
 		return 'browser';
+		#elseif webos
+		return 'webos';
 		#elseif android
 		return 'android';
+		#elseif ios
+		return 'ios';
+		#elseif iphonesim
+		return 'iphonesimulator';
 		#elseif switch
 		return 'switch';
+		#elseif neko
+		return 'neko';
 		#else
 		return 'unknown';
 		#end

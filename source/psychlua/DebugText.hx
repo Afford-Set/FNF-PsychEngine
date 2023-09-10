@@ -4,7 +4,7 @@ import flixel.FlxG;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 
-class DebugLuaText extends FlxText
+class DebugText extends FlxText
 {
 	public var disableTime:Float = 6;
 

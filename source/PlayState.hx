@@ -32,7 +32,7 @@ import Replay;
 #end
 
 #if LUA_ALLOWED
-import psychlua.DebugLuaText;
+import psychlua.DebugText;
 import psychlua.ModchartSprite;
 #end
 
@@ -117,9 +117,10 @@ class PlayState extends MusicBeatState
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 	#end
 
+	public var debugTextGroup:FlxTypedGroup<DebugText>;
+
 	#if LUA_ALLOWED
 	public var luaArray:Array<FunkinLua> = [];
-	public var luaDebugGroup:FlxTypedGroup<DebugLuaText>;
 	#end
 
 	#if HSCRIPT_ALLOWED
@@ -312,11 +313,9 @@ class PlayState extends MusicBeatState
 
 		createStageAndChars(SONG.stage);
 
-		#if LUA_ALLOWED
-		luaDebugGroup = new FlxTypedGroup<DebugLuaText>();
-		luaDebugGroup.cameras = [camOther];
-		add(luaDebugGroup);
-		#end
+		debugTextGroup = new FlxTypedGroup<DebugText>();
+		debugTextGroup.cameras = [camOther];
+		add(debugTextGroup);
 
 		#if LUA_ALLOWED
 		var foldersToCheck:Array<String> = Paths.directoriesWithFile(Paths.getPreloadPath(), 'scripts/');
@@ -1327,20 +1326,18 @@ class PlayState extends MusicBeatState
 
 	public function addTextToDebug(text:String, color:FlxColor):Void
 	{
-		#if LUA_ALLOWED
-		var newText:DebugLuaText = luaDebugGroup.recycle(DebugLuaText);
+		var newText:DebugText = debugTextGroup.recycle(DebugText);
 		newText.text = text;
 		newText.color = color;
 		newText.disableTime = 6;
 		newText.alpha = 1;
 		newText.setPosition(10, 8 - newText.height);
 
-		luaDebugGroup.forEachAlive(function(spr:DebugLuaText):Void {
+		debugTextGroup.forEachAlive(function(spr:DebugText):Void {
 			spr.y += newText.height + 2;
 		});
 
-		luaDebugGroup.add(newText);
-		#end
+		debugTextGroup.add(newText);
 	}
 
 	public function reloadHealthBarColors():Void
