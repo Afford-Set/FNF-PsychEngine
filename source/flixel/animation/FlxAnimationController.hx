@@ -690,9 +690,9 @@ class FlxAnimationController implements IFlxDestroyable
 	{
 		for (frameName in FrameNames)
 		{
-			if (_sprite.frames.framesHash.exists(frameName))
+			if (_sprite.frames.exists(frameName))
 			{
-				var frameToAdd:FlxFrame = _sprite.frames.framesHash.get(frameName);
+				var frameToAdd = _sprite.frames.getByName(frameName);
 				AddTo.push(getFrameIndex(frameToAdd));
 			}
 		}
@@ -702,10 +702,10 @@ class FlxAnimationController implements IFlxDestroyable
 	{
 		for (index in Indices)
 		{
-			var name:String = Prefix + index + Postfix;
-			if (_sprite.frames.framesHash.exists(name))
+			final name:String = Prefix + index + Postfix;
+			if (_sprite.frames.exists(name))
 			{
-				var frameToAdd:FlxFrame = _sprite.frames.framesHash.get(name);
+				final frameToAdd = _sprite.frames.getByName(name);
 				AddTo.push(getFrameIndex(frameToAdd));
 			}
 		}
@@ -767,7 +767,7 @@ class FlxAnimationController implements IFlxDestroyable
 
 	function set_frameName(Value:String):String
 	{
-		if (_sprite.frames != null && _sprite.frames.framesHash.exists(Value))
+		if (_sprite.frames != null && _sprite.frames.exists(Value))
 		{
 			if (_curAnim != null)
 			{
@@ -775,7 +775,7 @@ class FlxAnimationController implements IFlxDestroyable
 				_curAnim = null;
 			}
 
-			var frame = _sprite.frames.framesHash.get(Value);
+			var frame = _sprite.frames.getByName(Value);
 			if (frame != null)
 			{
 				frameIndex = getFrameIndex(frame);
