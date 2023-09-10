@@ -2,13 +2,22 @@
 Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
 ## Installation:
-You must have [Haxe version 4.2.5](https://haxe.org/download/version/4.2.5/), seriously, stop using older or newer versions, it won't work!
+1. Download [Haxe](https://haxe.org/download/).
+2. Download [git-scm](https://git-scm.com/downloads). Works for Windows, Mac, and Linux, just select your build.
+Install Visual Studio Community 2022.
+3. Install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/).
+4. While installing VSC, don't click on any of the options to install workloads. Instead, go to the individual components tab and choose the following:
+- MSVC v143 - VS 2022 C++ x64/x86 build tools
+- Windows SDK (10.0.20348.0) and (10.0.22621.0)
 
-open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm`
+5. Open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm` after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Psych Engine!* If the compiler gives an error saying that hxCodec cannot be found read this issue to fix it: ShadowMario/FNF-PsychEngine#12770
 
-after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Psych Engine!*
-
-If the compiler gives an error saying that hxCodec cannot be found read this issue to fix it: ShadowMario/FNF-PsychEngine#12770
+## Supported platforms:
+- Hashlink
+- Windows
+- Linux
+- MacOS
+- HTML5
 
 ## Customization:
 
