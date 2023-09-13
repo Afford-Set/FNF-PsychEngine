@@ -39,8 +39,8 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 	public var nextDialogueThing:Void->Void = null;
 	public var skipDialogueThing:Void->Void = null;
 
-	var bgFade:FlxSprite = null;
-	var box:FlxSprite;
+	var bgFade:Sprite = null;
+	var box:Sprite;
 	var textToType:String = '';
 
 	var arrayCharacters:Array<DialogueCharacter> = [];
@@ -62,7 +62,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 			FlxG.sound.music.fadeIn(2, 0, 1);
 		}
 		
-		bgFade = new FlxSprite(-500, -500);
+		bgFade = new Sprite(-500, -500);
 		bgFade.makeGraphic(FlxG.width * 2, FlxG.height * 2, FlxColor.WHITE);
 		bgFade.scrollFactor.set();
 		bgFade.visible = true;
@@ -72,7 +72,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		this.dialogueList = dialogueList;
 		spawnCharacters();
 
-		box = new FlxSprite(70, 370);
+		box = new Sprite(70, 370);
 
 		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
 			box.frames = Paths.getSparrowAtlas('speech_bubble');
@@ -90,8 +90,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		box.animation.addByPrefix('center-normalOpen', 'Speech Bubble Middle Open', 24, false);
 		box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
 		box.animation.addByPrefix('center-angryOpen', 'speech bubble Middle loud open', 24, false);
-		box.animation.play('normal', true);
-		box.antialiasing = ClientPrefs.globalAntialiasing;
+		box.playAnim('normal', true);
 		box.visible = false;
 		box.setGraphicSize(Std.int(box.width * 0.9));
 		box.updateHitbox();
@@ -212,7 +211,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 						for (j in 0...checkArray.length)
 						{
 							if (animName == checkArray[j] + textBoxTypes[i] || animName == checkArray[j] + textBoxTypes[i] + 'Open') {
-								box.animation.play(checkArray[j] + textBoxTypes[i] + 'Open', true);
+								box.playAnim(checkArray[j] + textBoxTypes[i] + 'Open', true);
 							}
 						}
 					}
@@ -263,7 +262,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 					for (j in 0...checkArray.length)
 					{
 						if (animName == checkArray[j] + textBoxTypes[i] || animName == checkArray[j] + textBoxTypes[i] + 'Open') {
-							box.animation.play(checkArray[j] + textBoxTypes[i], true);
+							box.playAnim(checkArray[j] + textBoxTypes[i], true);
 						}
 					}
 				}
@@ -442,14 +441,14 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 
 		if (character != lastCharacter)
 		{
-			box.animation.play(centerPrefix + boxType + 'Open', true);
+			box.playAnim(centerPrefix + boxType + 'Open', true);
 			updateBoxOffsets(box);
 
 			box.flipX = (lePosition == 'left');
 		}
 		else if (boxType != lastBoxType)
 		{
-			box.animation.play(centerPrefix + boxType, true);
+			box.playAnim(centerPrefix + boxType, true);
 			updateBoxOffsets(box);
 		}
 
@@ -498,7 +497,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		return cast Json.parse(Paths.getTextFromFile(path));
 	}
 
-	public static function updateBoxOffsets(box:FlxSprite):Void //Had to make it static because of the editors
+	public static function updateBoxOffsets(box:Sprite):Void //Had to make it static because of the editors
 	{
 		box.centerOffsets();
 		box.updateHitbox();

@@ -1,8 +1,6 @@
 package;
 
-import flixel.FlxSprite;
-
-class BGSprite extends FlxSprite
+class BGSprite extends Sprite
 {
 	private var idleAnim:String;
 
@@ -22,7 +20,7 @@ class BGSprite extends FlxSprite
 				if (idleAnim == null)
 				{
 					idleAnim = anim;
-					animation.play(anim);
+					playAnim(anim);
 				}
 			}
 		}
@@ -36,13 +34,12 @@ class BGSprite extends FlxSprite
 		}
 
 		scrollFactor.set(scrollX, scrollY);
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	public function dance(?forceplay:Bool = false):Void
 	{
 		if (idleAnim != null) {
-			animation.play(idleAnim, forceplay);
+			playAnim(idleAnim, forceplay);
 		}
 	}
 }

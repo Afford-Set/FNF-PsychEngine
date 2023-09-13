@@ -1,4 +1,4 @@
-package psychlua;
+package;
 
 import flixel.FlxG;
 import flixel.text.FlxText;

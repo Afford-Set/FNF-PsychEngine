@@ -79,8 +79,8 @@ class Paths
 	public static var dumpExclusions:Array<String> =
 	[
 		'assets/music/freakyMenu.$SOUND_EXT',
-		'shared:assets/shared/music/breakfast.$SOUND_EXT',
-		'shared:assets/shared/music/tea-time.$SOUND_EXT',
+		'assets/shared/music/breakfast.$SOUND_EXT',
+		'assets/shared/music/tea-time.$SOUND_EXT',
 	];
 
 	public static var localTrackedAssets:Array<String> = []; // define the locally tracked assets
@@ -164,24 +164,24 @@ class Paths
 
 	public static function getPath(file:String, type:AssetType, ?library:Null<String> = null):String
 	{
-		if (library != null) {
+		if (library != null && library.length > 0) {
 			return getLibraryPath(file, library);
 		}
 
-		if (currentLevel != null)
+		if (currentLevel != null && currentLevel.length > 0)
 		{
 			var levelPath:String = '';
 
 			if (currentLevel != 'shared')
 			{
-				levelPath = getLibraryPathForce(file, currentLevel);
+				levelPath = getLibraryPath(file, currentLevel);
 
 				if (OpenFlAssets.exists(levelPath, type)) {
 					return levelPath;
 				}
 			}
 
-			levelPath = getLibraryPathForce(file, 'shared');
+			levelPath = getLibraryPath(file, 'shared');
 
 			if (OpenFlAssets.exists(levelPath, type)) {
 				return levelPath;
@@ -551,12 +551,14 @@ class Paths
 		{
 			if (getFileLocation) return gottenPath;
 
-			if (!currentTrackedSounds.exists(gottenPath)) {
-				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(gottenPath));
+			var cutPath:String = gottenPath.substr(gottenPath.indexOf(':') + 1);
+
+			if (!currentTrackedSounds.exists(cutPath)) {
+				currentTrackedSounds.set(cutPath, OpenFlAssets.getSound(gottenPath));
 			}
 
-			localTrackedAssets.push(gottenPath);
-			return currentTrackedSounds.get(gottenPath);
+			localTrackedAssets.push(cutPath);
+			return currentTrackedSounds.get(cutPath);
 		}
 
 		if (!getFileLocation) {

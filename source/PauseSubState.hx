@@ -84,7 +84,7 @@ class PauseSubState extends MusicBeatSubState
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
 		FlxG.sound.list.add(pauseMusic);
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0;
 		bg.scrollFactor.set();
@@ -443,6 +443,8 @@ class PauseSubState extends MusicBeatSubState
 					DiscordClient.resetClientID(); #end
 
 					PlayState.deathCounter = 0;
+
+					PlayState.SONG = null;
 
 					PlayState.seenCutscene = false;
 					PlayState.usedPractice = false;

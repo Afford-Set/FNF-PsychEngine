@@ -59,9 +59,9 @@ class TitleState extends MusicBeatState
 
 	var titleJSON:TitleData;
 
-	var blackScreen:FlxSprite;
+	var blackScreen:Sprite;
 	var textGroup:FlxGroup;
-	var ngSpr:FlxSprite;
+	var ngSpr:Sprite;
 
 	var mustUpdate:Bool = false;
 	var curWacky:Array<String> = [];
@@ -199,11 +199,11 @@ class TitleState extends MusicBeatState
 		startIntro();
 	}
 
-	var logoBl:FlxSprite;
-	var gfDance:FlxSprite;
+	var logoBl:Sprite;
+	var gfDance:Sprite;
 	var swagShader:ColorSwap = null;
 	var danceLeft:Bool = false;
-	var titleText:FlxSprite;
+	var titleText:Sprite;
 	var titleTextColors:Array<FlxColor> = [0xFF33FFFF, 0xFF3333CC];
 	var titleTextAlphas:Array<Float> = [1, .64];
 	var newTitle:Bool = false;
@@ -224,7 +224,7 @@ class TitleState extends MusicBeatState
 		Conductor.bpm = titleJSON.bpm;
 		persistentUpdate = true;
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 
 		if (titleJSON.backgroundSprite != null && titleJSON.backgroundSprite.length > 0 && titleJSON.backgroundSprite != 'none')
 		{
@@ -243,7 +243,7 @@ class TitleState extends MusicBeatState
 
 		if (ClientPrefs.shadersEnabled) swagShader = new ColorSwap();
 
-		gfDance = new FlxSprite(titleJSON.gfx, titleJSON.gfy);
+		gfDance = new Sprite(titleJSON.gfx, titleJSON.gfy);
 
 		var easterEgg:String = FlxG.save.data.psychDevsEasterEgg;
 		if (easterEgg == null) easterEgg = ''; //html5 fix
@@ -294,7 +294,7 @@ class TitleState extends MusicBeatState
 		gfDance.antialiasing = ClientPrefs.globalAntialiasing && titleJSON.gfantialiasing;
 		add(gfDance);
 
-		logoBl = new FlxSprite(titleJSON.titlex, titleJSON.titley);
+		logoBl = new Sprite(titleJSON.titlex, titleJSON.titley);
 
 		if (Paths.fileExists('images/logoBumpin.png', IMAGE)) {
 			logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
@@ -304,7 +304,6 @@ class TitleState extends MusicBeatState
 		}
 
 		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.antialiasing = ClientPrefs.globalAntialiasing;
 		logoBl.updateHitbox();
 		add(logoBl);
 
@@ -314,7 +313,7 @@ class TitleState extends MusicBeatState
 			logoBl.shader = swagShader.shader;
 		}
 
-		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
+		titleText = new Sprite(titleJSON.startx, titleJSON.starty);
 
 		if (Paths.fileExists('images/titleEnter.png', IMAGE)) {
 			titleText.frames = Paths.getSparrowAtlas('titleEnter');
@@ -345,18 +344,18 @@ class TitleState extends MusicBeatState
 			titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 		}
 
-		titleText.antialiasing = ClientPrefs.globalAntialiasing;
-		titleText.animation.play('idle');
+		titleText.playAnim('idle');
 		titleText.updateHitbox();
 		add(titleText);
 
-		blackScreen = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
+		blackScreen = new Sprite();
+		blackScreen.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		add(blackScreen);
 
 		textGroup = new FlxGroup();
 		add(textGroup);
 
-		ngSpr = new FlxSprite(0, FlxG.height * 0.52);
+		ngSpr = new Sprite(0, FlxG.height * 0.52);
 
 		if (Paths.fileExists('images/newgrounds_logo.png', IMAGE)) {
 			ngSpr.loadGraphic(Paths.getImage('newgrounds_logo'));
@@ -368,7 +367,6 @@ class TitleState extends MusicBeatState
 		ngSpr.setGraphicSize(Std.int(ngSpr.width * 0.8));
 		ngSpr.updateHitbox();
 		ngSpr.screenCenter(X);
-		ngSpr.antialiasing = ClientPrefs.globalAntialiasing;
 		ngSpr.visible = false;
 		add(ngSpr);
 
@@ -451,7 +449,7 @@ class TitleState extends MusicBeatState
 				{
 					if (titleText != null)
 					{
-						titleText.animation.play('press');
+						titleText.playAnim('press');
 						titleText.color = FlxColor.WHITE;
 						titleText.alpha = 1;
 					}
@@ -461,7 +459,7 @@ class TitleState extends MusicBeatState
 
 					transitioning = true;
 
-					new FlxTimer().start(1, function(tmr:FlxTimer)
+					new FlxTimer().start(1, function(tmr:FlxTimer):Void
 					{
 						#if CHECK_FOR_UPDATES // Check if version is outdated
 						if (mustUpdate) FlxG.switchState(new OutdatedState());
@@ -496,7 +494,7 @@ class TitleState extends MusicBeatState
 
 								FlxG.sound.play(Paths.getSound('ToggleJingle'));
 
-								var black:FlxSprite = new FlxSprite(0, 0);
+								var black:Sprite = new Sprite(0, 0);
 								black.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 								black.alpha = 0;
 								add(black);
@@ -589,7 +587,7 @@ class TitleState extends MusicBeatState
 		super.beatHit();
 
 		if (logoBl != null) {
-			logoBl.animation.play('bump');
+			logoBl.playAnim('bump');
 		}
 
 		if (gfDance != null)
@@ -597,10 +595,10 @@ class TitleState extends MusicBeatState
 			danceLeft = !danceLeft;
 
 			if (danceLeft) {
-				gfDance.animation.play('danceRight');
+				gfDance.playAnim('danceRight');
 			}
 			else {
-				gfDance.animation.play('danceLeft');
+				gfDance.playAnim('danceLeft');
 			}
 		}
 

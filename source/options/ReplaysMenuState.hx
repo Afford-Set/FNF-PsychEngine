@@ -78,7 +78,7 @@ class ReplaysMenuState extends MusicBeatState
 		}
 		#end
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 
 		if (Paths.fileExists('images/menuBGBlue.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuBGBlue'));
@@ -89,7 +89,6 @@ class ReplaysMenuState extends MusicBeatState
 
 		bg.updateHitbox();
 		bg.screenCenter();
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		grpOptions = new FlxTypedGroup<Alphabet>();

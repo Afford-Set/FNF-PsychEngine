@@ -1,10 +1,9 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
-class PhillyGlowParticle extends FlxSprite
+class PhillyGlowParticle extends Sprite
 {
 	var lifeTime:Float = 0;
 	var decay:Float = 0;
@@ -33,8 +32,6 @@ class PhillyGlowParticle extends FlxSprite
 		scrollFactor.set(FlxG.random.float(0.3, 0.75), FlxG.random.float(0.65, 0.75));
 		velocity.set(FlxG.random.float(-40, 40), FlxG.random.float(-175, -250));
 		acceleration.set(FlxG.random.float(-10, 10), 25);
-
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	override function update(elapsed:Float):Void

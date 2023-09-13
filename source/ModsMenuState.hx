@@ -28,7 +28,7 @@ class ModsMenuState extends MusicBeatState
 {
 	var mods:Array<ModMetaData> = [];
 	static var changedAThing = false;
-	var bg:FlxSprite;
+	var bg:Sprite;
 	var intendedColor:Int;
 	var colorTween:FlxTween;
 
@@ -66,7 +66,7 @@ class ModsMenuState extends MusicBeatState
 		DiscordClient.changePresence("In the Menus"); // Updating Discord Rich Presence
 		#end
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -78,7 +78,6 @@ class ModsMenuState extends MusicBeatState
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.scrollFactor.set();
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		noModsTxt = new FlxText(0, 0, FlxG.width, "NO MODS INSTALLED\nPRESS BACK TO EXIT AND INSTALL A MOD", 48);
@@ -293,7 +292,7 @@ class ModsMenuState extends MusicBeatState
 
 				var totalFrames = Math.floor(loadedIcon.width / 150) * Math.floor(loadedIcon.height / 150);
 				newMod.icon.animation.add("icon", [for (i in 0...totalFrames) i],10);
-				newMod.icon.animation.play("icon");
+				newMod.icon.playAnim("icon");
 			}
 			else
 			{

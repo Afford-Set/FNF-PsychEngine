@@ -1,15 +1,13 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 
 using StringTools;
 
-class RatingSprite extends FlxSprite
+class RatingSprite extends Sprite
 {
-	public var destroyed:Bool = false;
 	public var group:FlxTypedGroup<RatingSprite>;
 	public var rating:String = 'sick';
 
@@ -94,8 +92,6 @@ class RatingSprite extends FlxSprite
 	{
 		if (!destroyed)
 		{
-			destroyed = true;
-
 			if (disappearTween != null)
 			{
 				disappearTween.cancel();

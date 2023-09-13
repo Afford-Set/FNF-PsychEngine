@@ -1,8 +1,6 @@
 package;
 
-import flixel.FlxSprite;
-
-class PhillyGlowGradient extends FlxSprite
+class PhillyGlowGradient extends Sprite
 {
 	public var originalY:Float;
 	public var originalHeight:Int = 400;
@@ -19,8 +17,6 @@ class PhillyGlowGradient extends FlxSprite
 		scrollFactor.set(0, 0.75);
 		setGraphicSize(2000, originalHeight);
 		updateHitbox();
-
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	override function update(elapsed:Float):Void

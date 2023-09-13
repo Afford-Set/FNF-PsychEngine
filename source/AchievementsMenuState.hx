@@ -29,10 +29,10 @@ class AchievementsMenuState extends MusicBeatState
 	private var grpTexts:FlxTypedGroup<Alphabet>;
 	private var grpAchievements:FlxTypedGroup<AttachedAchievement>;
 
-	private var descBox:FlxSprite;
+	private var descBox:Sprite;
 	private var descText:FlxText;
 
-	var bg:FlxSprite;
+	var bg:Sprite;
 
 	var startingTweenBGColor:Bool = true;
 	var startColor:FlxColor = FlxColor.WHITE;
@@ -45,7 +45,7 @@ class AchievementsMenuState extends MusicBeatState
 		DiscordClient.changePresence("Achievements Menu");
 		#end
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -58,7 +58,6 @@ class AchievementsMenuState extends MusicBeatState
 		bg.screenCenter();
 		bg.scrollFactor.set();
 		bg.color = startColor;
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		grpTexts = new FlxTypedGroup<Alphabet>();
@@ -104,7 +103,7 @@ class AchievementsMenuState extends MusicBeatState
 
 		if (curSelected >= achievements.length) curSelected = 0;
 
-		descBox = new FlxSprite();
+		descBox = new Sprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
 		descBox.alpha = 0.6;
 		add(descBox);

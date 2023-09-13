@@ -35,7 +35,7 @@ using StringTools;
 
 class DialogueCharacterEditorState extends MusicBeatUIState
 {
-	var box:FlxSprite;
+	var box:Sprite;
 	var daText:TypedAlphabet = null;
 
 	private var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
@@ -117,16 +117,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		ghostIdle.cameras = [camGame];
 		add(ghostIdle);
 
-		box = new FlxSprite(70, 370);
-
-		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
-			box.frames = Paths.getSparrowAtlas('speech_bubble');
-		}
-		else {
-			box.frames = Paths.getSparrowAtlas('dialogue/speech_bubble');
-		}
-
-		box = new FlxSprite(70, 370);
+		box = new Sprite(70, 370);
 
 		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
 			box.frames = Paths.getSparrowAtlas('speech_bubble');
@@ -140,8 +131,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 		box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
 		box.animation.addByPrefix('center', 'speech bubble middle', 24);
 		box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
-		box.animation.play('normal', true);
-		box.antialiasing = ClientPrefs.globalAntialiasing;
+		box.playAnim('normal', true);
 		box.setGraphicSize(Std.int(box.width * 0.9));
 		box.updateHitbox();
 		hudGroup.add(box);
@@ -551,7 +541,7 @@ class DialogueCharacterEditorState extends MusicBeatUIState
 				anim = character.jsonFile.dialogue_pos;
 		}
 
-		box.animation.play(anim, true);
+		box.playAnim(anim, true);
 		DialogueBoxPsych.updateBoxOffsets(box);
 	}
 

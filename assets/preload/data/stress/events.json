@@ -2565,9 +2565,9 @@
 						"dad"
 					],
 					[
-						"Set Property",
-						"defaultCamZoom",
-						"1.08"
+						"Set Camera Zoom",
+						"1.08",
+						""
 					],
 					[
 						"Camera Follow Pos",
@@ -2760,13 +2760,13 @@
 						""
 					],
 					[
-						"Set Property",
-						"defaultCamZoom",
-						"0.9"
+						"Set Camera Zoom",
+						"",
+						""
 					],
 					[
-						"Call From Object",
-						"cameraMovementSection",
+						"Move Camera",
+						"dad",
 						""
 					]
 				]

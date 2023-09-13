@@ -198,7 +198,11 @@ class CoolUtil
 
 	public static function listFromString(string:String):Array<String>
 	{
-		return [for (i in string.trim().split('\n')) i.trim()];
+		if (string != null && string.length > 0) {
+			return [for (i in string.trim().split('\n')) i.trim()];
+		}
+
+		return [];
 	}
 
 	public static function numberArray(max:Int, ?min:Int = 0):Array<Int>
@@ -212,6 +216,35 @@ class CoolUtil
 		Sys.command('/usr/bin/xdg-open', [site]);
 		#else
 		return FlxG.openURL(site);
+		#end
+	}
+
+	public static function getBuildTarget():String // clone functions
+	{
+		#if windows
+		return 'windows';
+		#elseif linux
+		return 'linux';
+		#elseif mac
+		return 'mac';
+		#elseif hl
+		return 'hashlink';
+		#elseif (html5 || emscripten)
+		return 'browser';
+		#elseif webos
+		return 'webos';
+		#elseif android
+		return 'android';
+		#elseif ios
+		return 'ios';
+		#elseif iphonesim
+		return 'iphonesimulator';
+		#elseif switch
+		return 'switch';
+		#elseif neko
+		return 'neko';
+		#else
+		return 'unknown';
 		#end
 	}
 

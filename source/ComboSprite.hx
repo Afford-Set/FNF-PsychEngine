@@ -1,15 +1,13 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 
 using StringTools;
 
-class ComboSprite extends FlxSprite
+class ComboSprite extends Sprite
 {
-	public var destroyed:Bool = false;
 	public var group:FlxTypedGroup<ComboSprite>;
 
 	public function new(x:Float = 705, suffix:String = null):Void
@@ -49,7 +47,7 @@ class ComboSprite extends FlxSprite
 		updateHitbox();
 
 		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
-		setPosition(x + offset[4], y - offset[5] + 60);
+		setPosition(x + offset[2], y - offset[3] + 60);
 
 		visible = ClientPrefs.showCombo;
 	}
@@ -88,8 +86,6 @@ class ComboSprite extends FlxSprite
 	{
 		if (!destroyed)
 		{
-			destroyed = true;
-
 			if (disappearTween != null)
 			{
 				disappearTween.cancel();

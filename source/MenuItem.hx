@@ -1,14 +1,13 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 
 using StringTools;
 
-class MenuItem extends FlxSprite
+class MenuItem extends Sprite
 {
 	public static var DEFAULT_COLOR:FlxColor = 0xFF33ffff;
 
@@ -28,8 +27,6 @@ class MenuItem extends FlxSprite
 		else {
 			loadGraphic(Paths.getImage('storymenu/menuitems/' + weekName));
 		}
-
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	public var isFlashing:Bool = false;

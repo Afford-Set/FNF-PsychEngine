@@ -23,9 +23,8 @@ class NoteOffsetState extends MusicBeatState
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
 
-	var coolText:FlxText;
-	var rating:FlxSprite;
-	var comboNums:FlxSpriteGroup;
+	var rating:Sprite;
+	var comboNums:FlxTypedSpriteGroup<Sprite>;
 	var dumbTexts:FlxTypedGroup<FlxText>;
 
 	var barPercent:Float = 0;
@@ -38,7 +37,7 @@ class NoteOffsetState extends MusicBeatState
 
 	var changeModeText:FlxText;
 
-	var controllerPointer:FlxSprite;
+	var controllerPointer:FlxShapeCircle;
 	var _lastControllerMode:Bool = false;
 
 	override function create():Void
@@ -124,7 +123,7 @@ class NoteOffsetState extends MusicBeatState
 		boyfriend.y += boyfriend.positionArray[1];
 		add(boyfriend);
 
-		rating = new FlxSprite();
+		rating = new Sprite();
 
 		if (Paths.fileExists('images/sick.png', IMAGE)) {
 			rating.loadGraphic(Paths.getImage('sick'));
@@ -136,10 +135,9 @@ class NoteOffsetState extends MusicBeatState
 		rating.cameras = [camHUD];
 		rating.setGraphicSize(Std.int(rating.width * 0.7));
 		rating.updateHitbox();
-		rating.antialiasing = ClientPrefs.globalAntialiasing;
 		add(rating);
 
-		comboNums = new FlxSpriteGroup();
+		comboNums = new FlxTypedSpriteGroup<Sprite>();
 		comboNums.cameras = [camHUD];
 		add(comboNums);
 
@@ -153,7 +151,7 @@ class NoteOffsetState extends MusicBeatState
 
 		for (i in seperatedScore)
 		{
-			var numScore:FlxSprite = new FlxSprite(43 * daLoop);
+			var numScore:Sprite = new Sprite(43 * daLoop);
 
 			if (Paths.fileExists('images/num' + i + '.png', IMAGE)) {
 				numScore.loadGraphic(Paths.getImage('num'));
@@ -165,8 +163,8 @@ class NoteOffsetState extends MusicBeatState
 			numScore.cameras = [camHUD];
 			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
 			numScore.updateHitbox();
-			numScore.antialiasing = ClientPrefs.globalAntialiasing;
 			comboNums.add(numScore);
+
 			daLoop++;
 		}
 
@@ -209,7 +207,7 @@ class NoteOffsetState extends MusicBeatState
 		add(timeBar);
 		add(timeTxt);
 
-		var blackBox:FlxSprite = new FlxSprite();
+		var blackBox:Sprite = new Sprite();
 		blackBox.makeGraphic(FlxG.width, 40, FlxColor.BLACK);
 		blackBox.scrollFactor.set();
 		blackBox.alpha = 0.6;

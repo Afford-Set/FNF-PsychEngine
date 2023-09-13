@@ -40,7 +40,7 @@ class DialogueEditorState extends MusicBeatUIState
 
 	var character:DialogueCharacter;
 
-	var box:FlxSprite;
+	var box:Sprite;
 	var daText:TypedAlphabet;
 
 	var selectedText:FlxText;
@@ -73,7 +73,7 @@ class DialogueEditorState extends MusicBeatUIState
 		character.scrollFactor.set();
 		add(character);
 
-		box = new FlxSprite(70, 370);
+		box = new Sprite(70, 370);
 
 		if (Paths.fileExists('images/speech_bubble.png', IMAGE)) {
 			box.frames = Paths.getSparrowAtlas('speech_bubble');
@@ -87,8 +87,7 @@ class DialogueEditorState extends MusicBeatUIState
 		box.animation.addByPrefix('angry', 'AHH speech bubble', 24);
 		box.animation.addByPrefix('center', 'speech bubble middle', 24);
 		box.animation.addByPrefix('center-angry', 'AHH Speech Bubble middle', 24);
-		box.animation.play('normal', true);
-		box.antialiasing = ClientPrefs.globalAntialiasing;
+		box.playAnim('normal', true);
 		box.setGraphicSize(Std.int(box.width * 0.9));
 		box.updateHitbox();
 		add(box);
@@ -224,7 +223,7 @@ class DialogueEditorState extends MusicBeatUIState
 			}
 		}
 
-		box.animation.play(anim, true);
+		box.playAnim(anim, true);
 		DialogueBoxPsych.updateBoxOffsets(box);
 	}
 

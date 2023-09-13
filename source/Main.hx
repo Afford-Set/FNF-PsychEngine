@@ -11,9 +11,6 @@ import llua.State;
 import llua.Convert;
 #end
 
-import psychlua.HScript;
-import psychlua.FunkinLua;
-
 #if CRASH_HANDLER
 #if desktop
 import sys.io.File;

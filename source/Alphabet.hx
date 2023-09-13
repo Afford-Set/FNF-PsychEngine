@@ -1,7 +1,6 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.group.FlxSpriteGroup;
@@ -276,7 +275,7 @@ typedef Letter =
 	?offsetsBold:Array<Float>
 }
 
-class AlphaCharacter extends FlxSprite
+class AlphaCharacter extends Sprite
 {
 	public var image(default, set):String;
 
@@ -362,7 +361,6 @@ class AlphaCharacter extends FlxSprite
 		}
 
 		image = path;
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	public var curLetter:Letter = null;
@@ -420,7 +418,7 @@ class AlphaCharacter extends FlxSprite
 
 			var anim:String = alphaAnim + suffix;
 			animation.addByPrefix(anim, anim, 24);
-			animation.play(anim, true);
+			playAnim(anim, true);
 
 			if (animation.curAnim == null)
 			{
@@ -428,7 +426,7 @@ class AlphaCharacter extends FlxSprite
 
 				anim = 'question' + suffix;
 				animation.addByPrefix(anim, anim, 24);
-				animation.play(anim, true);
+				playAnim(anim, true);
 			}
 		}
 
@@ -472,8 +470,8 @@ class AlphaCharacter extends FlxSprite
 		if (lastAnim != null)
 		{
 			animation.addByPrefix(lastAnim, lastAnim, 24);
-			animation.play(lastAnim, true);
-			
+			playAnim(lastAnim, true);
+
 			updateHitbox();
 		}
 

@@ -29,7 +29,7 @@ class StoryMenuState extends MusicBeatState
 	private var weeksArray:Array<WeekData> = [];
 	private var curWeek:WeekData;
 
-	var bgSprite:FlxSprite;
+	var bgSprite:Sprite;
 
 	var scoreText:FlxText;
 	var txtWeekTitle:FlxText;
@@ -40,9 +40,9 @@ class StoryMenuState extends MusicBeatState
 
 	var txtTracklist:FlxText;
 
-	var sprDifficulty:FlxSprite;
-	var leftArrow:FlxSprite;
-	var rightArrow:FlxSprite;
+	var sprDifficulty:Sprite;
+	var leftArrow:Sprite;
+	var rightArrow:Sprite;
 
 	override function create():Void
 	{
@@ -73,7 +73,7 @@ class StoryMenuState extends MusicBeatState
 		grpLocks = new FlxTypedGroup<AttachedSprite>();
 		add(grpLocks);
 
-		var blackBarThingie:FlxSprite = new FlxSprite();
+		var blackBarThingie:Sprite = new Sprite();
 		blackBarThingie.makeGraphic(FlxG.width, 56, FlxColor.BLACK);
 		add(blackBarThingie);
 
@@ -86,12 +86,11 @@ class StoryMenuState extends MusicBeatState
 		txtWeekTitle.alpha = 0.7;
 		add(txtWeekTitle);
 
-		var bgYellow:FlxSprite = new FlxSprite(0, 56);
+		var bgYellow:Sprite = new Sprite(0, 56);
 		bgYellow.makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		add(bgYellow);
 
-		bgSprite = new FlxSprite(0, 56);
-		bgSprite.antialiasing = ClientPrefs.globalAntialiasing;
+		bgSprite = new Sprite(0, 56);
 		add(bgSprite);
 
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
@@ -147,13 +146,12 @@ class StoryMenuState extends MusicBeatState
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 
-		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgYellow.y + 425);
+		var tracksSprite:Sprite = new Sprite(FlxG.width * 0.07, bgYellow.y + 425);
 
 		var path2:String = 'storymenu/Menu_Tracks';
 		if (Paths.fileExists('images/Menu_Tracks.png', IMAGE)) path2 = 'Menu_Tracks';
 
 		tracksSprite.loadGraphic(Paths.getImage(path2));
-		tracksSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		add(tracksSprite);
 
 		txtTracklist = new FlxText(FlxG.width * 0.05, tracksSprite.y + 60);
@@ -162,27 +160,24 @@ class StoryMenuState extends MusicBeatState
 
 		var ui_tex:FlxFramesCollection = Paths.getSparrowAtlas(path);
 
-		leftArrow = new FlxSprite(872, 462);
+		leftArrow = new Sprite(872, 462);
 		leftArrow.frames = ui_tex;
 		leftArrow.animation.addByPrefix('idle', 'arrow left', 24, false);
 		leftArrow.animation.addByPrefix('press', 'arrow push left', 24, false);
-		leftArrow.animation.play('idle');
-		leftArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		leftArrow.playAnim('idle');
 		add(leftArrow);
 
-		sprDifficulty = new FlxSprite(0, leftArrow.y);
-		sprDifficulty.antialiasing = ClientPrefs.globalAntialiasing;
+		sprDifficulty = new Sprite(0, leftArrow.y);
 		add(sprDifficulty);
 
-		rightArrow = new FlxSprite(leftArrow.x + 376, leftArrow.y);
+		rightArrow = new Sprite(leftArrow.x + 376, leftArrow.y);
 		rightArrow.frames = ui_tex;
 		rightArrow.animation.addByPrefix('idle', 'arrow right', 24, false);
 		rightArrow.animation.addByPrefix('press', 'arrow push right', 24, false);
-		rightArrow.animation.play('idle');
-		rightArrow.antialiasing = ClientPrefs.globalAntialiasing;
+		rightArrow.playAnim('idle');
 		add(rightArrow);
 
-		var textBG:FlxSprite = new FlxSprite(0, FlxG.height);
+		var textBG:Sprite = new Sprite(0, FlxG.height);
 		textBG.makeGraphic(FlxG.width, 26, FlxColor.BLACK);
 		textBG.alpha = 0.6;
 		add(textBG);
@@ -240,21 +235,21 @@ class StoryMenuState extends MusicBeatState
 			{
 				if (controls.UI_LEFT_P)
 				{
-					leftArrow.animation.play('press');
+					leftArrow.playAnim('press');
 
 					changeDifficulty(-1);
 					holdTimeDiff = 0;
 				}
-				else if (controls.UI_LEFT_R) leftArrow.animation.play('idle');
+				else if (controls.UI_LEFT_R) leftArrow.playAnim('idle');
 
 				if (controls.UI_RIGHT_P)
 				{
-					rightArrow.animation.play('press');
+					rightArrow.playAnim('press');
 
 					changeDifficulty(1);
 					holdTimeDiff = 0;
 				}
-				else if (controls.UI_RIGHT_R) rightArrow.animation.play('idle');
+				else if (controls.UI_RIGHT_R) rightArrow.playAnim('idle');
 
 				if (controls.UI_LEFT || controls.UI_RIGHT)
 				{

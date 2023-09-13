@@ -35,28 +35,28 @@ class NotesSubState extends MusicBeatSubState
 	var onPixel:Bool = false;
 	var dataArray:Array<Array<FlxColor>>;
 
-	var hexTypeLine:FlxSprite;
+	var hexTypeLine:Sprite;
 	var hexTypeNum:Int = -1;
 	var hexTypeVisibleTimer:Float = 0;
 
-	var copyButton:FlxSprite;
-	var pasteButton:FlxSprite;
+	var copyButton:Sprite;
+	var pasteButton:Sprite;
 
 	var colorGradient:FlxSprite;
-	var colorGradientSelector:FlxSprite;
-	var colorPalette:FlxSprite;
-	var colorWheel:FlxSprite;
-	var colorWheelSelector:FlxSprite;
+	var colorGradientSelector:Sprite;
+	var colorPalette:Sprite;
+	var colorWheel:Sprite;
+	var colorWheelSelector:FlxShapeCircle;
 
 	var alphabetR:Alphabet;
 	var alphabetG:Alphabet;
 	var alphabetB:Alphabet;
 	var alphabetHex:Alphabet;
 
-	var modeBG:FlxSprite;
-	var notesBG:FlxSprite;
+	var modeBG:Sprite;
+	var notesBG:Sprite;
 
-	var controllerPointer:FlxSprite; // controller support
+	var controllerPointer:FlxShapeCircle; // controller support
 	var _lastControllerMode:Bool = false;
 	var tipTxt:FlxText;
 
@@ -64,30 +64,30 @@ class NotesSubState extends MusicBeatSubState
 	{
 		super();
 
-		modeBG = new FlxSprite(215, 85);
+		modeBG = new Sprite(215, 85);
 		modeBG.makeGraphic(315, 115, FlxColor.BLACK);
 		modeBG.visible = false;
 		modeBG.alpha = 0.4;
 		add(modeBG);
 
-		notesBG = new FlxSprite(140, 190);
+		notesBG = new Sprite(140, 190);
 		notesBG.makeGraphic(480, 125, FlxColor.BLACK);
 		notesBG.visible = false;
 		notesBG.alpha = 0.4;
 		add(notesBG);
 
-		modeNotes = new FlxTypedGroup<FlxSprite>();
+		modeNotes = new FlxTypedGroup<Sprite>();
 		add(modeNotes);
 
 		myNotes = new FlxTypedGroup<StrumNote>();
 		add(myNotes);
 
-		var bg:FlxSprite = new FlxSprite(720);
+		var bg:Sprite = new Sprite(720);
 		bg.makeGraphic(FlxG.width - 720, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0.25;
 		add(bg);
 
-		var bg:FlxSprite = new FlxSprite(750, 160);
+		var bg:Sprite = new Sprite(750, 160);
 		bg.makeGraphic(FlxG.width - 780, 540, FlxColor.BLACK);
 		bg.alpha = 0.25;
 		add(bg);
@@ -97,12 +97,12 @@ class NotesSubState extends MusicBeatSubState
 		text.setScale(0.4);
 		add(text);
 
-		copyButton = new FlxSprite(760, 50);
+		copyButton = new Sprite(760, 50);
 		copyButton.loadGraphic(Paths.getImage('noteColorMenu/copy'));
 		copyButton.alpha = 0.6;
 		add(copyButton);
 
-		pasteButton = new FlxSprite(1180, 50);
+		pasteButton = new Sprite(1180, 50);
 		pasteButton.loadGraphic(Paths.getImage('noteColorMenu/paste'));
 		pasteButton.alpha = 0.6;
 		add(pasteButton);
@@ -111,19 +111,18 @@ class NotesSubState extends MusicBeatSubState
 		colorGradient.setPosition(780, 200);
 		add(colorGradient);
 
-		colorGradientSelector = new FlxSprite(770, 200);
+		colorGradientSelector = new Sprite(770, 200);
 		colorGradientSelector.makeGraphic(80, 10, FlxColor.WHITE);
 		colorGradientSelector.offset.y = 5;
 		add(colorGradientSelector);
 
-		colorPalette = new FlxSprite(820, 580);
+		colorPalette = new Sprite(820, 580);
 		colorPalette.loadGraphic(Paths.getImage('noteColorMenu/palette', false));
 		colorPalette.scale.set(20, 20);
 		colorPalette.updateHitbox();
-		colorPalette.antialiasing = false;
 		add(colorPalette);
 		
-		colorWheel = new FlxSprite(860, 200);
+		colorWheel = new Sprite(860, 200);
 		colorWheel.loadGraphic(Paths.getImage('noteColorMenu/colorWheel'));
 		colorWheel.setGraphicSize(360, 360);
 		colorWheel.updateHitbox();
@@ -149,7 +148,7 @@ class NotesSubState extends MusicBeatSubState
 		alphabetHex = makeColorAlphabet(txtX, txtY - 55);
 		add(alphabetHex);
 
-		hexTypeLine = new FlxSprite(0, 20);
+		hexTypeLine = new Sprite(0, 20);
 		hexTypeLine.makeGraphic(5, 62, FlxColor.WHITE);
 		hexTypeLine.visible = false;
 		add(hexTypeLine);
@@ -171,6 +170,7 @@ class NotesSubState extends MusicBeatSubState
 		tipTxt.setFormat(Paths.getFont("vcr.ttf"), 16, FlxColor.WHITE, LEFT, OUTLINE, FlxColor.BLACK);
 		tipTxt.borderSize = 2;
 		add(tipTxt);
+
 		updateTip();
 
 		controllerPointer = new FlxShapeCircle(0, 0, 20, {thickness: 0}, FlxColor.WHITE);
@@ -410,7 +410,7 @@ class NotesSubState extends MusicBeatSubState
 
 			var mousePoint:FlxPoint = pointerFlxPoint();
 
-			modeNotes.forEachAlive(function(note:FlxSprite):Void
+			modeNotes.forEachAlive(function(note:Sprite):Void
 			{
 				if (curSelectedMode != note.ID && mousePoint.x >= objPoint(note).x && mousePoint.y >= objPoint(note).y && mousePoint.x < objPoint(note).x + note.width && mousePoint.y < objPoint(note).y + note.height)
 				{
@@ -640,8 +640,8 @@ class NotesSubState extends MusicBeatSubState
 		return text;
 	}
 
-	var skinNote:FlxSprite; // notes sprites functions
-	var modeNotes:FlxTypedGroup<FlxSprite>;
+	var skinNote:Sprite; // notes sprites functions
+	var modeNotes:FlxTypedGroup<Sprite>;
 	var myNotes:FlxTypedGroup<StrumNote>;
 	var bigNote:Note;
 
@@ -650,7 +650,7 @@ class NotesSubState extends MusicBeatSubState
 		dataArray = !onPixel ? ClientPrefs.arrowRGB : ClientPrefs.arrowRGBPixel;
 		PlayState.isPixelStage = onPixel;
 
-		modeNotes.forEachAlive(function(note:FlxSprite):Void // clear groups
+		modeNotes.forEachAlive(function(note:Sprite):Void // clear groups
 		{
 			note.kill();
 			note.destroy();
@@ -679,26 +679,26 @@ class NotesSubState extends MusicBeatSubState
 
 		var res:Int = onPixel ? 160 : 17; // respawn stuff
 
-		skinNote = new FlxSprite(48, 24);
+		skinNote = new Sprite(48, 24);
 		skinNote.loadGraphic(Paths.getImage('noteColorMenu/' + (onPixel ? 'note' : 'notePixel')), true, res, res);
 		skinNote.antialiasing = ClientPrefs.globalAntialiasing && onPixel;
 		skinNote.setGraphicSize(68);
 		skinNote.updateHitbox();
 		skinNote.animation.add('anim', [0], 24, true);
-		skinNote.animation.play('anim', true);
+		skinNote.playAnim('anim', true);
 		add(skinNote);
 
 		var res:Int = !onPixel ? 160 : 17;
 
 		for (i in 0...3)
 		{
-			var newNote:FlxSprite = new FlxSprite(230 + (100 * i), 100);
+			var newNote:Sprite = new Sprite(230 + (100 * i), 100);
 			newNote.loadGraphic(Paths.getImage('noteColorMenu/' + (!onPixel ? 'note' : 'notePixel')), true, res, res);
 			newNote.antialiasing = ClientPrefs.globalAntialiasing && !onPixel;
 			newNote.setGraphicSize(85);
 			newNote.updateHitbox();
 			newNote.animation.add('anim', [i], 24, true);
-			newNote.animation.play('anim', true);
+			newNote.playAnim('anim', true);
 			newNote.ID = i;
 			modeNotes.add(newNote);
 		}

@@ -1,8 +1,6 @@
 package;
 
-import flixel.FlxSprite;
-
-class BackgroundGirls extends FlxSprite
+class BackgroundGirls extends Sprite
 {
 	var isPissed:Bool = true;
 
@@ -18,7 +16,7 @@ class BackgroundGirls extends FlxSprite
 		setGraphicSize(Std.int(width * PlayState.daPixelZoom));
 		updateHitbox();
 
-		animation.play('danceLeft');
+		playAnim('danceLeft');
 	}
 
 	var danceDir:Bool = false;
@@ -46,10 +44,10 @@ class BackgroundGirls extends FlxSprite
 		danceDir = !danceDir;
 
 		if (danceDir) {
-			animation.play('danceRight', true);
+			playAnim('danceRight', true);
 		}
 		else {
-			animation.play('danceLeft', true);
+			playAnim('danceLeft', true);
 		}
 	}
 }

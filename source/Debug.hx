@@ -207,7 +207,7 @@ class Debug // stolen from kade engine
 		// We have to set it to TRACE for now.
 		logFileWriter = new DebugLogWriter("TRACE");
 
-		logInfo("Debug logging initialized. Hello, developer.");
+		logInfo("Debug logging initialized.");
 
 		#if debug
 		logInfo("This is a DEBUG build.");

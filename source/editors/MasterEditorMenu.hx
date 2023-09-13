@@ -53,7 +53,7 @@ class MasterEditorMenu extends MusicBeatState
 		DiscordClient.changePresence("Editors Main Menu", null); // Updating Discord Rich Presence
 		#end
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -79,7 +79,7 @@ class MasterEditorMenu extends MusicBeatState
 		}
 
 		#if MODS_ALLOWED
-		var textBG:FlxSprite = new FlxSprite(0, FlxG.height - 42);
+		var textBG:Sprite = new Sprite(0, FlxG.height - 42);
 		textBG.makeGraphic(FlxG.width, 42, FlxColor.BLACK);
 		textBG.alpha = 0.6;
 		add(textBG);

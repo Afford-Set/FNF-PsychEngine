@@ -61,7 +61,7 @@ class WeekEditorState extends MusicBeatUIState
 	private var blockPressWhileTypingOnStepper:Array<FlxUINumericStepper> = [];
 	private var blockPressWhileScrolling:Array<FlxUIDropDownMenu> = [];
 
-	var bgSprite:FlxSprite;
+	var bgSprite:Sprite;
 	var lock:AttachedSprite;
 	var grpWeekCharacters:FlxTypedGroup<MenuCharacter>;
 	var txtWeekTitle:FlxText;
@@ -80,7 +80,7 @@ class WeekEditorState extends MusicBeatUIState
 		var path:String = 'storymenu/campaign_menu_UI_assets';
 		if (Paths.fileExists('images/campaign_menu_UI_assets.png', IMAGE)) path = 'campaign_menu_UI_assets';
 
-		var blackBarThingie:FlxSprite = new FlxSprite();
+		var blackBarThingie:Sprite = new Sprite();
 		blackBarThingie.makeGraphic(FlxG.width, 56, FlxColor.BLACK);
 		add(blackBarThingie);
 
@@ -89,12 +89,10 @@ class WeekEditorState extends MusicBeatUIState
 		txtWeekTitle.alpha = 0.7;
 		add(txtWeekTitle);
 
-		var bgYellow:FlxSprite = new FlxSprite(0, 56);
-		bgYellow.makeGraphic(FlxG.width, 386, 0xFFF9CF51);
+		var bgYellow:Sprite = new Sprite(0, 56);
 		add(bgYellow);
 
-		bgSprite = new FlxSprite(0, 56);
-		bgSprite.antialiasing = ClientPrefs.globalAntialiasing;
+		bgSprite = new Sprite(0, 56);
 		add(bgSprite);
 
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
@@ -125,13 +123,12 @@ class WeekEditorState extends MusicBeatUIState
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 
-		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgYellow.y + 425);
+		var tracksSprite:Sprite = new Sprite(FlxG.width * 0.07, bgYellow.y + 425);
 
 		var path2:String = 'storymenu/Menu_Tracks';
 		if (Paths.fileExists('images/Menu_Tracks.png', IMAGE)) path2 = 'Menu_Tracks';
 
 		tracksSprite.loadGraphic(Paths.getImage(path2));
-		tracksSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		add(tracksSprite);
 
 		txtTracklist = new FlxText(FlxG.width * 0.05, tracksSprite.y + 60);
@@ -930,7 +927,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 	}
 
 	var curSong:WeekSong;
-	var bg:FlxSprite;
+	var bg:Sprite;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var grpIcons:FlxTypedGroup<HealthIcon>;
@@ -939,7 +936,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 
 	override function create():Void
 	{
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -952,7 +949,6 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		bg.screenCenter();
 		bg.scrollFactor.set();
 		bg.color = FlxColor.WHITE;
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		grpSongs = new FlxTypedGroup<Alphabet>();
@@ -1007,7 +1003,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 
 		add(UI_box);
 
-		var blackBlack:FlxSprite = new FlxSprite(0, 670);
+		var blackBlack:Sprite = new Sprite(0, 670);
 		blackBlack.makeGraphic(FlxG.width, 50, FlxColor.BLACK);
 		blackBlack.alpha = 0.6;
 		add(blackBlack);

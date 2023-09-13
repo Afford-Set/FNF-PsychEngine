@@ -68,7 +68,7 @@ class ControlsSubState extends MusicBeatSubState
 	var keyboardColor:FlxColor = 0xff7192fd;
 	var onKeyboardMode:Bool = true;
 
-	var controllerSpr:FlxSprite;
+	var controllerSpr:Sprite;
 
 	public function new():Void
 	{
@@ -100,7 +100,7 @@ class ControlsSubState extends MusicBeatSubState
 		grpBinds = new FlxTypedGroup<Alphabet>();
 		add(grpBinds);
 
-		controllerSpr = new FlxSprite(50, 40);
+		controllerSpr = new Sprite(50, 40);
 
 		if (Paths.fileExists('images/controllertype.png', IMAGE)) {
 			controllerSpr.loadGraphic(Paths.getImage('controllertype'), true, 82, 60);
@@ -109,7 +109,6 @@ class ControlsSubState extends MusicBeatSubState
 			controllerSpr.loadGraphic(Paths.getImage('ui/controllertype'), true, 82, 60);
 		}
 
-		controllerSpr.antialiasing = ClientPrefs.globalAntialiasing;
 		controllerSpr.animation.add('keyboard', [0], 1, false);
 		controllerSpr.animation.add('gamepad', [1], 1, false);
 		add(controllerSpr);
@@ -293,7 +292,7 @@ class ControlsSubState extends MusicBeatSubState
 
 	var binding:Bool = false;
 	var holdingEsc:Float = 0;
-	var bindingBlack:FlxSprite;
+	var bindingBlack:Sprite;
 	var bindingText:Alphabet;
 	var bindingText2:Alphabet;
 
@@ -337,7 +336,7 @@ class ControlsSubState extends MusicBeatSubState
 				{
 					var startRebinding:Void->Void = function():Void
 					{
-						bindingBlack = new FlxSprite();
+						bindingBlack = new Sprite();
 						bindingBlack.makeGraphic(FlxG.width, FlxG.height, FlxColor.WHITE);
 						bindingBlack.alpha = 0;
 	
@@ -595,7 +594,7 @@ class ControlsSubState extends MusicBeatSubState
 
 		curSelected = 0;
 		curAlt = false;
-		controllerSpr.animation.play(onKeyboardMode ? 'keyboard' : 'gamepad');
+		controllerSpr.playAnim(onKeyboardMode ? 'keyboard' : 'gamepad');
 
 		createTexts();
 	}

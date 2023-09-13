@@ -4,7 +4,7 @@ import flixel.FlxSprite;
 import flixel.ui.FlxButton;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
-import flash.geom.Rectangle;
+import openfl.geom.Rectangle;
 
 using StringTools;
 
@@ -16,8 +16,8 @@ class Prompt extends MusicBeatSubState
 	var theText:String = '';
 	var goAnyway:Bool = false;
 
-	var panel:FlxSprite;
-	var panelbg:FlxSprite;
+	var panel:Sprite;
+	var panelbg:Sprite;
 	var buttonAccept:FlxButton;
 	var buttonNo:FlxButton;
 	var cornerSize:Int = 10;
@@ -59,8 +59,8 @@ class Prompt extends MusicBeatSubState
 		}
 		else
 		{
-			panel = new FlxSprite(0, 0);
-			panelbg = new FlxSprite(0, 0);
+			panel = new Sprite(0, 0);
+			panelbg = new Sprite(0, 0);
 
 			makeSelectorGraphic(panel, 300, 150, 0xff999999);
 			makeSelectorGraphic(panelbg, 304, 154, FlxColor.BLACK);
@@ -95,7 +95,7 @@ class Prompt extends MusicBeatSubState
 		super.create();
 	}
 	
-	function makeSelectorGraphic(panel:FlxSprite,w,h,color:FlxColor)
+	function makeSelectorGraphic(panel:FlxSprite, w:Int, h:Int, color:FlxColor):Void
 	{
 		panel.makeGraphic(w, h, color);
 		panel.pixels.fillRect(new Rectangle(0, 190, panel.width, 5), 0x0);
@@ -113,7 +113,7 @@ class Prompt extends MusicBeatSubState
 		drawCircleCornerOnSelector(panel, true, true, color);
 	}
 
-	function drawCircleCornerOnSelector(panel:FlxSprite,flipX:Bool, flipY:Bool,color:FlxColor)
+	function drawCircleCornerOnSelector(panel:FlxSprite, flipX:Bool, flipY:Bool, color:FlxColor):Void
 	{
 		var antiX:Float = (panel.width - cornerSize);
 		var antiY:Float = flipY ? (panel.height - 1) : 0;

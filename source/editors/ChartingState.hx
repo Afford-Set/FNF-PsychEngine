@@ -91,7 +91,10 @@ class ChartingState extends MusicBeatUIState
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
 		['Set Property', "Value 1: Variable name\nValue 2: New value"],
 		['Call Method', "Value 1: Function name\nValue 2: Arguments of function (with a ', ' between\nthe values)"],
-		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"]
+		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"],
+		['Set Camera Zoom', "Value 1: New camera zoom\n(Default: Stage Camera Zoom)"],
+		['Set Camera Speed', "Value 1: New camera speed\n(Default: Stage Camera Speed)"],
+		['Move Camera', "Value 1: Target (Dad, GF, BF)\n\nIf empty, camera moves to\ncharacter by current section."]
 	];
 
 	private var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
@@ -110,18 +113,18 @@ class ChartingState extends MusicBeatUIState
 	public static var lastSection:Int = 0;
 
 	var bpmTxt:FlxText;
-	var strumLine:FlxSprite;
+	var strumLine:Sprite;
 	var quant:AttachedSprite;
 
-	var dummyArrow:FlxSprite;
+	var dummyArrow:Sprite;
 
 	var strumLineNotes:FlxTypedGroup<StrumNote>;
 
-	var curRenderedSustains:FlxTypedGroup<FlxSprite>;
+	var curRenderedSustains:FlxTypedGroup<Sprite>;
 	var curRenderedNotes:FlxTypedGroup<Note>;
 	var curRenderedNoteType:FlxTypedGroup<FlxText>;
 
-	var nextRenderedSustains:FlxTypedGroup<FlxSprite>;
+	var nextRenderedSustains:FlxTypedGroup<Sprite>;
 	var nextRenderedNotes:FlxTypedGroup<Note>;
 
 	var gridBG:FlxSprite;
@@ -234,7 +237,7 @@ class ChartingState extends MusicBeatUIState
 
 		curSec = lastSection;
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
 		}
@@ -243,17 +246,16 @@ class ChartingState extends MusicBeatUIState
 		}
 		bg.scrollFactor.set();
 		bg.color = 0xFF222222;
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		gridLayer = new FlxTypedGroup<FlxSprite>();
 		add(gridLayer);
 
-		waveformSprite = new FlxSprite(GRID_SIZE, 0);
+		waveformSprite = new Sprite(GRID_SIZE, 0);
 		waveformSprite.makeGraphic(FlxG.width, FlxG.height, 0x00FFFFFF);
 		add(waveformSprite);
 
-		var eventIcon:FlxSprite = new FlxSprite(-GRID_SIZE - 5, -90);
+		var eventIcon:Sprite = new Sprite(-GRID_SIZE - 5, -90);
 		if (Paths.fileExists('images/eventArrow.png', IMAGE)) {
 			eventIcon.loadGraphic(Paths.getImage('eventArrow'));
 		}
@@ -280,11 +282,11 @@ class ChartingState extends MusicBeatUIState
 		rightIcon.setPosition(GRID_SIZE * 5.2, -100);
 		add(rightIcon);
 
-		curRenderedSustains = new FlxTypedGroup<FlxSprite>();
+		curRenderedSustains = new FlxTypedGroup<Sprite>();
 		curRenderedNotes = new FlxTypedGroup<Note>();
 		curRenderedNoteType = new FlxTypedGroup<FlxText>();
 
-		nextRenderedSustains = new FlxTypedGroup<FlxSprite>();
+		nextRenderedSustains = new FlxTypedGroup<Sprite>();
 		nextRenderedNotes = new FlxTypedGroup<Note>();
 
 		if (curSec >= _song.notes.length) curSec = _song.notes.length - 1;
@@ -306,7 +308,7 @@ class ChartingState extends MusicBeatUIState
 		bpmTxt.scrollFactor.set();
 		add(bpmTxt);
 
-		strumLine = new FlxSprite(0, 50);
+		strumLine = new Sprite(0, 50);
 		strumLine.makeGraphic(Std.int(GRID_SIZE * 9), 4);
 		add(strumLine);
 
@@ -318,7 +320,7 @@ class ChartingState extends MusicBeatUIState
 
 		quant = new AttachedSprite(ourShit, 'chart_quant');
 		quant.animation.addByPrefix('q', 'chart_quant', 0, false);
-		quant.animation.play('q', true, false, 0);
+		quant.playAnim('q', true, false, 0);
 		quant.sprTracker = strumLine;
 		quant.xAdd = -32;
 		quant.yAdd = 8;
@@ -341,7 +343,7 @@ class ChartingState extends MusicBeatUIState
 		camPos = new FlxObject(0, 0, 1, 1);
 		camPos.setPosition(strumLine.x + CAM_OFFSET, strumLine.y);
 
-		dummyArrow = new FlxSprite();
+		dummyArrow = new Sprite();
 		dummyArrow.makeGraphic(GRID_SIZE, GRID_SIZE);
 		add(dummyArrow);
 
@@ -2235,7 +2237,7 @@ class ChartingState extends MusicBeatUIState
 				updateText();
 			}
 	
-			quant.animation.play('q', true, false, curQuant);
+			quant.playAnim('q', true, false, curQuant);
 			
 			if (vortex)
 			{
@@ -2529,12 +2531,14 @@ class ChartingState extends MusicBeatUIState
 
 		if (foundNextSec)
 		{
-			var gridBlack:FlxSprite = new FlxSprite(0, gridBG.height).makeGraphic(Std.int(GRID_SIZE * 9), Std.int(nextGridBG.height), FlxColor.BLACK);
+			var gridBlack:Sprite = new Sprite(0, gridBG.height);
+			gridBlack.makeGraphic(Std.int(GRID_SIZE * 9), Std.int(nextGridBG.height), FlxColor.BLACK);
 			gridBlack.alpha = 0.4;
 			gridLayer.add(gridBlack);
 		}
 
-		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + gridBG.width - (GRID_SIZE * 4)).makeGraphic(2, leHeight, FlxColor.BLACK);
+		var gridBlackLine:Sprite = new Sprite(gridBG.x + gridBG.width - (GRID_SIZE * 4));
+		gridBlackLine.makeGraphic(2, leHeight, FlxColor.BLACK);
 		gridLayer.add(gridBlackLine);
 
 		for (i in 1...4)
@@ -2546,8 +2550,10 @@ class ChartingState extends MusicBeatUIState
 			}
 		}
 
-		var gridBlackLine:FlxSprite = new FlxSprite(gridBG.x + GRID_SIZE).makeGraphic(2, leHeight, FlxColor.BLACK);
+		var gridBlackLine:Sprite = new Sprite(gridBG.x + GRID_SIZE);
+		gridBlackLine.makeGraphic(2, leHeight, FlxColor.BLACK);
 		gridLayer.add(gridBlackLine);
+
 		updateGrid();
 
 		lastSecBeats = getSectionBeats();
@@ -3152,7 +3158,7 @@ class ChartingState extends MusicBeatUIState
 		return note;
 	}
 
-	function setupSusNote(note:Note, beats:Float):FlxSprite
+	function setupSusNote(note:Note, beats:Float):Sprite
 	{
 		var height:Int = Math.floor(FlxMath.remapToRange(note.sustainLength, 0, Conductor.stepCrochet * 16, 0, GRID_SIZE * 16 * zoomList[curZoom]) + (GRID_SIZE * zoomList[curZoom]) - GRID_SIZE / 2);
 		var minHeight:Int = Std.int((GRID_SIZE * zoomList[curZoom] / 2) + GRID_SIZE / 2);
@@ -3160,7 +3166,7 @@ class ChartingState extends MusicBeatUIState
 		if (height < minHeight) height = minHeight;
 		if (height < 1) height = 1; //Prevents error of invalid height
 
-		var spr:FlxSprite = new FlxSprite(note.x + (GRID_SIZE * 0.5) - 4, note.y + GRID_SIZE / 2);
+		var spr:Sprite = new Sprite(note.x + (GRID_SIZE * 0.5) - 4, note.y + GRID_SIZE / 2);
 		spr.makeGraphic(8, height);
 		return spr;
 	}

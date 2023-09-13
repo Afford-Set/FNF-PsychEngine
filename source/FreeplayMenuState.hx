@@ -29,14 +29,14 @@ class FreeplayMenuState extends MusicBeatState
 	private var songsArray:Array<SongMetaData> = [];
 	private var curSong:SongMetaData;
 
-	var scoreBG:FlxSprite;
+	var scoreBG:Sprite;
 	var scoreText:FlxText;
 	var diffText:FlxText;
 
 	private var grpSongs:FlxTypedGroup<Alphabet>;
 	private var grpIcons:FlxTypedGroup<HealthIcon>;
 
-	var bg:FlxSprite;
+	var bg:Sprite;
 
 	var startingTweenBGColor:Bool = true;
 	var startColor:FlxColor = FlxColor.WHITE;
@@ -82,7 +82,7 @@ class FreeplayMenuState extends MusicBeatState
 
 		Paths.loadTopMod();
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -95,7 +95,6 @@ class FreeplayMenuState extends MusicBeatState
 		bg.screenCenter();
 		bg.scrollFactor.set();
 		bg.color = startColor;
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		grpSongs = new FlxTypedGroup<Alphabet>();
@@ -131,7 +130,7 @@ class FreeplayMenuState extends MusicBeatState
 		scoreText.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, RIGHT);
 		add(scoreText);
 
-		scoreBG = new FlxSprite(scoreText.x - 6, 0);
+		scoreBG = new Sprite(scoreText.x - 6, 0);
 		scoreBG.makeGraphic(1, 66, 0x99000000);
 		insert(members.indexOf(scoreText), scoreBG);
 
@@ -139,7 +138,7 @@ class FreeplayMenuState extends MusicBeatState
 		diffText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE);
 		add(diffText);
 
-		var textBG:FlxSprite = new FlxSprite(0, FlxG.height);
+		var textBG:Sprite = new Sprite(0, FlxG.height);
 		textBG.makeGraphic(FlxG.width, 26, FlxColor.BLACK);
 		textBG.alpha = 0.6;
 		add(textBG);

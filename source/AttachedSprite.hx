@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxSprite;
 
-class AttachedSprite extends FlxSprite
+class AttachedSprite extends Sprite
 {
 	public var sprTracker:FlxSprite;
 
@@ -24,13 +24,12 @@ class AttachedSprite extends FlxSprite
 		{
 			frames = Paths.getSparrowAtlas(file, library);
 			animation.addByPrefix('idle', anim, 24, loop);
-			animation.play('idle');
+			playAnim('idle');
 		}
 		else if (file != null) {
 			loadGraphic(Paths.getImage(file));
 		}
 
-		antialiasing = ClientPrefs.globalAntialiasing;
 		scrollFactor.set();
 	}
 

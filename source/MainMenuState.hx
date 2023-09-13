@@ -43,9 +43,9 @@ class MainMenuState extends MusicBeatState
 		'options'
 	];
 
-	var menuItems:FlxTypedGroup<FlxSprite>;
+	var menuItems:FlxTypedGroup<Sprite>;
 
-	var magenta:FlxSprite;
+	var magenta:Sprite;
 	var camFollow:FlxPoint;
 	var camFollowPos:FlxObject;
 
@@ -72,13 +72,12 @@ class MainMenuState extends MusicBeatState
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
 
-		var bg:FlxSprite = new FlxSprite(-80);
+		var bg:Sprite = new Sprite(-80);
 
 		var path:String = 'bg/menuBG';
 		if (Paths.fileExists('images/menuBG.png', IMAGE)) path = 'menuBG';
 
 		bg.loadGraphic(Paths.getImage(path));
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
@@ -90,13 +89,12 @@ class MainMenuState extends MusicBeatState
 		camFollowPos = new FlxObject(0, 0, 1, 1);
 		add(camFollowPos);
 
-		magenta = new FlxSprite(-80);
+		magenta = new Sprite(-80);
 
 		var path:String = 'bg/menuDesat';
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) path = 'menuDesat';
 
 		magenta.loadGraphic(Paths.getImage(path));
-		magenta.antialiasing = ClientPrefs.globalAntialiasing;
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
 		magenta.updateHitbox();
@@ -105,7 +103,7 @@ class MainMenuState extends MusicBeatState
 		magenta.color = 0xFFfd719b;
 		add(magenta);
 
-		menuItems = new FlxTypedGroup<FlxSprite>();
+		menuItems = new FlxTypedGroup<Sprite>();
 		add(menuItems);
 
 		for (i in 0...optionShit.length)
@@ -114,14 +112,13 @@ class MainMenuState extends MusicBeatState
 
 			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
 
-			var menuItem:FlxSprite = new FlxSprite(0, (i * 140) + offset);
+			var menuItem:Sprite = new Sprite(0, (i * 140) + offset);
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
 			menuItem.animation.addByPrefix('idle', optionShit[i] + " basic", 24);
 			menuItem.animation.addByPrefix('selected', optionShit[i] + " white", 24);
-			menuItem.animation.play('idle');
+			menuItem.playAnim('idle');
 			menuItem.ID = i;
 			menuItem.screenCenter(X);
-			menuItem.antialiasing = ClientPrefs.globalAntialiasing;
 			menuItems.add(menuItem);
 
 			var scr:Float = (optionShit.length - 4) * 0.135;
@@ -241,7 +238,7 @@ class MainMenuState extends MusicBeatState
 
 				if (optionShit[curSelected] == 'donate')
 				{
-					menuItems.forEach(function(spr:FlxSprite):Void
+					menuItems.forEach(function(spr:Sprite):Void
 					{
 						if (curSelected == spr.ID)
 						{
@@ -259,7 +256,7 @@ class MainMenuState extends MusicBeatState
 				}
 				else
 				{
-					menuItems.forEach(function(spr:FlxSprite):Void
+					menuItems.forEach(function(spr:Sprite):Void
 					{
 						if (curSelected != spr.ID)
 						{
@@ -309,7 +306,7 @@ class MainMenuState extends MusicBeatState
 
 		super.update(elapsed);
 
-		menuItems.forEach(function(spr:FlxSprite):Void {
+		menuItems.forEach(function(spr:Sprite):Void {
 			spr.screenCenter(X);
 		});
 	}
@@ -358,14 +355,14 @@ class MainMenuState extends MusicBeatState
 	{
 		curSelected = CoolUtil.boundSelection(curSelected + huh, optionShit.length);
 
-		menuItems.forEach(function(spr:FlxSprite):Void
+		menuItems.forEach(function(spr:Sprite):Void
 		{
-			spr.animation.play('idle');
+			spr.playAnim('idle');
 			spr.updateHitbox();
 
 			if (spr.ID == curSelected)
 			{
-				spr.animation.play('selected');
+				spr.playAnim('selected');
 
 				var add:Float = 0;
 

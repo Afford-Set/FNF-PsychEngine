@@ -4,13 +4,6 @@ import flixel.FlxG;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 
-#if mobile
-import mobile.flixel.FlxButton;
-import mobile.flixel.FlxHitbox;
-import mobile.flixel.FlxVirtualPad;
-import mobile.flixel.FlxMobileControlsID;
-#end
-
 using StringTools;
 
 class Controls
@@ -20,16 +13,8 @@ class Controls
 	public var keyboardBinds:Map<String, Array<FlxKey>> = null;
 	public var gamepadBinds:Map<String, Array<FlxGamepadInputID>> = null;
 
-	#if mobile
-	public var mobileBinds:Map<String, Array<FlxMobileControlsID>>;
-	#end
-
 	public function new():Void
 	{
-		#if mobile
-		mobileBinds = ClientPrefs.mobileBinds;
-		#end
-
 		keyboardBinds = ClientPrefs.keyBinds;
 		gamepadBinds = ClientPrefs.gamepadBinds;
 	}

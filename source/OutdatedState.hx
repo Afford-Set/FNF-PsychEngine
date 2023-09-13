@@ -1,7 +1,6 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.tweens.FlxTween;
@@ -13,14 +12,14 @@ class OutdatedState extends MusicBeatState
 {
 	public static var leftState:Bool = false;
 
-	private var bg:FlxSprite;
+	private var bg:Sprite;
 	private var txt:FlxText;
 
 	override function create():Void
 	{
 		super.create();
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -29,11 +28,10 @@ class OutdatedState extends MusicBeatState
 			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
 		}
 
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		bg.color = 0xFF0F0F0F;
 		add(bg);
 
-		txt = new FlxText(0, 0, FlxG.width, "Your used version " + MainMenuState.psychEngineVersion.trim() + "\nof Psych Engine is outdated."
+		txt = new FlxText(0, 0, FlxG.width, "Your used version " + MainMenuState.psychEngineVersion.trim() + "\nof Psych Engine (Null Edition) is outdated."
 			+ "\nUse the latest version " + TitleState.updateVersion.trim() + " instead."
 			+ "\n\nWhat new?\n\n" + TitleState.updateChanges + "\n\nPress ENTER to download latest version\nor ESCAPE to ignore this message.", 32);
 		txt.setFormat(Paths.getFont('vcr.ttf'), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

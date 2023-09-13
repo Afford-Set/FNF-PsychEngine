@@ -5,7 +5,7 @@ import flixel.graphics.FlxGraphic;
 
 using StringTools;
 
-class HealthIcon extends FlxSprite
+class HealthIcon extends Sprite
 {
 	public static var DEFAULT_WIDTH:Int = 150;
 
@@ -54,7 +54,7 @@ class HealthIcon extends FlxSprite
 
 				animation.add(char, [for (i in 0...ken) i], 0, false, isPlayer);
 
-				animation.play(char);
+				playAnim(char);
 				antialiasing = ClientPrefs.globalAntialiasing && !char.endsWith('-pixel');
 
 				character = char;

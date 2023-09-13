@@ -1,4 +1,4 @@
-package psychlua;
+package;
 
 #if LUA_ALLOWED
 import llua.Lua;

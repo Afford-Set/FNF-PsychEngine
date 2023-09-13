@@ -32,11 +32,11 @@ class AchievementPopup extends FlxSpriteGroup
 		col.greenFloat -= col.greenFloat / 1.25;
 		col.blueFloat -= col.blueFloat / 1.25;
 
-		var achievementBG:FlxSprite = new FlxSprite(60, 50);
+		var achievementBG:Sprite = new Sprite(60, 50);
 		achievementBG.makeGraphic(420, 120, col);
 		achievementBG.scrollFactor.set();
 
-		var achievementIcon:FlxSprite = new FlxSprite(achievementBG.x + 10, achievementBG.y + 10);
+		var achievementIcon:Sprite = new Sprite(achievementBG.x + 10, achievementBG.y + 10);
 
 		if (Paths.fileExists('images/achievements/' + name + '.png', IMAGE)) {
 			achievementIcon.loadGraphic(Paths.getImage('achievements/' + name));
@@ -48,7 +48,6 @@ class AchievementPopup extends FlxSpriteGroup
 		achievementIcon.scrollFactor.set();
 		achievementIcon.setGraphicSize(Std.int(achievementIcon.width * (2 / 3)));
 		achievementIcon.updateHitbox();
-		achievementIcon.antialiasing = ClientPrefs.globalAntialiasing;
 
 		var achievementName:FlxText = new FlxText(achievementIcon.x + achievementIcon.width + 20, achievementIcon.y + 16, 280, achieve.name, 16);
 		achievementName.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);

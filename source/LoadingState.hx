@@ -26,8 +26,8 @@ class LoadingState extends MusicBeatState
 	var directory:String;
 	var callbacks:MultiCallback;
 
-	var loadBar:FlxSprite;
-	var funkay:FlxSprite;
+	var loadBar:Sprite;
+	var funkay:Sprite;
 
 	function new(target:FlxState, stopMusic:Bool, directory:String):Void
 	{
@@ -42,20 +42,19 @@ class LoadingState extends MusicBeatState
 	{
 		CustomFadeTransition.nextCamera = null;
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFFcaff4d);
 		add(bg);
 
-		funkay = new FlxSprite();
+		funkay = new Sprite();
 		funkay.loadGraphic(Paths.getImage('bg/funkay'));
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
-		funkay.antialiasing = ClientPrefs.globalAntialiasing;
 		funkay.scrollFactor.set();
 		funkay.screenCenter();
 		add(funkay);
 
-		loadBar = new FlxSprite(0, FlxG.height - 20);
+		loadBar = new Sprite(0, FlxG.height - 20);
 		loadBar.makeGraphic(FlxG.width, 10, 0xFFff16d2);
 		loadBar.screenCenter(X);
 		loadBar.scale.x = FlxMath.EPSILON;
@@ -65,7 +64,7 @@ class LoadingState extends MusicBeatState
 
 		FlxG.camera.fade(FlxG.camera.bgColor, fadeTime, true, function():Void
 		{
-			initSongsManifest().onComplete(function(lib:AssetLibrary):Void
+			loadEmptyLibrary('songs').onComplete(function(lib:AssetLibrary):Void
 			{
 				callbacks = new MultiCallback(onLoad);
 
@@ -99,7 +98,8 @@ class LoadingState extends MusicBeatState
 
 			Paths.loadSound(path).onComplete(function(_:Sound):Void
 			{
-				Debug.logInfo('loaded path: ' + path);
+				var cutPath:String = path.substr(path.indexOf(':') + 1);
+				Debug.logInfo('loaded path: ' + cutPath);
 				callback();
 			})
 			.onError(function(error:Dynamic):Void
@@ -221,7 +221,7 @@ class LoadingState extends MusicBeatState
 
 	static function isSoundLoaded(path:String):Bool
 	{
-		return #if PRELOAD_ALL Paths.currentTrackedSounds.exists(path) #else Assets.cache.hasSound(path) #end;
+		return Paths.currentTrackedSounds.exists(path);
 	}
 
 	static function isLibraryLoaded(library:String):Bool
@@ -229,11 +229,9 @@ class LoadingState extends MusicBeatState
 		return Assets.getLibrary(library) != null;
 	}
 
-	static function initSongsManifest():Future<AssetLibrary>
+	public static function loadEmptyLibrary(id:String):Future<AssetLibrary>
 	{
-		var id:String = 'songs';
 		var promise:Promise<AssetLibrary> = new Promise<AssetLibrary>();
-
 		var library:AssetLibrary = LimeAssets.getLibrary(id);
 
 		if (library != null) {

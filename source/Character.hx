@@ -38,9 +38,8 @@ typedef CharacterFile =
 	var gameover_properties:Array<String>;
 }
 
-class Character extends FlxSprite
+class Character extends Sprite
 {
-	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
 	public var debugMode:Bool = false;
 
 	public var isPlayer:Bool = false;
@@ -279,30 +278,21 @@ class Character extends FlxSprite
 		}
 	}
 
-	public function playAnim(animName:String, force:Bool = false, reversed:Bool = false, frame:Int = 0):Void
+	override public function playAnim(name:String, forced:Bool = false, ?reverse:Bool = false, ?frame:Int = 0):Void
 	{
 		specialAnim = false;
-		animation.play(animName, force, reversed, frame);
-
-		var daOffset:Array<Float> = animOffsets.get(animName);
-
-		if (animOffsets.exists(animName)) {
-			offset.set(daOffset[0], daOffset[1]);
-		}
-		else {
-			offset.set(0, 0);
-		}
+		super.playAnim(name, forced, reverse, frame);
 
 		if (curCharacter.startsWith('gf'))
 		{
-			if (animName == 'singLEFT') {
+			if (name == 'singLEFT') {
 				danced = true;
 			}
-			else if (animName == 'singRIGHT') {
+			else if (name == 'singRIGHT') {
 				danced = false;
 			}
 
-			if (animName == 'singUP' || animName == 'singDOWN') {
+			if (name == 'singUP' || name == 'singDOWN') {
 				danced = !danced;
 			}
 		}
@@ -335,11 +325,6 @@ class Character extends FlxSprite
 		}
 
 		settingCharacterUp = false;
-	}
-
-	public function addOffset(name:String, x:Float = 0, y:Float = 0)
-	{
-		animOffsets.set(name, [x, y]);
 	}
 
 	public function quickAnimAdd(name:String, anim:String):Void

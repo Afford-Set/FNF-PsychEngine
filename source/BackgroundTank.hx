@@ -17,8 +17,6 @@ class BackgroundTank extends BGSprite
 
 		tankSpeed = FlxG.random.float(5, 7);
 		tankAngle = FlxG.random.int(-90, 45);
-
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	override function update(elapsed:Float):Void

@@ -1,15 +1,13 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
 
 using StringTools;
 
-class ComboNumberSprite extends FlxSprite
+class ComboNumberSprite extends Sprite
 {
-	public var destroyed:Bool = false;
 	public var group:FlxTypedGroup<ComboNumberSprite>;
 	public var number:Int = 0;
 
@@ -94,8 +92,6 @@ class ComboNumberSprite extends FlxSprite
 	{
 		if (!destroyed)
 		{
-			destroyed = true;
-
 			if (disappearTween != null)
 			{
 				disappearTween.cancel();

@@ -1,14 +1,13 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.util.FlxColor;
 
 using StringTools;
 
 class ResetScoreSubState extends MusicBeatSubState
 {
-	var bg:FlxSprite;
+	var bg:Sprite;
 	var alphabetArray:Array<Alphabet> = [];
 	var icon:HealthIcon;
 	var onYes:Bool = false;
@@ -35,7 +34,7 @@ class ResetScoreSubState extends MusicBeatSubState
 
 		name += ' (' + CoolUtil.difficultyStuff[difficulty][1] + ')?';
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 		bg.makeGraphic(FlxG.width, FlxG.height, FlxColor.BLACK);
 		bg.alpha = 0;
 		bg.scrollFactor.set();

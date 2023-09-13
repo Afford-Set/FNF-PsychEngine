@@ -95,7 +95,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		cachePopUpScore();
 		if (ClientPrefs.hitsoundVolume > 0) Paths.getSound('hitsound');
 
-		var bg:FlxSprite = new FlxSprite();
+		var bg:Sprite = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -104,10 +104,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			bg.loadGraphic(Paths.getImage('bg/menuDesat'));
 		}
 
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		bg.scrollFactor.set();
-		bg.color = 0xFF101010;
-		bg.alpha = 0.9;
+		bg.alpha = 0.6;
 		add(bg);
 
 		grpRatings = new FlxTypedGroup<RatingSprite>();

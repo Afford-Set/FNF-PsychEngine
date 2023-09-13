@@ -55,7 +55,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 	{
 		persistentUpdate = persistentDraw = true;
 
-		var blackBarThingie:FlxSprite = new FlxSprite();
+		var blackBarThingie:Sprite = new Sprite();
 		blackBarThingie.makeGraphic(FlxG.width, 56, FlxColor.BLACK);
 		add(blackBarThingie);
 
@@ -69,7 +69,7 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		animOffsetTxt.alpha = 0.7;
 		add(animOffsetTxt);
 
-		var bgYellow:FlxSprite = new FlxSprite(0, 56);
+		var bgYellow:Sprite = new Sprite(0, 56);
 		bgYellow.makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		add(bgYellow);
 

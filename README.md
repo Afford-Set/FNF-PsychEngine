@@ -1,8 +1,8 @@
-# Friday Night Funkin' - Psych Engine
+# Friday Night Funkin' - Psych Engine (Null Edition)
 Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
 ## Installation:
-1. Download [Haxe](https://haxe.org/download/).
+1. Download [Haxe](https://haxe.org/download/) higher than version `4.2.5`.
 2. Download [git-scm](https://git-scm.com/downloads). Works for Windows, Mac, and Linux, just select your build.
 Install Visual Studio Community 2022.
 3. Install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/).
@@ -10,7 +10,9 @@ Install Visual Studio Community 2022.
 - MSVC v143 - VS 2022 C++ x64/x86 build tools
 - Windows SDK (10.0.20348.0) and (10.0.22621.0)
 
-5. Open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm` after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Psych Engine!* If the compiler gives an error saying that hxCodec cannot be found read this issue to fix it: ShadowMario/FNF-PsychEngine#12770
+5. Open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm` after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Psych Engine!*
+
+If the compiler gives an error saying that hxCodec cannot be found read this issue to fix it: ShadowMario/FNF-PsychEngine#12770
 
 ## Supported platforms:
 - Hashlink

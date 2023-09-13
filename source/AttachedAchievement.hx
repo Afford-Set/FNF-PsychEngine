@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxSprite;
 
-class AttachedAchievement extends FlxSprite
+class AttachedAchievement extends Sprite
 {
 	public var sprTracker:FlxSprite;
 	private var tag:String;
@@ -12,8 +12,6 @@ class AttachedAchievement extends FlxSprite
 		super(x, y);
 
 		changeAchievement(name);
-
-		antialiasing = ClientPrefs.globalAntialiasing;
 	}
 
 	public function changeAchievement(tag:String, ?disableLock:Bool = false):Void

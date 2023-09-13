@@ -1,7 +1,6 @@
 package;
 
 import haxe.Json;
-import flixel.FlxSprite;
 import Character.AnimArray;
 
 typedef MenuCharacterFile =
@@ -14,10 +13,8 @@ typedef MenuCharacterFile =
 	var no_antialiasing:Bool;
 }
 
-class MenuCharacter extends FlxSprite
+class MenuCharacter extends Sprite
 {
-	public var animOffsets:Map<String, Array<Float>> = new Map<String, Array<Float>>();
-
 	public var character:String;
 	public var hasConfirmAnimation:Bool = false;
 
@@ -35,7 +32,6 @@ class MenuCharacter extends FlxSprite
 	{
 		super();
 
-		antialiasing = ClientPrefs.globalAntialiasing;
 		changeCharacter(character);
 	}
 
@@ -196,20 +192,6 @@ class MenuCharacter extends FlxSprite
 		}
 	}
 
-	public function playAnim(animName:String, force:Bool = false, reversed:Bool = false, frame:Int = 0):Void
-	{
-		animation.play(animName, force, reversed, frame);
-
-		var daOffset:Array<Float> = animOffsets.get(animName);
-
-		if (animOffsets.exists(animName)) {
-			offset.set(daOffset[0], daOffset[1]);
-		}
-		else {
-			offset.set(0, 0);
-		}
-	}
-
 	public var danceEveryNumBeats:Int = ClientPrefs.danceOffset;
 
 	private var settingCharacterUp:Bool = true;
@@ -222,7 +204,7 @@ class MenuCharacter extends FlxSprite
 		if (settingCharacterUp) {
 			danceEveryNumBeats = (danceIdle ? 1 : ClientPrefs.danceOffset);
 		}
-		else if(lastDanceIdle != danceIdle)
+		else if (lastDanceIdle != danceIdle)
 		{
 			var calc:Float = danceEveryNumBeats;
 
@@ -237,11 +219,6 @@ class MenuCharacter extends FlxSprite
 		}
 
 		settingCharacterUp = false;
-	}
-
-	public function addOffset(name:String, x:Float = 0, y:Float = 0)
-	{
-		animOffsets.set(name, [x, y]);
 	}
 
 	public static function precacheMenuCharacters(week:WeekData):Void

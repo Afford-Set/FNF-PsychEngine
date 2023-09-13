@@ -2,7 +2,7 @@ package;
 
 import flixel.FlxSprite;
 
-class CheckboxThingie extends FlxSprite
+class CheckboxThingie extends Sprite
 {
 	public var sprTracker:FlxSprite;
 	public var daValue(default, set):Bool;
@@ -47,8 +47,6 @@ class CheckboxThingie extends FlxSprite
 			animation.addByPrefix('checked', 'checkbox finish', 24, false);
 		}
 
-		antialiasing = ClientPrefs.globalAntialiasing;
-
 		var sizeShit:Float = isVanilla ? 0.8 : 0.9;
 
 		setGraphicSize(Std.int(sizeShit * width));
@@ -61,7 +59,7 @@ class CheckboxThingie extends FlxSprite
 		}
 
 		if (isVanilla) {
-			animation.play('static');
+			playAnim('static');
 		}
 
 		daValue = checked;
@@ -100,13 +98,13 @@ class CheckboxThingie extends FlxSprite
 			{
 				if (animation.curAnim != null && animation.curAnim.name != 'checked')
 				{
-					animation.play('checked', true);
+					playAnim('checked', true);
 					offset.set(17, 70);
 				}
 			}
 			else
 			{
-				animation.play('static');
+				playAnim('static');
 				offset.set();
 			}
 		}
@@ -116,13 +114,13 @@ class CheckboxThingie extends FlxSprite
 			{
 				if (animation.curAnim.name != 'checked' && animation.curAnim.name != 'checking')
 				{
-					animation.play('checking', true);
+					playAnim('checking', true);
 					offset.set(34, 25);
 				}
 			}
 			else if (animation.curAnim.name != 'unchecked' && animation.curAnim.name != 'unchecking')
 			{
-				animation.play('unchecking', true);
+				playAnim('unchecking', true);
 				offset.set(25, 28);
 			}
 		}
@@ -138,12 +136,12 @@ class CheckboxThingie extends FlxSprite
 			{
 				case 'checking':
 				{
-					animation.play('checked', true);
+					playAnim('checked', true);
 					offset.set(3, 12);
 				}
 				case 'unchecking':
 				{
-					animation.play('unchecked', true);
+					playAnim('unchecked', true);
 					offset.set(0, 2);
 				}
 			}

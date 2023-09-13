@@ -45,7 +45,7 @@ class AchievementEditorState extends MusicBeatUIState
 
 	var icon:AttachedAchievement = null;
 	var text:Alphabet = null;
-	var bg:FlxSprite = null;
+	var bg:Sprite = null;
 
 	var misses:Int = 0;
 	var diff:String = 'hard';
@@ -107,7 +107,7 @@ class AchievementEditorState extends MusicBeatUIState
 		return value;
 	}
 
-	private var descBox:FlxSprite = null;
+	private var descBox:Sprite = null;
 	private var descText:FlxText = null;
 
 	override function create():Void
@@ -116,7 +116,7 @@ class AchievementEditorState extends MusicBeatUIState
 			award = formatToAchievementFile();
 		}
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -128,7 +128,6 @@ class AchievementEditorState extends MusicBeatUIState
 		bg.updateHitbox();
 		bg.screenCenter();
 		bg.scrollFactor.set();
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		text = new Alphabet(280, 270, name, false);
@@ -138,7 +137,7 @@ class AchievementEditorState extends MusicBeatUIState
 		icon.sprTracker = text;
 		add(icon);
 
-		descBox = new FlxSprite();
+		descBox = new Sprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
 		descBox.alpha = 0.6;
 		add(descBox);

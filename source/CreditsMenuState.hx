@@ -10,7 +10,6 @@ import sys.FileSystem;
 #end
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
 import flixel.math.FlxMath;
@@ -54,7 +53,7 @@ class CreditsMenuState extends MusicBeatState
 
 	var curCredit:Array<String>;
 
-	var bg:FlxSprite;
+	var bg:Sprite;
 
 	var startingTweenBGColor:Bool = true;
 	var startColor:FlxColor = FlxColor.WHITE;
@@ -64,7 +63,7 @@ class CreditsMenuState extends MusicBeatState
 	var grpCredits:FlxTypedGroup<Alphabet>;
 	var grpIcons:FlxTypedGroup<AttachedSprite>;
 
-	private var descBox:FlxSprite;
+	private var descBox:Sprite;
 	private var descText:FlxText;
 
 	override function create():Void
@@ -77,7 +76,7 @@ class CreditsMenuState extends MusicBeatState
 		for (mod in Paths.parseModList().enabled) pushModCreditsToList(mod);
 		#end
 
-		bg = new FlxSprite();
+		bg = new Sprite();
 
 		if (Paths.fileExists('images/menuDesat.png', IMAGE)) {
 			bg.loadGraphic(Paths.getImage('menuDesat'));
@@ -90,7 +89,6 @@ class CreditsMenuState extends MusicBeatState
 		bg.screenCenter();
 		bg.scrollFactor.set();
 		bg.color = startColor;
-		bg.antialiasing = ClientPrefs.globalAntialiasing;
 		add(bg);
 
 		grpCredits = new FlxTypedGroup<Alphabet>();
@@ -141,7 +139,7 @@ class CreditsMenuState extends MusicBeatState
 
 		if (curSelected >= creditsStuff.length) curSelected = 0;
 
-		descBox = new FlxSprite();
+		descBox = new Sprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
 		descBox.alpha = 0.6;
 		add(descBox);

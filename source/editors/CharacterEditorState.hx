@@ -76,7 +76,7 @@ class CharacterEditorState extends MusicBeatUIState
 	var leHealthIcon:HealthIcon;
 	var characterList:Array<String> = [];
 
-	var cameraFollowPointer:FlxSprite;
+	var cameraFollowPointer:Sprite;
 	var healthBar:HealthBar;
 
 	override function create():Void
@@ -110,7 +110,7 @@ class CharacterEditorState extends MusicBeatUIState
 
 		var pointer:FlxGraphic = FlxGraphic.fromClass(GraphicCursorCross);
 
-		cameraFollowPointer = new FlxSprite();
+		cameraFollowPointer = new Sprite();
 		cameraFollowPointer.loadGraphic(pointer);
 		cameraFollowPointer.setGraphicSize(40, 40);
 		cameraFollowPointer.updateHitbox();
@@ -260,7 +260,7 @@ class CharacterEditorState extends MusicBeatUIState
 
 			var widShit:Int = Std.int(bgSky.width * 6);
 
-			var bgTrees:FlxSprite = new FlxSprite(repositionShit - 380, -800 - playerYDifference);
+			var bgTrees:Sprite = new Sprite(repositionShit - 380, -800 - playerYDifference);
 			bgTrees.frames = Paths.getPackerAtlas('weeb/weebTrees');
 			bgTrees.animation.add('treeLoop', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], 12);
 			bgTrees.animation.play('treeLoop');
@@ -568,11 +568,7 @@ class CharacterEditorState extends MusicBeatUIState
 		noAntialiasingCheckBox.checked = char.noAntialiasing;
 		noAntialiasingCheckBox.callback = function():Void
 		{
-			char.antialiasing = false;
-
-			if (!noAntialiasingCheckBox.checked && ClientPrefs.globalAntialiasing) {
-				char.antialiasing = true;
-			}
+			char.antialiasing = ClientPrefs.globalAntialiasing && !noAntialiasingCheckBox.checked;
 
 			char.noAntialiasing = noAntialiasingCheckBox.checked;
 			ghostChar.antialiasing = char.antialiasing;
@@ -1257,7 +1253,7 @@ class CharacterEditorState extends MusicBeatUIState
 			}
 		}
 		#else
-		characterList = CoolUtil.coolTextFile(Paths.getTxt('characterList'));
+		characterList = CoolUtil.coolTextFile(Paths.getTxt('data/characterList'));
 		#end
 
 		charDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(characterList, true));

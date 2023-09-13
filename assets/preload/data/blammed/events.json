@@ -615,14 +615,14 @@
 						"550"
 					],
 					[
-						"Set Property",
-						"defaultCamZoom",
-						"1.22"
+						"Set Camera Zoom",
+						"1.22",
+						""
 					],
 					[
-						"Set Property",
-						"cameraSpeed",
-						"2"
+						"Set Camera Speed",
+						"2",
+						""
 					]
 				]
 			],
@@ -727,9 +727,9 @@
 						""
 					],
 					[
-						"Set Property",
-						"defaultCamZoom",
-						"1.05"
+						"Set Camera Zoom",
+						"",
+						""
 					],
 					[
 						"Camera Follow Pos",
@@ -737,19 +737,19 @@
 						"520"
 					],
 					[
-						"Call From Object",
-						"cameraMovementSection",
+						"Move Camera",
+						"dad",
 						""
 					],
 					[
-						"Set Property",
-						"isCameraOnForcedPos",
-						"false"
+						"Camera Follow Pos",
+						"",
+						""
 					],
 					[
-						"Set Property",
-						"cameraSpeed",
-						"1"
+						"Set Camera Speed",
+						"",
+						""
 					]
 				]
 			],

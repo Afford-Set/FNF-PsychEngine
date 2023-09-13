@@ -410,7 +410,7 @@ class PreferencesSubState extends MusicBeatSubState
 	var checkboxGroup:FlxTypedGroup<CheckboxThingie>;
 	var grpTexts:FlxTypedGroup<AttachedText>;
 
-	var descBox:FlxSprite;
+	var descBox:Sprite;
 	var descText:FlxText;
 
 	var boyfriend:Character = null;
@@ -514,7 +514,7 @@ class PreferencesSubState extends MusicBeatSubState
 			notes.add(note);
 		}
 
-		descBox = new FlxSprite();
+		descBox = new Sprite();
 		descBox.makeGraphic(1, 1, FlxColor.BLACK);
 		descBox.alpha = 0.6;
 		add(descBox);
