@@ -26,7 +26,7 @@ using StringTools;
 
 class MainMenuState extends MusicBeatState
 {
-	public static var psychEngineVersion:String = '0.7.2h';
+	public static var psychEngineVersion:String = '0.7.2n';
 
 	private static var curSelected:Int = -1;
 
