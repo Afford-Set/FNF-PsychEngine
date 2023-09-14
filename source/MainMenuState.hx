@@ -131,7 +131,7 @@ class MainMenuState extends MusicBeatState
 		FlxG.camera.follow(camFollowPos, null, 1);
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "v " + FlxG.stage.application.meta.get('version') #if PSYCH_WATERMARKS
-			+ (ClientPrefs.watermarks ? ' - FNF | v ' + psychEngineVersion + ' - Psych Engine' : '') #end, 12);
+			+ (ClientPrefs.watermarks ? ' - FNF | v ' + psychEngineVersion + ' - Psych Engine (Null Edition)' : '') #end, 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(versionShit);
