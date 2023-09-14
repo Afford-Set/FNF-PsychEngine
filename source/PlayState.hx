@@ -404,18 +404,7 @@ class PlayState extends MusicBeatState
 		eventsPushed = null;
 
 		#if sys
-		var foldersToCheck:Array<String> = [];
-
-		#if MODS_ALLOWED
-		foldersToCheck.push(Paths.mods('data/' + SONG.songID + '/'));
-		foldersToCheck.push(Paths.mods(Paths.currentModDirectory + '/data/' + SONG.songID + '/'));
-
-		for (mod in Paths.globalMods) {
-			foldersToCheck.push(Paths.mods(mod + '/data/' + SONG.songID + '/'));
-		}
-		#end
-
-		foldersToCheck.push(Paths.getPreloadPath('data/' + SONG.songID + '/'));
+		var foldersToCheck:Array<String> = Paths.directoriesWithFile([Paths.getPreloadPath()], 'data/' + SONG.songID + '/');
 
 		for (folder in foldersToCheck)
 		{

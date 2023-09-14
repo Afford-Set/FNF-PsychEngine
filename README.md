@@ -1,5 +1,7 @@
 # Friday Night Funkin' - Psych Engine (Null Edition)
-Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
+Null Edition (former Alsuh Engine) - fanmade version of Psych Engine by Null4ik_2j6k, 
+
+Psych Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
 ## Installation:
 1. Download [Haxe](https://haxe.org/download/) higher than version `4.2.5`.

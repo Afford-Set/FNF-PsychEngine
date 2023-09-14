@@ -1538,8 +1538,6 @@ class FunkinLua
 			DiscordClient.resetClientID();
 			#end
 
-			PlayState.SONG = null;
-
 			PlayState.seenCutscene = false;
 			PlayState.usedPractice = false;
 			PlayState.changedDifficulty = false;

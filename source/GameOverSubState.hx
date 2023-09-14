@@ -193,8 +193,6 @@ class GameOverSubState extends MusicBeatSubState
 
 			PlayState.deathCounter = 0;
 
-			PlayState.SONG = null;
-
 			PlayState.seenCutscene = false;
 			PlayState.usedPractice = false;
 			PlayState.changedDifficulty = false;
