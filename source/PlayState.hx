@@ -320,15 +320,35 @@ class PlayState extends MusicBeatState
 		debugTextGroup.cameras = [camOther];
 		add(debugTextGroup);
 
-		#if LUA_ALLOWED
-		var foldersToCheck:Array<String> = Paths.directoriesWithFile(Paths.getPreloadPath(), 'scripts/');
+		#if sys
+		var defaultDirectories:Array<String> = [Paths.getLibraryPath()];
+
+		var libraryPath:String = Paths.getLibraryPath('', 'shared');
+		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+
+		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
+		{
+			var libraryPath:String = Paths.getLibraryPath('', Paths.currentLevel);
+			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+		}
+
+		var foldersToCheck:Array<String> = Paths.directoriesWithFile(defaultDirectories, 'scripts/');
 
 		for (folder in foldersToCheck)
 		{
 			for (file in FileSystem.readDirectory(folder))
 			{
-				if (file.toLowerCase().endsWith('.lua')) luaArray.push(new FunkinLua(folder + file));
-				if (file.toLowerCase().endsWith('.hx')) initHScript(folder + file);
+				#if LUA_ALLOWED
+				if (file.toLowerCase().endsWith('.lua')) {
+					luaArray.push(new FunkinLua(folder + file));
+				}
+				#end
+
+				#if HSCRIPT_ALLOWED
+				if (file.toLowerCase().endsWith('.hx')) {
+					initHScript(folder + file);
+				}
+				#end
 			}
 		}
 		#end
@@ -383,15 +403,35 @@ class PlayState extends MusicBeatState
 		noteTypes = null;
 		eventsPushed = null;
 
-		#if LUA_ALLOWED
-		var foldersToCheck:Array<String> = Paths.directoriesWithFile(Paths.getPreloadPath(), 'data/' + SONG.songID + '/');
+		#if sys
+		var foldersToCheck:Array<String> = [];
+
+		#if MODS_ALLOWED
+		foldersToCheck.push(Paths.mods('data/' + SONG.songID + '/'));
+		foldersToCheck.push(Paths.mods(Paths.currentModDirectory + '/data/' + SONG.songID + '/'));
+
+		for (mod in Paths.globalMods) {
+			foldersToCheck.push(Paths.mods(mod + '/data/' + SONG.songID + '/'));
+		}
+		#end
+
+		foldersToCheck.push(Paths.getPreloadPath('data/' + SONG.songID + '/'));
 
 		for (folder in foldersToCheck)
 		{
 			for (file in FileSystem.readDirectory(folder))
 			{
-				if (file.toLowerCase().endsWith('.lua')) luaArray.push(new FunkinLua(folder + file));
-				if (file.toLowerCase().endsWith('.hx')) initHScript(folder + file);
+				#if LUA_ALLOWED
+				if (file.toLowerCase().endsWith('.lua')) {
+					luaArray.push(new FunkinLua(folder + file));
+				}
+				#end
+
+				#if HSCRIPT_ALLOWED
+				if (file.toLowerCase().endsWith('.hx')) {
+					initHScript(folder + file);
+				}
+				#end
 			}
 		}
 		#end
@@ -5170,6 +5210,10 @@ class PlayState extends MusicBeatState
 
 		if (Paths.fileExists(luaToLoad, TEXT))
 		{
+			#if sys
+			luaToLoad.substr(luaToLoad.indexOf(':') + 1);
+			#end
+
 			for (script in luaArray) {
 				if (script.scriptName == luaToLoad) return false;
 			}
@@ -5191,6 +5235,10 @@ class PlayState extends MusicBeatState
 
 		if (Paths.fileExists(scriptToLoad, TEXT))
 		{
+			#if sys
+			scriptToLoad.substr(scriptToLoad.indexOf(':') + 1);
+			#end
+
 			if (SScript.global.exists(scriptToLoad)) return false;
 	
 			initHScript(scriptToLoad);
@@ -5583,11 +5631,11 @@ class PlayState extends MusicBeatState
 	
 			var foldersToCheck:Array<String> = [Paths.getPreloadPath('shaders/')];
 
-			if (Paths.currentLevel != null)
-			{
-				var libraryPath:String = Paths.getLibraryPath('shaders/', 'shared');
-				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+			var libraryPath:String = Paths.getLibraryPath('shaders/', 'shared');
+			foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
 
+			if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
+			{
 				var libraryPath:String = Paths.getLibraryPath('shaders/', Paths.currentLevel);
 				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
 			}

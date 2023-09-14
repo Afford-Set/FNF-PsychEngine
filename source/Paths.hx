@@ -732,7 +732,7 @@ class Paths
 		if (!defaultDirectory.startsWith('assets/')) defaultDirectory = 'assets/$defaultDirectory';
 
 		var mergedList:Array<String> = [];
-		var paths:Array<String> = directoriesWithFile(defaultDirectory, path);
+		var paths:Array<String> = directoriesWithFile([defaultDirectory], path);
 
 		var defaultPath:String = defaultDirectory + path;
 
@@ -757,13 +757,16 @@ class Paths
 		return mergedList;
 	}
 
-	public static function directoriesWithFile(path:String, fileToFind:String, mods:Bool = true):Array<String>
+	public static function directoriesWithFile(paths:Array<String>, fileToFind:String, mods:Bool = true):Array<String>
 	{
 		var foldersToCheck:Array<String> = [];
 
-		#if sys
-		if (FileSystem.exists(path + fileToFind)) #end {
-			foldersToCheck.push(path + fileToFind);
+		for (path in paths)
+		{
+			#if sys
+			if (FileSystem.exists(path + fileToFind)) #end {
+				foldersToCheck.push(path + fileToFind);
+			}
 		}
 
 		#if MODS_ALLOWED

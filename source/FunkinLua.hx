@@ -3364,7 +3364,7 @@ class FunkinLua
 
 			var foldersToCheck:Array<String> = [Paths.getPreloadPath('shaders/')];
 
-			if (Paths.currentLevel != null)
+			if (Paths.currentLevel != null && Paths.currentLevel.length > 0)
 			{
 				var libraryPath:String = Paths.getLibraryPath('shaders/', 'shared');
 				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));

@@ -64,11 +64,7 @@ class ChartingState extends MusicBeatUIState
 		'No Animation'
 	];
 
-	private var noteTypeIntMap:Map<Int, String> = new Map<Int, String>();
-	private var noteTypeMap:Map<String, Null<Int>> = new Map<String, Null<Int>>();
-
-	public var ignoreWarnings:Bool = false;
-
+	var ignoreWarnings:Bool = false;
 	var curNoteTypes:Array<String> = [];
 
 	var eventStuff:Array<Dynamic> =
@@ -393,7 +389,7 @@ class ChartingState extends MusicBeatUIState
 
 	function addAssets():Void
 	{
-		var tab_group_assets = new FlxUI(null, UI_box);
+		var tab_group_assets:FlxUI = new FlxUI(null, UI_box);
 		tab_group_assets.name = "Assets";
 
 		#if MODS_ALLOWED
@@ -406,11 +402,11 @@ class ChartingState extends MusicBeatUIState
 		var directories:Array<String> = [Paths.getPreloadPath('characters/')];
 		#end
 
-		var tempMap:Map<String, Bool> = new Map<String, Bool>();
-		var characters:Array<String> = CoolUtil.coolTextFile('data/characterList.txt');
+		var tempArray:Array<String> = [];
+		var characters:Array<String> = Paths.mergeAllTextsNamed('data/characterList.txt', Paths.getPreloadPath());
 
 		for (i in 0...characters.length) {
-			tempMap.set(characters[i], true);
+			tempArray.push(characters[i]);
 		}
 
 		#if MODS_ALLOWED
@@ -428,9 +424,9 @@ class ChartingState extends MusicBeatUIState
 					{
 						var charToCheck:String = file.substr(0, file.length - 5);
 				
-						if (!charToCheck.endsWith('-dead') && !tempMap.exists(charToCheck))
+						if (charToCheck.trim().length > 0 && !charToCheck.endsWith('-dead') && !tempArray.contains(charToCheck))
 						{
-							tempMap.set(charToCheck, true);
+							tempArray.push(charToCheck);
 							characters.push(charToCheck);
 						}
 					}
@@ -476,40 +472,36 @@ class ChartingState extends MusicBeatUIState
 		var directories:Array<String> = [Paths.getPreloadPath('stages/')];
 		#end
 
-		tempMap.clear();
-
-		var stageFile:Array<String> = CoolUtil.coolTextFile('data/stageList.txt');
+		var stageFile:Array<String> = Paths.mergeAllTextsNamed('data/stageList.txt', Paths.getPreloadPath());
 		var stages:Array<String> = [];
 
-		for (i in 0...stageFile.length) // Prevent duplicates
+		for (stage in stageFile)
 		{
-			var stageToCheck:String = stageFile[i];
-	
-			if (!tempMap.exists(stageToCheck)) {
-				stages.push(stageToCheck);
+			if (stage.trim().length > 0) {
+				stages.push(stage);
 			}
-	
-			tempMap.set(stageToCheck, true);
+
+			tempArray.push(stage);
 		}
 
 		#if MODS_ALLOWED
 		for (i in 0...directories.length)
 		{
 			var directory:String = directories[i];
-	
+
 			if (FileSystem.exists(directory))
 			{
 				for (file in FileSystem.readDirectory(directory))
 				{
 					var path:String = Path.join([directory, file]);
-			
+
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
 					{
 						var stageToCheck:String = file.substr(0, file.length - 5);
-				
-						if (!tempMap.exists(stageToCheck))
+
+						if (stageToCheck.trim().length > 0 && !tempArray.contains(stageToCheck))
 						{
-							tempMap.set(stageToCheck, true);
+							tempArray.push(stageToCheck);
 							stages.push(stageToCheck);
 						}
 					}
@@ -760,7 +752,7 @@ class ChartingState extends MusicBeatUIState
 			shiftNotes(Std.int(stepperShiftNoteDial.value), Std.int(stepperShiftNoteDialstep.value), Std.int(stepperShiftNoteDialms.value));
 		});
 
-		var tab_group_song = new FlxUI(null, UI_box);
+		var tab_group_song:FlxUI = new FlxUI(null, UI_box);
 		tab_group_song.name = "Song";
 
 		tab_group_song.add(new FlxText(UI_songIDTitle.width + 17.5, UI_songIDTitle.y, 0, 'Song\'s ID'));
@@ -808,7 +800,7 @@ class ChartingState extends MusicBeatUIState
 
 	function addSectionUI():Void
 	{
-		var tab_group_section = new FlxUI(null, UI_box);
+		var tab_group_section:FlxUI = new FlxUI(null, UI_box);
 		tab_group_section.name = 'Section';
 
 		check_mustHitSection = new FlxUICheckBox(10, 15, null, null, "Camera Points to P1?", 100);
@@ -1095,7 +1087,7 @@ class ChartingState extends MusicBeatUIState
 
 	function addNoteUI():Void
 	{
-		var tab_group_note = new FlxUI(null, UI_box);
+		var tab_group_note:FlxUI = new FlxUI(null, UI_box);
 		tab_group_note.name = 'Note';
 
 		stepperSusLength = new FlxUINumericStepper(10, 10, Conductor.stepCrochet / 2, 0, 0, Conductor.stepCrochet * 64);
@@ -1108,67 +1100,51 @@ class ChartingState extends MusicBeatUIState
 		blockPressWhileTypingOn.push(strumTimeInputText);
 
 		var key:Int = 0;
-		var displayNameList:Array<String> = [];
 
 		while (key < noteTypeList.length)
 		{
-			displayNameList.push(noteTypeList[key]);
-			noteTypeMap.set(noteTypeList[key], key);
-			noteTypeIntMap.set(key, noteTypeList[key]);
-
+			curNoteTypes.push(noteTypeList[key]);
 			key++;
 		}
 
-		#if LUA_ALLOWED
-		var directories:Array<String> = [];
+		#if sys
+		var defaultDirectories:Array<String> = [Paths.getLibraryPath()];
 
-		#if MODS_ALLOWED
-		directories.push(Paths.mods('custom_notetypes/'));
-		directories.push(Paths.mods(Paths.currentModDirectory + '/custom_notetypes/'));
+		var libraryPath:String = Paths.getLibraryPath('', 'shared');
+		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
 
-		for (mod in Paths.globalMods) {
-			directories.push(Paths.mods(mod + '/custom_notetypes/'));
-		}
-		#end
-
-		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
-			var lib:String=Paths.getLibraryPath('custom_notetypes/', Paths.currentLevel);
-			lib=lib.substring(lib.indexOf(':')+1,lib.length);
-			directories.push(lib);
-		}
-
-		var lib:String=Paths.getLibraryPath('custom_notetypes/', 'shared');
-		lib=lib.substring(lib.indexOf(':')+1,lib.length);
-		directories.push(lib);
-		directories.push(Paths.getPreloadPath('custom_notetypes/'));
-
-		for (i in 0...directories.length)
+		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
 		{
-			var directory:String = directories[i];
+			var libraryPath:String = Paths.getLibraryPath('', Paths.currentLevel);
+			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+		}
 
-			if (FileSystem.exists(directory))
+		var foldersToCheck:Array<String> = Paths.directoriesWithFile(defaultDirectories, 'custom_notetypes/');
+
+		for (folder in foldersToCheck)
+		{
+			for (file in FileSystem.readDirectory(folder))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				var fileName:String = file.toLowerCase().trim();
+				var wordLen:Int = 4; // length of word ".lua" and ".txt";
+
+				if ((#if LUA_ALLOWED fileName.endsWith('.lua') || #end
+					#if HSCRIPT_ALLOWED (fileName.endsWith('.hx') && (wordLen = 3) == 3) || #end
+					fileName.endsWith('.txt')) && fileName != 'readme.txt')
 				{
-					var path:String = Path.join([directory, file]);
+					var fileToCheck:String = file.substr(0, file.length - wordLen);
 
-					if (!FileSystem.isDirectory(path) && file.endsWith('.lua'))
+					if (!curNoteTypes.contains(fileToCheck))
 					{
-						var fileToCheck:String = file.substr(0, file.length - 4);
-
-						if (!noteTypeMap.exists(fileToCheck))
-						{
-							displayNameList.push(fileToCheck);
-							noteTypeMap.set(fileToCheck, key);
-							noteTypeIntMap.set(key, fileToCheck);
-
-							key++;
-						}
+						curNoteTypes.push(fileToCheck);
+						key++;
 					}
 				}
 			}
 		}
 		#end
+
+		var displayNameList:Array<String> = curNoteTypes.copy();
 
 		for (i in 1...displayNameList.length) {
 			displayNameList[i] = i + '. ' + displayNameList[i];
@@ -1180,7 +1156,7 @@ class ChartingState extends MusicBeatUIState
 
 			if (curSelectedNote != null && curSelectedNote[1] > -1)
 			{
-				curSelectedNote[3] = noteTypeIntMap.get(currentType);
+				curSelectedNote[3] = curNoteTypes[currentType];
 				updateGrid();
 			}
 		});
@@ -1205,11 +1181,10 @@ class ChartingState extends MusicBeatUIState
 
 	function addEventsUI():Void
 	{
-		var tab_group_event = new FlxUI(null, UI_box);
+		var tab_group_event:FlxUI = new FlxUI(null, UI_box);
 		tab_group_event.name = 'Events';
 
 		#if LUA_ALLOWED
-		var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
 		var directories:Array<String> = [];
 
 		#if MODS_ALLOWED
@@ -1221,20 +1196,20 @@ class ChartingState extends MusicBeatUIState
 		}
 		#end
 
-		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared') {
-			var lib:String=Paths.getLibraryPath('custom_events/', Paths.currentLevel);
-			lib=lib.substring(lib.indexOf(':')+1,lib.length);
-			directories.push(lib);
+		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
+		{
+			var libraryPath:String = Paths.getLibraryPath('custom_events/', Paths.currentLevel);
+			directories.push(libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
 		}
 
-		var lib:String=Paths.getLibraryPath('custom_events/', 'shared');
-		lib=lib.substring(lib.indexOf(':')+1,lib.length);
-		directories.push(lib);
+		var libraryPath:String = Paths.getLibraryPath('custom_events/', 'shared');
+		directories.push(libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+
 		directories.push(Paths.getPreloadPath('custom_events/'));
 
 		for (i in 0...directories.length)
 		{
-			var directory:String =  directories[i];
+			var directory:String = directories[i];
 
 			if (FileSystem.exists(directory))
 			{
@@ -1246,18 +1221,13 @@ class ChartingState extends MusicBeatUIState
 					{
 						var fileToCheck:String = file.substr(0, file.length - 4);
 
-						if (!eventPushedMap.exists(fileToCheck))
-						{
-							eventPushedMap.set(fileToCheck, true);
+						if (!eventStuff.contains(fileToCheck)) {
 							eventStuff.push([fileToCheck, File.getContent(path)]);
 						}
 					}
 				}
 			}
 		}
-
-		eventPushedMap.clear();
-		eventPushedMap = null;
 		#end
 
 		descText = new FlxText(20, 200, 0, eventStuff[0][0]);
@@ -1933,7 +1903,7 @@ class ChartingState extends MusicBeatUIState
 						else if (FlxG.keys.pressed.ALT)
 						{
 							selectNote(note);
-							curSelectedNote[3] = noteTypeIntMap.get(currentType);
+							curSelectedNote[3] = curNoteTypes[currentType];
 							updateGrid();
 						}
 						else {
@@ -2361,7 +2331,7 @@ class ChartingState extends MusicBeatUIState
 			FlxG.sound.music.pause();
 			FlxG.sound.music.time = 0;
 		}
-		else if(FlxG.sound.music.time > FlxG.sound.music.length)
+		else if (FlxG.sound.music.time > FlxG.sound.music.length)
 		{
 			FlxG.sound.music.pause();
 			FlxG.sound.music.time = 0;
@@ -2962,27 +2932,40 @@ class ChartingState extends MusicBeatUIState
 		return json.healthicon;
 	}
 
-	function updateNoteUI():Void {
-		if (curSelectedNote != null) {
-			if(curSelectedNote[2] != null) {
+	function updateNoteUI():Void
+	{
+		if (curSelectedNote != null)
+		{
+			if (curSelectedNote[2] != null)
+			{
 				stepperSusLength.value = curSelectedNote[2];
-				if(curSelectedNote[3] != null) {
-					currentType = noteTypeMap.get(curSelectedNote[3]);
-					if(currentType <= 0) {
+
+				if (curSelectedNote[3] != null)
+				{
+					currentType = curNoteTypes.indexOf(curSelectedNote[3]);
+
+					if (currentType <= 0) {
 						noteTypeDropDown.selectedLabel = '';
-					} else {
+					}
+					else {
 						noteTypeDropDown.selectedLabel = currentType + '. ' + curSelectedNote[3];
 					}
 				}
-			} else {
+			}
+			else
+			{
 				eventDropDown.selectedLabel = curSelectedNote[1][curEventSelected][0];
+
 				var selected:Int = Std.parseInt(eventDropDown.selectedId);
-				if(selected > 0 && selected < eventStuff.length) {
+
+				if (selected > 0 && selected < eventStuff.length) {
 					descText.text = eventStuff[selected][1];
 				}
+
 				value1InputText.text = curSelectedNote[1][curEventSelected][1];
 				value2InputText.text = curSelectedNote[1][curEventSelected][2];
 			}
+
 			strumTimeInputText.text = '' + curSelectedNote[0];
 		}
 	}
@@ -2991,10 +2974,19 @@ class ChartingState extends MusicBeatUIState
 	{
 		updateHeads();
 
+		curRenderedNotes.forEachAlive((spr:Note) -> spr.destroy());
 		curRenderedNotes.clear();
+
+		curRenderedSustains.forEachAlive((spr:FlxSprite) -> spr.destroy());
 		curRenderedSustains.clear();
+
+		curRenderedNoteType.forEachAlive((spr:FlxText) -> spr.destroy());
 		curRenderedNoteType.clear();
+
+		nextRenderedNotes.forEachAlive((spr:Note) -> spr.destroy());
 		nextRenderedNotes.clear();
+
+		nextRenderedSustains.forEachAlive((spr:FlxSprite) -> spr.destroy());
 		nextRenderedSustains.clear();
 
 		if (_song.notes[curSec].changeBPM == true && _song.notes[curSec].bpm > 0) {
@@ -3027,9 +3019,9 @@ class ChartingState extends MusicBeatUIState
 
 			if (i[3] != null && note.noteType != null && note.noteType.length > 0)
 			{
-				var typeInt:Null<Int> = noteTypeMap.get(i[3]);
+				var typeInt:Int = curNoteTypes.indexOf(i[3]);
 				var theType:String = '' + typeInt;
-				if (typeInt == null) theType = '?';
+				if (typeInt < 0) theType = '?';
 
 				var daText:AttachedFlxText = new AttachedFlxText(0, 0, 100, theType, 24);
 				daText.setFormat(Paths.getFont('vcr.ttf'), 24, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
@@ -3106,9 +3098,9 @@ class ChartingState extends MusicBeatUIState
 		if (daSus != null) // Common note
 		{
 			if (!Std.isOfType(i[3], String)) { // Convert old note type to new note type format
-				i[3] = noteTypeIntMap.get(i[3]);
+				i[3] = curNoteTypes[i[3]];
 			}
-	
+
 			if (i.length > 3 && (i[3] == null || i[3].length < 1)) {
 				i.remove(i[3]);
 			}
@@ -3123,7 +3115,14 @@ class ChartingState extends MusicBeatUIState
 		}
 		else // Event note
 		{
-			note.loadGraphic(Paths.getImage('ui/eventArrow'));
+			if (Paths.fileExists('images/eventArrow.png', IMAGE)) {
+				note.loadGraphic(Paths.getImage('eventArrow'));
+			}
+			else {
+				note.loadGraphic(Paths.getImage('ui/eventArrow'));
+			}
+			
+			note.rgbShader.enabled = false;
 			note.eventName = getEventName(i[1]);
 			note.eventLength = i[1].length;
 
@@ -3158,19 +3157,6 @@ class ChartingState extends MusicBeatUIState
 		return note;
 	}
 
-	function setupSusNote(note:Note, beats:Float):Sprite
-	{
-		var height:Int = Math.floor(FlxMath.remapToRange(note.sustainLength, 0, Conductor.stepCrochet * 16, 0, GRID_SIZE * 16 * zoomList[curZoom]) + (GRID_SIZE * zoomList[curZoom]) - GRID_SIZE / 2);
-		var minHeight:Int = Std.int((GRID_SIZE * zoomList[curZoom] / 2) + GRID_SIZE / 2);
-
-		if (height < minHeight) height = minHeight;
-		if (height < 1) height = 1; //Prevents error of invalid height
-
-		var spr:Sprite = new Sprite(note.x + (GRID_SIZE * 0.5) - 4, note.y + GRID_SIZE / 2);
-		spr.makeGraphic(8, height);
-		return spr;
-	}
-
 	function getEventName(names:Array<Dynamic>):String
 	{
 		var retStr:String = '';
@@ -3185,6 +3171,19 @@ class ChartingState extends MusicBeatUIState
 		}
 
 		return retStr;
+	}
+
+	function setupSusNote(note:Note, beats:Float):Sprite
+	{
+		var height:Int = Math.floor(FlxMath.remapToRange(note.sustainLength, 0, Conductor.stepCrochet * 16, 0, GRID_SIZE * 16 * zoomList[curZoom]) + (GRID_SIZE * zoomList[curZoom]) - GRID_SIZE / 2);
+		var minHeight:Int = Std.int((GRID_SIZE * zoomList[curZoom] / 2) + GRID_SIZE / 2);
+
+		if (height < minHeight) height = minHeight;
+		if (height < 1) height = 1; //Prevents error of invalid height
+
+		var spr:Sprite = new Sprite(note.x + (GRID_SIZE * 0.5) - 4, note.y + GRID_SIZE / 2);
+		spr.makeGraphic(8, height);
+		return spr;
 	}
 
 	private function addSection(sectionBeats:Float = 4):Void
@@ -3258,7 +3257,6 @@ class ChartingState extends MusicBeatUIState
 	function deleteNote(note:Note):Void
 	{
 		var noteDataToCheck:Int = note.noteData;
-
 		if (noteDataToCheck > -1 && note.mustPress != _song.notes[curSec].mustHitSection) noteDataToCheck += Note.pointers.length;
 
 		if (note.noteData > -1) // Normal Notes
@@ -3336,7 +3334,7 @@ class ChartingState extends MusicBeatUIState
 		var noteStrum:Float = getStrumTime(dummyArrow.y * (getSectionBeats() / 4), false) + sectionStartTime();
 		var noteData:Int = Math.floor((FlxG.mouse.x - GRID_SIZE) / GRID_SIZE);
 		var noteSus:Int = 0;
-		var daType:Dynamic = currentType;
+		var daType:Int = currentType;
 
 		if (strum != null) noteStrum = strum;
 		if (data != null) noteData = data;
@@ -3344,7 +3342,7 @@ class ChartingState extends MusicBeatUIState
 
 		if (noteData > -1)
 		{
-			_song.notes[curSec].sectionNotes.push([noteStrum, noteData, noteSus, noteTypeIntMap.get(daType)]);
+			_song.notes[curSec].sectionNotes.push([noteStrum, noteData, noteSus, curNoteTypes[daType]]);
 			curSelectedNote = _song.notes[curSec].sectionNotes[_song.notes[curSec].sectionNotes.length - 1];
 		}
 		else
@@ -3362,7 +3360,7 @@ class ChartingState extends MusicBeatUIState
 		changeEventSelected();
 
 		if (FlxG.keys.pressed.CONTROL && noteData > -1) {
-			_song.notes[curSec].sectionNotes.push([noteStrum, (noteData + Note.pointers.length) % Math.floor(Note.pointers.length * 2), noteSus, noteTypeIntMap.get(daType)]);
+			_song.notes[curSec].sectionNotes.push([noteStrum, (noteData + Note.pointers.length) % Math.floor(Note.pointers.length * 2), noteSus, curNoteTypes[daType]]);
 		}
 
 		strumTimeInputText.text = '' + curSelectedNote[0];
