@@ -191,11 +191,6 @@ class TitleState extends MusicBeatState
 			persistentDraw = true;
 		}
 
-		#if EDITOR
-		FlxG.switchState(new editors.MenuCharacterEditorState());
-		return;
-		#end
-
 		startIntro();
 	}
 
