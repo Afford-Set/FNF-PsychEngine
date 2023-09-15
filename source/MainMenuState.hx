@@ -26,8 +26,6 @@ using StringTools;
 
 class MainMenuState extends MusicBeatState
 {
-	public static var psychEngineVersion:String = '0.7.2n';
-
 	private static var curSelected:Int = -1;
 
 	private var camGame:FlxCamera;
@@ -48,6 +46,8 @@ class MainMenuState extends MusicBeatState
 	var magenta:Sprite;
 	var camFollow:FlxPoint;
 	var camFollowPos:FlxObject;
+
+	public static var psychEngineVersion:String = '0.7.2n';
 
 	override function create():Void
 	{

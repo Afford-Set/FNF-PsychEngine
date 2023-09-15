@@ -39,7 +39,7 @@ class Option
 		this.description = description;
 		this.variable = variable;
 		this.type = type;
-		defaultValue = ClientPrefs.defaultPrefs.get(variable);
+		defaultValue = Reflect.getProperty(ClientPrefs.defaultData, variable);
 		this.options = options;
 
 		if (defaultValue == 'null variable value')

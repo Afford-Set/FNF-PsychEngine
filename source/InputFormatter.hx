@@ -56,7 +56,7 @@ class InputFormatter
 		}
 
 		var label:String = Std.string(key);
-		if (label.toLowerCase() == 'null') return '---';
+		if (label == null || label.toLowerCase() == 'null') return '---';
 
 		return CoolUtil.formatToName(label);
 	}
@@ -192,7 +192,7 @@ class InputFormatter
 		}
 
 		var label:String = Std.string(key);
-		if (label.toLowerCase() == 'null') return '---';
+		if (label == null || label.toLowerCase() == 'null') return '---';
 
 		return CoolUtil.formatToName(label);
 	}

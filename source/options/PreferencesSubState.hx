@@ -227,10 +227,10 @@ class PreferencesSubState extends MusicBeatSubState
 		if (noteSkins.length > 0)
 		{
 			if (!noteSkins.contains(ClientPrefs.noteSkin)) {
-				ClientPrefs.noteSkin = ClientPrefs.defaultPrefs.get('noteSkin'); //Reset to default if saved noteskin couldnt be found
+				ClientPrefs.noteSkin = ClientPrefs.defaultData.noteSkin; //Reset to default if saved noteskin couldnt be found
 			}
 
-			noteSkins.insert(0, ClientPrefs.defaultPrefs.get('noteSkin')); //Default skin always comes first
+			noteSkins.insert(0, ClientPrefs.defaultData.noteSkin); //Default skin always comes first
 
 			var option:Option = new Option('Note Skins:',
 				"Select your prefered Note skin.",
@@ -265,10 +265,10 @@ class PreferencesSubState extends MusicBeatSubState
 		if (noteSplashes.length > 0)
 		{
 			if (!noteSplashes.contains(ClientPrefs.splashSkin)) {
-				ClientPrefs.splashSkin = ClientPrefs.defaultPrefs.get('splashSkin'); //Reset to default if saved splashskin couldnt be found
+				ClientPrefs.splashSkin = ClientPrefs.defaultData.splashSkin; //Reset to default if saved splashskin couldnt be found
 			}
 
-			noteSplashes.insert(0, ClientPrefs.defaultPrefs.get('splashSkin')); // Default skin always comes first
+			noteSplashes.insert(0, ClientPrefs.defaultData.splashSkin); // Default skin always comes first
 
 			var option:Option = new Option('Note Splashes:',
 				"Select your prefered Note Splash variation or turn it off.",

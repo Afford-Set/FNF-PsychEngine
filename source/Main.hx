@@ -115,8 +115,8 @@ class Main extends Sprite
 		variables.width = Math.ceil(stageWidth / zoom);
 		variables.height = Math.ceil(stageHeight / zoom);
 
-		ClientPrefs.loadDefaultPrefs();
-		ClientPrefs.loadControls();
+		ClientPrefs.loadDefaultSettings();
+		Controls.instance = new Controls();
 
 		Debug.onInitProgram();
 

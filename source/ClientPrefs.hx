@@ -14,20 +14,17 @@ using StringTools;
 
 class ClientPrefs
 {
-	public static var defaultPrefs(default, null):Map<String, Dynamic> = [];
+	public static var defaultData(default, null):Dynamic = {};
 	public static var prefBlackList(default, never):Array<String> = [
-		'defaultPrefs',
+		'defaultData',
 		'prefBlackList',
 		'keyBinds',
 		'gamepadBinds',
 		'defaultKeys',
 		'defaultButtons',
 		'arrowRGB',
-		'defaultArrowRGB',
 		'arrowRGBPixel',
-		'defaultArrowRGBPixel',
 		'gameplaySettings',
-		'defaultGameplaySettings'
 	];
 
 	public static var fullScreen:Bool = false;
@@ -90,18 +87,6 @@ class ClientPrefs
 		FlxG.save.flush();
 
 		Debug.logInfo("Settings saved!");
-	}
-
-	public static function loadDefaultPrefs():Void
-	{
-		for (field in Type.getClassFields(ClientPrefs))
-		{
-			var defaultValue:Dynamic = Reflect.getProperty(ClientPrefs, field);
-
-			if (Type.typeof(defaultValue) != TFunction && !prefBlackList.contains(field)) {
-				defaultPrefs.set(field, defaultValue);
-			}
-		}
 	}
 
 	public static function loadPrefs():Void
@@ -251,14 +236,6 @@ class ClientPrefs
 		while (gamepadBind != null && gamepadBind.contains(NONE)) gamepadBind.remove(NONE);
 	}
 
-	public static function loadControls():Void
-	{
-		Controls.instance = new Controls();
-
-		defaultKeys = keyBinds.copy();
-		defaultButtons = gamepadBinds.copy();
-	}
-
 	public static function saveBinds():Void
 	{
 		var save:FlxSave = new FlxSave();
@@ -338,9 +315,6 @@ class ClientPrefs
 		[0xFFFF884E, 0xFFFFFAF5, 0xFF6C0000]
 	];
 
-	public static var defaultArrowRGB:Array<Array<FlxColor>> = null;
-	public static var defaultArrowRGBPixel:Array<Array<FlxColor>> = null;
-
 	public static function saveNoteColors():Void
 	{
 		var save:FlxSave = new FlxSave();
@@ -352,9 +326,6 @@ class ClientPrefs
 
 	public static function loadNoteColors():Void
 	{
-		defaultArrowRGB = arrowRGB.copy();
-		defaultArrowRGBPixel = arrowRGBPixel.copy();
-
 		var save:FlxSave = new FlxSave();
 		save.bind('note_colors', CoolUtil.getSavePath());
 
@@ -383,8 +354,6 @@ class ClientPrefs
 		'opponentplay' => false
 	];
 
-	public static var defaultGameplaySettings:Map<String, Dynamic> = null;
-
 	public static function saveGameplaySettings():Void
 	{
 		var save:FlxSave = new FlxSave();
@@ -395,8 +364,6 @@ class ClientPrefs
 
 	public static function loadGameplaySettings():Void
 	{
-		defaultGameplaySettings = gameplaySettings.copy();
-
 		var save:FlxSave = new FlxSave();
 		save.bind('gameplay_settings', CoolUtil.getSavePath());
 		
@@ -419,7 +386,27 @@ class ClientPrefs
 
 	public static function getGameplaySetting(name:String, defaultValue:Dynamic = null, ?customDefaultValue:Bool = false):Dynamic
 	{
-		if (!customDefaultValue) defaultValue = defaultGameplaySettings.get(name);
+		if (!customDefaultValue) defaultValue = defaultData.gameplaySettings.get(name);
 		return gameplaySettings.exists(name) ? gameplaySettings.get(name) : defaultValue;
+	}
+
+	public static function loadDefaultSettings():Void
+	{
+		defaultData.arrowRGB = arrowRGB.copy();
+		defaultData.arrowRGBPixel = arrowRGBPixel.copy();
+
+		defaultData.gameplaySettings = gameplaySettings.copy();
+
+		defaultKeys = keyBinds.copy();
+		defaultButtons = gamepadBinds.copy();
+
+		for (field in Type.getClassFields(ClientPrefs))
+		{
+			var defaultValue:Dynamic = Reflect.getProperty(ClientPrefs, field);
+
+			if (Type.typeof(defaultValue) != TFunction && !prefBlackList.contains(field)) {
+				Reflect.setProperty(defaultData, field, defaultValue);
+			}
+		}
 	}
 }

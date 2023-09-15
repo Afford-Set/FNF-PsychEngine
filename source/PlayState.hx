@@ -118,9 +118,13 @@ class PlayState extends MusicBeatState
 	public var modchartTexts:Map<String, FlxText> = new Map<String, FlxText>();
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 
+	public static var customFunctions:Map<String, Dynamic> = new Map<String, Dynamic>();
+
+	#if MODS_ALLOWED
 	public var debugMode:Bool = false;
 	public var deprecatedWarnings:Bool = false;
 	public var debugTextGroup:FlxTypedGroup<DebugText>;
+	#end
 
 	#if LUA_ALLOWED
 	public var luaArray:Array<FunkinLua> = [];
@@ -316,9 +320,11 @@ class PlayState extends MusicBeatState
 
 		createStageAndChars(SONG.stage);
 
+		#if MODS_ALLOWED
 		debugTextGroup = new FlxTypedGroup<DebugText>();
 		debugTextGroup.cameras = [camOther];
 		add(debugTextGroup);
+		#end
 
 		#if sys
 		var defaultDirectories:Array<String> = [Paths.getLibraryPath()];
@@ -1357,6 +1363,7 @@ class PlayState extends MusicBeatState
 
 	public function addTextToDebug(text:String, color:FlxColor):Void
 	{
+		#if MODS_ALLOWED
 		var newText:DebugText = debugTextGroup.recycle(DebugText);
 		newText.text = text;
 		newText.color = color;
@@ -1369,6 +1376,7 @@ class PlayState extends MusicBeatState
 		});
 
 		debugTextGroup.add(newText);
+		#end
 	}
 
 	public function reloadHealthBarColors():Void
@@ -4074,8 +4082,6 @@ class PlayState extends MusicBeatState
 							FlxG.save.flush();
 						}
 
-						SONG = null;
-
 						usedPractice = false;
 						changedDifficulty = false;
 
@@ -4119,8 +4125,6 @@ class PlayState extends MusicBeatState
 						CustomFadeTransition.nextCamera = null;
 					}
 
-					SONG = null;
-
 					usedPractice = false;
 					changedDifficulty = false;
 
@@ -4140,7 +4144,6 @@ class PlayState extends MusicBeatState
 						CustomFadeTransition.nextCamera = null;
 					}
 
-					SONG = null;
 					firstSong = null;
 
 					FlxG.switchState(new options.ReplaysMenuState());
@@ -4157,7 +4160,6 @@ class PlayState extends MusicBeatState
 						CustomFadeTransition.nextCamera = null;
 					}
 
-					SONG = null;
 					firstSong = null;
 
 					FlxG.switchState(new MainMenuState());
@@ -4879,7 +4881,7 @@ class PlayState extends MusicBeatState
 			luaArray.shift();
 		}
 
-		FunkinLua.customFunctions.clear();
+		customFunctions.clear();
 		#end
 
 		#if HSCRIPT_ALLOWED
@@ -5241,7 +5243,7 @@ class PlayState extends MusicBeatState
 	{
 		try
 		{
-			var newScript:HScript = new HScript(null, file);
+			var newScript:HScript = new HScript(file);
 
 			if (newScript.parsingException != null)
 			{
@@ -5345,7 +5347,7 @@ class PlayState extends MusicBeatState
 		return returnVal;
 	}
 	
-	public function callOnHScript(funcToCall:String, args: #if hl Dynamic #else Array<Dynamic> #end = null, ?ignoreStops:Bool = false, ?exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic
+	public function callOnHScript(funcToCall:String, args:Array<Dynamic> = null, ?ignoreStops:Bool = false, ?exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic
 	{
 		var returnVal:Dynamic = Function_Continue;
 
@@ -5681,12 +5683,9 @@ class PlayState extends MusicBeatState
 
 	public static function debugTrace(text:String, ignoreCheck:Bool = false, type:String = 'normal', color:FlxColor = FlxColor.WHITE):Void
 	{
+		#if MODS_ALLOWED
 		if (ignoreCheck || PlayState.instance.debugMode)
 		{
-			if (type == 'deprecated' && PlayState.instance.deprecatedWarnings) {
-				return;
-			}
-
 			PlayState.instance.addTextToDebug(text, color);
 
 			switch (type)
@@ -5696,6 +5695,7 @@ class PlayState extends MusicBeatState
 				default: Debug.logInfo(text);
 			}
 		}
+		#end
 	}
 
 	public static function getTween(options:Dynamic):LuaTweenOptions
@@ -5890,16 +5890,208 @@ class PlayState extends MusicBeatState
 			default:
 			{
 				var obj:Dynamic = instance.getLuaObject(objectName, checkForTextsToo);
-				if (obj == null) obj = getVarInArray(getTargetInstance(), objectName, allowMaps);
+				if (obj == null) obj = getVarInArray(getTargetInstance(), convertVariableToNew(getTargetInstanceName(), objectName), allowMaps);
 
 				return obj;
 			}
 		}
 	}
 
+	public static function convertObjectToNew(obj:String):String
+	{
+		switch (obj.trim())
+		{
+			case 'backend.ClientPrefs':
+				return 'ClientPrefs';
+			case 'backend.CoolUtil':
+				return 'CoolUtil';
+			case 'backend.Achievements':
+				return 'Achievements';
+			case 'backend.Conductor':
+				return 'Conductor';
+			case 'backend.CustomFadeTransition':
+				return 'CustomFadeTransition';
+			case 'backend.Difficulty':
+				return 'CoolUtil';
+			case 'backend.Discord':
+				return 'Discord';
+			case 'backend.Discord.DiscordClient':
+				return 'Discord.DiscordClient';
+			case 'backend.Highscore':
+				return 'Highscore';
+			case 'backend.Mods':
+				return 'Paths';
+			case 'backend.MusicBeatState':
+				return 'MusicBeatState';
+			case 'backend.MusicBeatSubState' | 'backend.MusicBeatSubstate' | 'MusicBeatSubstate':
+				return 'MusicBeatSubState';
+			case 'backend.MusicBeatUIState':
+				return 'MusicBeatUIState';
+			case 'backend.MusicBeatUISubState' | 'backend.MusicBeatUISubstate' | 'MusicBeatUISubstate':
+				return 'MusicBeatUISubState';
+			case 'backend.NoteTypesConfig':
+				return 'NoteTypesConfig';
+			case 'backend.Paths':
+				return 'Paths';
+			case 'backend.Rating':
+				return 'Rating';
+			case 'backend.Section':
+				return 'Section';
+			case 'backend.Section.SwagSection':
+				return 'Section.SwagSection';
+			case 'backend.Song':
+				return 'Song';
+			case 'backend.Song.SwagSong':
+				return 'Song.SwagSong';
+			case 'backend.StageData':
+				return 'StageData';
+			case 'backend.WeekData':
+				return 'WeekData';
+			case 'cutscenes.CutsceneHandler':
+				return 'CutsceneHandler';
+			case 'cutscenes.DialogueBox':
+				return 'DialogueBox';
+			case 'cutscenes.DialogueBoxPsych':
+				return 'DialogueBoxPsych';
+			case 'cutscenes.DialogueCharacter':
+				return 'DialogueCharacter';
+			case 'cutscenes.FlxVideo':
+				return 'FlxVideo';
+			case 'objects.AchievementPopup':
+				return 'AchievementPopup';
+			case 'objects.Alphabet':
+				return 'Alphabet';
+			case 'objects.AttachedAchievement':
+				return 'AttachedAchievement';
+			case 'objects.AttachedSprite':
+				return 'AttachedSprite';
+			case 'objects.AttachedText':
+				return 'AttachedText';
+			case 'objects.BGSprite':
+				return 'BGSprite';
+			case 'objects.Character':
+				return 'Character';
+			case 'objects.CheckboxThingie':
+				return 'CheckboxThingie';
+			case 'objects.HealthBar':
+				return 'HealthBar';
+			case 'objects.HealthIcon':
+				return 'HealthIcon';
+			case 'objects.MenuCharacter':
+				return 'MenuCharacter';
+			case 'objects.MenuItem':
+				return 'MenuItem';
+			case 'objects.Note':
+				return 'Note';
+			case 'objects.NoteSplash':
+				return 'NoteSplash';
+			case 'objects.Sprite':
+				return 'Sprite';
+			case 'objects.StrumNote':
+				return 'StrumNote';
+			case 'shaders.ColorSwap':
+				return 'shaderslmfao.ColorSwap';
+			case 'shaders.RGBPalette':
+				return 'shaderslmfao.RGBPalette';
+			case 'shaders.WiggleEffect':
+				return 'shaderslmfao.WiggleEffect';
+			case 'states.AchievementsMenuState':
+				return 'AchievementsMenuState';
+			case 'states.CreditsState' | 'states.CreditsMenuState' | 'CreditsState':
+				return 'AchievementsMenuState';
+			case 'states.FreeplayState' | 'states.FreeplayMenuState' | 'FreeplayState':
+				return 'FreeplayMenuState';
+			case 'states.LoadingState':
+				return 'LoadingState';
+			case 'states.MainMenuState':
+				return 'MainMenuState';
+			case 'states.ModsMenuState':
+				return 'ModsMenuState';
+			case 'states.OutdatedState':
+				return 'OutdatedState';
+			case 'states.PlayState':
+				return 'PlayState';
+			case 'states.StoryMenuState':
+				return 'StoryMenuState';
+			case 'states.TitleState':
+				return 'TitleState';
+			case 'states.stages.objects.BackgroundDancer':
+				return 'BackgroundDancer';
+			case 'states.stages.objects.BackgroundGirls':
+				return 'BackgroundGirls';
+			case 'states.stages.objects.BackgroundTank':
+				return 'BackgroundTank';
+			case 'states.stages.objects.DadBattleFog':
+				return 'DadBattleFog';
+			case 'states.stages.objects.MallCrowd':
+				return 'MallCrowd';
+			case 'states.stages.objects.PhillyGlowGradient':
+				return 'PhillyGlowGradient';
+			case 'states.stages.objects.PhillyGlowParticle':
+				return 'PhillyGlowParticle';
+			case 'states.stages.objects.PhillyTrain':
+				return 'PhillyTrain';
+			case 'substates.GameOverSubState' | 'substates.GameOverSubstate' | 'GameOverSubstate':
+				return 'GameOverSubstate';
+			case 'substates.GameplayChangersSubstate' | 'substates.GameplayChangersSubState' | 'GameplayChangersSubstate':
+				return 'GameplayChangersSubState';
+			case 'substates.PauseSubState':
+				return 'PauseSubState';
+			case 'substates.Prompt':
+				return 'Prompt';
+			case 'substates.ResetScoreSubState':
+				return 'ResetScoreSubState';
+			default:
+				return obj;
+		}
+	}
+
+	public static function convertVariableToNew(obj:String, variable:String):String
+	{
+		switch (obj)
+		{
+			case 'ClientPrefs':
+			{
+				if (variable.startsWith('data.')) {
+					variable = variable.substr(variable.indexOf('.') + 1);
+				}
+
+				switch (variable.trim())
+				{
+					case 'antialiasing':
+						return 'globalAntialiasing';
+					case 'showFPS':
+						return 'fpsCounter';
+					case 'showMEM' | 'showMemory':
+						return 'memoryCounter';
+					case 'shaders':
+						return 'shadersEnabled';
+					case 'saveSettings':
+						return 'savePrefs';
+					case 'flashing':
+						return 'flashingLights';
+				}
+			}
+			case 'PlayState.instance':
+			{
+				switch (variable.trim())
+				{
+					case 'moveCameraSection':
+						return 'cameraMovementSection';
+					case 'moveCamera':
+						return 'cameraMovement';
+					case 'ratingPercent':
+						return 'songAccuracy';
+				}
+			}
+		}
+
+		return variable;
+	}
+
 	public static function getTextObject(name:String):FlxText
 	{
-		return instance.modchartTexts.exists(name) ? instance.modchartTexts.get(name) : Reflect.getProperty(instance, name);
+		return instance.modchartTexts.exists(name) ? instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew('PlayState.instance', obj));
 	}
 
 	public static function isOfTypes(value:Any, types:Array<Dynamic>):Bool
@@ -5909,6 +6101,11 @@ class PlayState extends MusicBeatState
 		}
 
 		return false;
+	}
+
+	public static inline function getTargetInstanceName():String
+	{
+		return instance.isDead ? 'GameOverSubState.instance' : 'PlayState.instance';
 	}
 	
 	public static inline function getTargetInstance()

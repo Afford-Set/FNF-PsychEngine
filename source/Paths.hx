@@ -164,11 +164,11 @@ class Paths
 
 	public static function getPath(file:String, type:AssetType, ?library:Null<String> = null):String
 	{
-		if (library != null && library.length > 0) {
+		if (library != null) {
 			return getLibraryPath(file, library);
 		}
 
-		if (currentLevel != null && currentLevel.length > 0)
+		if (currentLevel != null)
 		{
 			var levelPath:String = '';
 

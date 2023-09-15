@@ -13,7 +13,7 @@ class CustomSubState extends MusicBeatSubState
 	public static var name:String = 'unnamed';
 	public static var instance:CustomSubState;
 
-	public static function implement(funk:FunkinLua):Void
+	public static function implementForLua(funk:FunkinLua):Void
 	{
 		#if LUA_ALLOWED
 		var lua:State = funk.lua;

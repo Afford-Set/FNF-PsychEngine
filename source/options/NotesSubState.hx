@@ -532,12 +532,15 @@ class NotesSubState extends MusicBeatSubState
 		}
 		else if (controls.RESET_P && hexTypeNum < 0)
 		{
+			var arrowRGB:Array<Array<FlxColor>> = ClientPrefs.defaultData.arrowRGB;
+			var arrowRGBPixel:Array<Array<FlxColor>> = ClientPrefs.defaultData.arrowRGBPixel;
+
 			if (FlxG.keys.pressed.SHIFT || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER))
 			{
 				for (i in 0...3)
 				{
 					var strumRGB:RGBShaderReference = myNotes.members[curSelectedNote].rgbShader;
-					var color:FlxColor = !onPixel ? ClientPrefs.defaultArrowRGB[curSelectedNote][i] : ClientPrefs.defaultArrowRGBPixel[curSelectedNote][i];
+					var color:FlxColor = !onPixel ? arrowRGB[curSelectedNote][i] : arrowRGBPixel[curSelectedNote][i];
 
 					switch (i)
 					{
@@ -550,7 +553,7 @@ class NotesSubState extends MusicBeatSubState
 				}
 			}
 
-			setShaderColor(!onPixel ? ClientPrefs.defaultArrowRGB[curSelectedNote][curSelectedMode] : ClientPrefs.defaultArrowRGBPixel[curSelectedNote][curSelectedMode]);
+			setShaderColor(!onPixel ? arrowRGB[curSelectedNote][curSelectedMode] : arrowRGBPixel[curSelectedNote][curSelectedMode]);
 
 			FlxG.sound.play(Paths.getSound('cancelMenu'), 0.6);
 			updateColors();

@@ -26,38 +26,40 @@ using StringTools;
 #else
 class HScript extends SScript
 {
-	public var parentLua:FunkinLua;
-	
-	public static function initHaxeModule(parent:FunkinLua):Void
+	#if LUA_ALLOWED
+	public var parentLua(default, set):FunkinLua = null;
+	#end
+
+	#if LUA_ALLOWED
+	public static function initHaxeModuleForLua(parent:FunkinLua):Void
 	{
 		if (parent.hscript == null)
 		{
 			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
-			parent.hscript = new HScript(parent);
+
+			parent.hscript = new HScript();
+			parent.hscript.parentLua = parent;
 		}
 	}
 
-	public static function initHaxeModuleCode(parent:FunkinLua, code:String):Void
+	public static function initHaxeModuleCodeForLua(parent:FunkinLua, code:String):Void
 	{
 		if (parent.hscript == null)
 		{
 			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
-			parent.hscript = new HScript(parent, code);
+
+			parent.hscript = new HScript(code);
+			parent.hscript.parentLua = parent;
 		}
 	}
+	#end
 
 	public var origin:String;
 
-	public function new(?parent:FunkinLua, ?file:String):Void
+	public function new(?file:String):Void
 	{
 		if (file == null) file = '';
 		super(file, false, false);
-
-		parentLua = parent;
-
-		if (parent != null) {
-			origin = parent.scriptName;
-		}
 
 		if (scriptFile != null && scriptFile.length > 0) {
 			origin = scriptFile;
@@ -133,10 +135,11 @@ class HScript extends SScript
 			}
 			#end
 
-			FunkinLua.customFunctions.set(name, func);
+			PlayState.customFunctions.set(name, func);
 		});
 
 		// tested
+		#if LUA_ALLOWED
 		set('createCallback', function(name:String, func:Dynamic, ?funk:FunkinLua = null):Void
 		{
 			if (funk == null) funk = parentLua;
@@ -146,6 +149,7 @@ class HScript extends SScript
 			}
 			else PlayState.debugTrace('createCallback ($name): 3rd argument is null', false, 'error', FlxColor.RED);
 		});
+		#end
 
 		set('addHaxeLibrary', function(libName:String, ?libPackage:String = ''):Void
 		{
@@ -163,18 +167,21 @@ class HScript extends SScript
 			{
 				var msg:String = e.message.substr(0, e.message.indexOf('\n'));
 
-				if (parentLua != null)
+				#if LUA_ALLOWED if (parentLua != null)
 				{
 					FunkinLua.lastCalledScript = parentLua;
 					msg = origin + ":" + parentLua.lastCalledFunction + " - " + msg;
 				}
-				else msg = '$origin - $msg';
+				else #end msg = '$origin - $msg';
 
-				PlayState.debugTrace(msg, parentLua == null, 'error', FlxColor.RED);
+				PlayState.debugTrace(msg, #if LUA_ALLOWED parentLua == null #else true #end, 'error', FlxColor.RED);
 			}
 		});
 
+		#if LUA_ALLOWED
 		set('parentLua', parentLua);
+		#end
+
 		set('this', this);
 		set('game', PlayState.instance);
 		set('buildTarget', CoolUtil.getBuildTarget());
@@ -215,12 +222,12 @@ class HScript extends SScript
 			{
 				var msg:String = e.toString();
 
-				if (parentLua != null) {
+				#if LUA_ALLOWED if (parentLua != null) {
 					msg = origin + ":" + parentLua.lastCalledFunction + " - " + msg;
 				}
-				else msg = '$origin - $msg';
+				else #end msg = '$origin - $msg';
 
-				PlayState.debugTrace(msg, parentLua == null, 'error', FlxColor.RED);
+				PlayState.debugTrace(msg, #if LUA_ALLOWED parentLua == null #else true #end, 'error', FlxColor.RED);
 			}
 
 			return null;
@@ -235,14 +242,14 @@ class HScript extends SScript
 		return call(funcToRun, funcArgs);
 	}
 
-	public static function implement(funk:FunkinLua):Void
+	public static function implementForLua(funk:FunkinLua):Void
 	{
 		#if LUA_ALLOWED
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 		{
 			var retVal:SCall = null;
 
-			initHaxeModuleCode(funk, codeToRun);
+			initHaxeModuleCodeForLua(funk, codeToRun);
 
 			if (varsToBring != null)
 			{
@@ -320,10 +327,28 @@ class HScript extends SScript
 	override public function destroy():Void
 	{
 		origin = null;
+		#if LUA_ALLOWED
 		parentLua = null;
+		#end
 
 		super.destroy();
 	}
+
+	#if LUA_ALLOWED
+	private function set_parentLua(newLua:FunkinLua):FunkinLua
+	{
+		if (newLua != null)
+		{
+			if (newLua != null) {
+				origin = newLua.scriptName;
+			}
+
+			parentLua = newLua;
+		}
+
+		return null;
+	}
+	#end
 }
 
 class CustomFlxColor

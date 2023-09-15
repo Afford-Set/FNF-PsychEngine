@@ -406,16 +406,21 @@ class GameplayChangersSubState extends MusicBeatSubState
 							updateTextFrom(curOption);
 						}
 
-						if (curOption.name == 'Scroll Speed')
+						for (i in 0...optionsArray.length)
 						{
-							curOption.displayFormat = "%vX";
-							curOption.maxValue = 3;
+							var leOption:GameplayOption = optionsArray[i];
 
-							if (curOption.value > curOption.maxValue) {
-								curOption.value = curOption.maxValue;
+							if (leOption.name == 'Scroll Speed')
+							{
+								leOption.displayFormat = "%vX";
+								leOption.maxValue = 3;
+	
+								if (leOption.value > leOption.maxValue) {
+									leOption.value = leOption.maxValue;
+								}
+	
+								updateTextFrom(leOption);
 							}
-
-							updateTextFrom(curOption);
 						}
 
 						curOption.change();
@@ -583,7 +588,7 @@ class GameplayOption
 		this.name = name;
 		this.variable = variable;
 		this.type = type;
-		defaultValue = ClientPrefs.defaultGameplaySettings.get(this.variable);
+		defaultValue = ClientPrefs.defaultData.gameplaySettings.get(this.variable);
 		this.options = options;
 
 		if (defaultValue == 'null variable value')

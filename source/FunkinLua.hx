@@ -74,7 +74,7 @@ typedef LuaTweenOptions =
 class FunkinLua
 {
 	public static var lastCalledScript:FunkinLua = null;
-	public static var customFunctions:Map<String, Dynamic> = new Map<String, Dynamic>();
+
 
 	#if LUA_ALLOWED
 	public var lua:State = null;
@@ -205,7 +205,7 @@ class FunkinLua
 
 		set('buildTarget', CoolUtil.getBuildTarget());
 
-		for (name => func in customFunctions) {
+		for (name => func in PlayState.customFunctions) {
 			if (func != null) Lua_helper.add_callback(lua, name, func);
 		}
 
@@ -476,6 +476,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = false):Dynamic
 		{
+			classVar = PlayState.convertObjectToNew(classVar);
 			var myClass:Dynamic = Type.resolveClass(classVar);
 
 			if (myClass == null)
@@ -502,6 +503,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false):Dynamic
 		{
+			classVar = PlayState.convertObjectToNew(classVar);
 			var myClass:Dynamic = Type.resolveClass(classVar);
 
 			if (myClass == null)
@@ -619,6 +621,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic> = null):Dynamic
 		{
+			className = PlayState.convertObjectToNew(className);
 			return PlayState.callMethodFromObject(Type.resolveClass(className), funcToRun, args);
 		});
 
@@ -1875,7 +1878,7 @@ class FunkinLua
 				return;
 			}
 
-			var object:FlxObject = Reflect.getProperty(PlayState.getTargetInstance(), obj);
+			var object:FlxObject = Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew(PlayState.getTargetInstanceName(), obj));
 
 			if (object != null) {
 				object.scrollFactor.set(scrollX, scrollY);
@@ -1966,7 +1969,7 @@ class FunkinLua
 				return;
 			}
 
-			var poop:FlxSprite = Reflect.getProperty(PlayState.getTargetInstance(), obj);
+			var poop:FlxSprite = Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew(PlayState.getTargetInstanceName(), obj));
 
 			if (poop != null)
 			{
@@ -2510,7 +2513,7 @@ class FunkinLua
 					objectsArray.push(real);
 				}
 				else {
-					objectsArray.push(Reflect.getProperty(PlayState.getTargetInstance(), namesArray[i]));
+					objectsArray.push(Reflect.getProperty(PlayState.getTargetInstance(), Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew(PlayState.getTargetInstanceName(), namesArray[i]))));
 				}
 			}
 
@@ -3107,10 +3110,10 @@ class FunkinLua
 		#end
 
 		#if HSCRIPT_ALLOWED
-		HScript.implement(this);
+		HScript.implementForLua(this);
 		#end
 
-		CustomSubState.implement(this);
+		CustomSubState.implementForLua(this);
 
 		try
 		{

@@ -146,7 +146,7 @@ class NoteSplash extends FlxSprite
 	{
 		var skin:String = '';
 
-		if (ClientPrefs.splashSkin != ClientPrefs.defaultPrefs.get('splashSkin')) {
+		if (ClientPrefs.splashSkin != ClientPrefs.defaultData.splashSkin) {
 			skin = '-' + ClientPrefs.splashSkin.trim().toLowerCase().replace(' ', '_');
 		}
 

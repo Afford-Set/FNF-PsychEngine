@@ -435,7 +435,7 @@ class Note extends FlxSprite
 	{
 		var skin:String = '';
 
-		if (ClientPrefs.noteSkin != ClientPrefs.defaultPrefs.get('noteSkin')) {
+		if (ClientPrefs.noteSkin != ClientPrefs.defaultData.noteSkin) {
 			skin = '-' + ClientPrefs.noteSkin.trim().toLowerCase().replace(' ', '_');
 		}
 
