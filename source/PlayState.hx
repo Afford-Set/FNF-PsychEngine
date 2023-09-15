@@ -6091,7 +6091,7 @@ class PlayState extends MusicBeatState
 
 	public static function getTextObject(name:String):FlxText
 	{
-		return instance.modchartTexts.exists(name) ? instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew('PlayState.instance', obj));
+		return instance.modchartTexts.exists(name) ? instance.modchartTexts.get(name) : Reflect.getProperty(PlayState.getTargetInstance(), PlayState.convertVariableToNew('PlayState.instance', name));
 	}
 
 	public static function isOfTypes(value:Any, types:Array<Dynamic>):Bool
