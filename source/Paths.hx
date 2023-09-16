@@ -683,6 +683,15 @@ class Paths
 			}
 		}
 
+		if (secondFolder != null && secondFolder.length > 0)
+		{
+			var fileToCheck:String = mods(secondFolder + '/' + key);
+
+			if (FileSystem.exists(fileToCheck)) {
+				return fileToCheck;
+			}
+		}
+
 		return mods(key);
 	}
 	#end
