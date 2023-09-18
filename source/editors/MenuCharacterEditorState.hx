@@ -82,6 +82,15 @@ class MenuCharacterEditorState extends MusicBeatUIState
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 
+		var tipText:FlxText = new FlxText(0, 540, FlxG.width,
+			"ASWD - Change Character Offset (Hold shift for 10x speed)
+			\nArrow Keys - Change Animation Offset (Hold shift for 10x speed)
+			\n\nHK - Change Animation
+			\nSpace - Play current animation (Boyfriend Character Type)", 16);
+		tipText.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, CENTER);
+		tipText.scrollFactor.set();
+		add(tipText);
+
 		addEditorBox();
 		reloadCharacterOptions();
 		updateOffset();
@@ -141,21 +150,21 @@ class MenuCharacterEditorState extends MusicBeatUIState
 		tab_group.name = "Character Type";
 
 		opponentCheckbox = new FlxUICheckBox(10, 20, null, null, "Opponent", 100);
-		opponentCheckbox.callback = function()
+		opponentCheckbox.callback = function():Void
 		{
 			curTypeSelected = 0;
 			updateCharTypeBox();
 		}
 
 		boyfriendCheckbox = new FlxUICheckBox(opponentCheckbox.x, opponentCheckbox.y + 40, null, null, "Boyfriend", 100);
-		boyfriendCheckbox.callback = function()
+		boyfriendCheckbox.callback = function():Void
 		{
 			curTypeSelected = 1;
 			updateCharTypeBox();
 		}
 
 		girlfriendCheckbox = new FlxUICheckBox(boyfriendCheckbox.x, boyfriendCheckbox.y + 40, null, null, "Girlfriend", 100);
-		girlfriendCheckbox.callback = function()
+		girlfriendCheckbox.callback = function():Void
 		{
 			curTypeSelected = 2;
 			updateCharTypeBox();
@@ -450,17 +459,38 @@ class MenuCharacterEditorState extends MusicBeatUIState
 	function reloadSelectedCharacter():Void
 	{
 		char = grpWeekCharacters.members[curTypeSelected];
+
+		var spriteType:String = 'sparrow';
+
+		if (Paths.fileExists('images/' + char.imageFile + '.txt', TEXT)) {
+			spriteType = 'packer';
+		}
+		else if (Paths.fileExists('images/' + char.imageFile + '/Animation.json', TEXT)) {
+			spriteType = 'texture';
+		}
+
+		var path:String = 'storymenu/menucharacters/' + char.imageFile;
+
+		if (Paths.fileExists('images/menucharacters' + char.imageFile + '.png', IMAGE)) {
+			path = 'menucharacters/' + char.imageFile;
+		}
+
+		switch (spriteType)
+		{
+			case 'packer': char.frames = Paths.getPackerAtlas(path);
+			case 'sparrow': char.frames = Paths.getSparrowAtlas(path);
+			case 'texture': char.frames = Paths.getAnimateAtlas(path);
+		}
+
 		char.alpha = 1;
 
 		curAnim = 0;
 
-		char.playAnim(char.animationsArray[0].anim, true);
+		char.playAnim(char.animationsArray[curAnim].anim, true);
 		char.antialiasing = ClientPrefs.globalAntialiasing && !char.noAntialiasing;
 
-		if (char.jsonScale != 1)
-		{
+		if (char.jsonScale != 1) {
 			char.scale.set(char.jsonScale, char.jsonScale);
-			char.updateHitbox();
 		}
 
 		updateOffset();

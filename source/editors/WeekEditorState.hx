@@ -90,6 +90,7 @@ class WeekEditorState extends MusicBeatUIState
 		add(txtWeekTitle);
 
 		var bgYellow:Sprite = new Sprite(0, 56);
+		bgYellow.makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		add(bgYellow);
 
 		bgSprite = new Sprite(0, 56);
@@ -427,7 +428,7 @@ class WeekEditorState extends MusicBeatUIState
 		var assetName:String = weekFile.weekBackground;
 		var isMissing:Bool = true;
 
-		if (assetName != null && assetName.length > 0)
+		if (assetName != null && assetName.trim().length > 0)
 		{
 			if (Paths.fileExists('images/menubackgrounds/menu_' + assetName + '.png', IMAGE))
 			{
@@ -679,6 +680,14 @@ class WeekEditorState extends MusicBeatUIState
 
 	override function update(elapsed:Float):Void
 	{
+		if (loadedWeek != null)
+		{
+			weekFile = loadedWeek;
+			loadedWeek = null;
+
+			reloadAllShit();
+		}
+
 		if (FlxG.sound.music != null) {
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
@@ -1420,7 +1429,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 	{
 		iconInputText.text = curSong.icon;
 
-		bgColorStepperR.value = Math.round(curSong.color[1]);
+		bgColorStepperR.value = Math.round(curSong.color[0]);
 		bgColorStepperG.value = Math.round(curSong.color[1]);
 		bgColorStepperB.value = Math.round(curSong.color[2]);
 
