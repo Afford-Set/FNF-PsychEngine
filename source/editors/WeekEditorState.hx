@@ -583,7 +583,6 @@ class WeekEditorState extends MusicBeatUIState
 					}
 				}
 
-				songNamesInputText.text = splittedText.join(', ');
 				updateText();
 			}
 			else if (sender == weekBeforeInputText) {
@@ -596,11 +595,11 @@ class WeekEditorState extends MusicBeatUIState
 			{
 				if (difficultiesIDsInputText.text.length > 0)
 				{
-					var splittedText:Array<String> = [for (i in difficultiesIDsInputText.text.trim().split(',')) Paths.formatToSongPath(i).trim()];
+					var splittedText:Array<String> = [for (i in difficultiesIDsInputText.text.trim().split(',')) i.trim()];
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
 								weekFile.difficulties[i] = [];
@@ -609,11 +608,15 @@ class WeekEditorState extends MusicBeatUIState
 							weekFile.difficulties[i][0] = splittedText[i];
 						}
 					}
-
-					difficultiesIDsInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesIDsInputText.text = '';
+
+				for (i in 0...weekFile.difficulties.length)
+				{
+					if ((weekFile.difficulties[i][0] == null || weekFile.difficulties[i][0].length < 1) &&
+						(weekFile.difficulties[i][1] == null || weekFile.difficulties[i][1].length < 1) &&
+						(weekFile.difficulties[i][2] == null || weekFile.difficulties[i][2].length < 1)) {
+						weekFile.difficulties.remove(weekFile.difficulties[i]);
+					}
 				}
 			}
 			else if (sender == difficultiesNamesInputText)
@@ -624,7 +627,7 @@ class WeekEditorState extends MusicBeatUIState
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
 								weekFile.difficulties[i] = [];
@@ -633,11 +636,15 @@ class WeekEditorState extends MusicBeatUIState
 							weekFile.difficulties[i][1] = splittedText[i];
 						}
 					}
-
-					difficultiesNamesInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesNamesInputText.text = '';
+
+				for (i in 0...weekFile.difficulties.length)
+				{
+					if ((weekFile.difficulties[i][0] == null || weekFile.difficulties[i][0].length < 1) &&
+						(weekFile.difficulties[i][1] == null || weekFile.difficulties[i][1].length < 1) &&
+						(weekFile.difficulties[i][2] == null || weekFile.difficulties[i][2].length < 1)) {
+						weekFile.difficulties.remove(weekFile.difficulties[i]);
+					}
 				}
 			}
 			else if (sender == difficultiesSuffixesInputText)
@@ -648,7 +655,7 @@ class WeekEditorState extends MusicBeatUIState
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (weekFile.difficulties[i] == null || weekFile.difficulties[i].length < 1) {
 								weekFile.difficulties[i] = [];
@@ -657,11 +664,15 @@ class WeekEditorState extends MusicBeatUIState
 							weekFile.difficulties[i][2] = splittedText[i];
 						}
 					}
-
-					difficultiesSuffixesInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesSuffixesInputText.text = '';
+
+				for (i in 0...weekFile.difficulties.length)
+				{
+					if ((weekFile.difficulties[i][0] == null || weekFile.difficulties[i][0].length < 1) &&
+						(weekFile.difficulties[i][1] == null || weekFile.difficulties[i][1].length < 1) &&
+						(weekFile.difficulties[i][2] == null || weekFile.difficulties[i][2].length < 1)) {
+						weekFile.difficulties.remove(weekFile.difficulties[i]);
+					}
 				}
 			}
 		}
@@ -1005,11 +1016,11 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		UI_box.x = FlxG.width - UI_box.width - 100;
 		UI_box.y = FlxG.height - UI_box.height - 50;
 		UI_box.scrollFactor.set();
-		UI_box.selected_tab = 0;
 
 		addFreeplayUI();
 		addDiffsUI();
 
+		UI_box.selected_tab_id = 'Freeplay';
 		add(UI_box);
 
 		var blackBlack:Sprite = new Sprite(0, 670);
@@ -1182,11 +1193,11 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 			{
 				if (difficultiesIDsInputText.text.length > 0)
 				{
-					var splittedText:Array<String> = [for (i in difficultiesIDsInputText.text.trim().split(',')) Paths.formatToSongPath(i).trim()];
+					var splittedText:Array<String> = [for (i in difficultiesIDsInputText.text.trim().split(',')) i.trim()];
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (curSong.difficulties[i] == null || curSong.difficulties[i].length < 1) {
 								curSong.difficulties[i] = [];
@@ -1195,11 +1206,15 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 							curSong.difficulties[i][0] = splittedText[i];
 						}
 					}
-
-					difficultiesIDsInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesIDsInputText.text = '';
+
+				for (i in 0...curSong.difficulties.length)
+				{
+					if ((curSong.difficulties[i][0] == null || curSong.difficulties[i][0].length < 1) &&
+						(curSong.difficulties[i][1] == null || curSong.difficulties[i][1].length < 1) &&
+						(curSong.difficulties[i][2] == null || curSong.difficulties[i][2].length < 1)) {
+						curSong.difficulties.remove(curSong.difficulties[i]);
+					}
 				}
 			}
 			else if (sender == difficultiesNamesInputText)
@@ -1210,7 +1225,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (curSong.difficulties[i] == null || curSong.difficulties[i].length < 1) {
 								curSong.difficulties[i] = [];
@@ -1219,11 +1234,15 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 							curSong.difficulties[i][1] = splittedText[i];
 						}
 					}
-
-					difficultiesNamesInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesNamesInputText.text = '';
+	
+				for (i in 0...curSong.difficulties.length)
+				{
+					if ((curSong.difficulties[i][0] == null || curSong.difficulties[i][0].length < 1) &&
+						(curSong.difficulties[i][1] == null || curSong.difficulties[i][1].length < 1) &&
+						(curSong.difficulties[i][2] == null || curSong.difficulties[i][2].length < 1)) {
+						curSong.difficulties.remove(curSong.difficulties[i]);
+					}
 				}
 			}
 			else if (sender == difficultiesSuffixesInputText)
@@ -1234,7 +1253,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 
 					if (splittedText.length > 0)
 					{
-						for (i in 0...splittedText.length) 
+						for (i in 0...splittedText.length)
 						{
 							if (curSong.difficulties[i] == null || curSong.difficulties[i].length < 1) {
 								curSong.difficulties[i] = [];
@@ -1243,11 +1262,15 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 							curSong.difficulties[i][2] = splittedText[i];
 						}
 					}
-
-					difficultiesSuffixesInputText.text = splittedText.join(', ');
 				}
-				else {
-					difficultiesSuffixesInputText.text = '';
+
+				for (i in 0...curSong.difficulties.length)
+				{
+					if ((curSong.difficulties[i][0] == null || curSong.difficulties[i][0].length < 1) &&
+						(curSong.difficulties[i][1] == null || curSong.difficulties[i][1].length < 1) &&
+						(curSong.difficulties[i][2] == null || curSong.difficulties[i][2].length < 1)) {
+						curSong.difficulties.remove(curSong.difficulties[i]);
+					}
 				}
 			}
 			else if (sender == iconInputText)

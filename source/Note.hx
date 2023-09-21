@@ -83,6 +83,7 @@ class Note extends FlxSprite
 	public static var defaultNoteSkin(default, never):String = 'noteSkins/NOTE_assets';
 
 	public var noteSplashData:NoteSplashData = {
+		quick: false,
 		disabled: false,
 		texture: null,
 		antialiasing: !PlayState.isPixelStage,

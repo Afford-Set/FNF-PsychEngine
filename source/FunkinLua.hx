@@ -101,7 +101,11 @@ class FunkinLua
 		var game:PlayState = PlayState.instance;
 
 		set('Function_StopLua', PlayState.Function_StopLua);
+
+		#if HSCRIPT_ALLOWED
 		set('Function_StopHScript', PlayState.Function_StopHScript);
+		#end
+
 		set('Function_StopAll', PlayState.Function_StopAll);
 		set('Function_Stop', PlayState.Function_Stop);
 		set('Function_Continue', PlayState.Function_Continue);
@@ -134,6 +138,9 @@ class FunkinLua
 		set('week', WeekData.getWeekFileName());
 		set('seenCutscene', PlayState.seenCutscene);
 		set('hasVocals', PlayState.SONG.needsVoices);
+
+		var mode:String = Paths.formatToSongPath(ClientPrefs.cutscenesOnMode);
+		set('allowPlayCutscene', mode.contains(PlayState.gameMode) || ClientPrefs.cutscenesOnMode == 'Everywhere');
 
 		// Camera poo
 		set('cameraX', 0);
@@ -464,14 +471,22 @@ class FunkinLua
 		{
 			var split:Array<String> = variable.split('.');
 
-			if (split.length > 1)
+			try
 			{
-				PlayState.setVarInArray(PlayState.getPropertyLoop(split, true, true, allowMaps), split[split.length - 1], value, allowMaps);
+				if (split.length > 1)
+				{
+					PlayState.setVarInArray(PlayState.getPropertyLoop(split, true, true, allowMaps), split[split.length - 1], value, allowMaps);
+					return true;
+				}
+	
+				PlayState.setVarInArray(PlayState.getTargetInstance(), variable, value, allowMaps);
 				return true;
 			}
+			catch (e) {
+				trace(e);
+			}
 
-			PlayState.setVarInArray(PlayState.getTargetInstance(), variable, value, allowMaps);
-			return true;
+			return false;
 		});
 
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = false):Dynamic
@@ -2539,7 +2554,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "startDialogue", function(dialogueFile:String, music:String = null):Bool
 		{
-			var path:String = Paths.getJson(PlayState.SONG.songID + '/' + dialogueFile);
+			var path:String = Paths.getJson('data/' + PlayState.SONG.songID + '/' + dialogueFile);
 			PlayState.debugTrace('startDialogue: Trying to load dialogue: ' + path);
 
 			if (Paths.fileExists(path, TEXT))
@@ -3117,6 +3132,8 @@ class FunkinLua
 
 		try
 		{
+			scriptName = scriptName.substr(scriptName.indexOf(':') + 1);
+
 			var result:Dynamic = LuaL.dofile(lua, scriptName);
 			var resultStr:String = Lua.tostring(lua, result);
 
@@ -3285,10 +3302,9 @@ class FunkinLua
 		if (!scriptFile.endsWith(ext)) scriptFile += ext;
 
 		var path:String = Paths.getFile(scriptFile);
-		if (Paths.fileExists(scriptFile, TEXT)) path = scriptFile;
 
 		if (Paths.fileExists(path, TEXT)) {
-			return path;
+			return path.substr(path.indexOf(':') + 1);
 		}
 
 		return null;

@@ -128,9 +128,9 @@
 	<haxelib name="flixel-addons" />
 
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="web" />
-	<haxelib name="SScript" if="HSCRIPT_ALLOWED" />
 	<haxelib name="linc_luajit" if="LUA_ALLOWED" />
 	<haxelib name="discord_rpc" if="DISCORD_ALLOWED" />
+	<haxelib name="hscript-improved" if="HSCRIPT_ALLOWED" />
 
 	<haxedef name="openflPos" />
 	<haxedef name="hscriptPos" />

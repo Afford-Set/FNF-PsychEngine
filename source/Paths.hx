@@ -276,11 +276,14 @@ class Paths
 		#if MODS_ALLOWED
 		if (!ignoreMods)
 		{
+			if (FileSystem.exists(file)) return file;
+
 			var modded:String = modFolders(file, library);
 			if (FileSystem.exists(modded)) return modded;
 		}
 		#end
 
+		if (OpenFlAssets.exists(file, type)) return file;
 		return getPath(file, type, library);
 	}
 

@@ -178,20 +178,8 @@ class WeekData
 					songID: Paths.formatToSongPath(song[0]),
 					songName: CoolUtil.formatToName(song[0]),
 					icon: song[1],
-					color: song[2],
-					difficulties: diffs.copy(),
-					defaultDifficulty: weekFile.defaultDifficulty
+					color: song[2]
 				};
-			}
-			else
-			{
-				var song:WeekSong = weekFile.songs[i];
-
-				if (song.difficulties == null || song.difficulties.length < 1)
-				{
-					var shit:Array<Dynamic> = weekFile.difficulties; // fucking HTML5
-					song.difficulties = shit.copy();
-				}
 			}
 		}
 

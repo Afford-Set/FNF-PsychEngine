@@ -32,10 +32,6 @@ import Achievements;
 import Replay;
 #end
 
-#if HSCRIPT_ALLOWED
-import tea.SScript;
-#end
-
 #if RUNTIME_SHADERS_ALLOWED
 import flixel.addons.display.FlxRuntimeShader;
 #end
@@ -360,11 +356,11 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if LUA_ALLOWED
-		startLuasNamed('stages/' + SONG.stage + '.lua');
+		startLuasNamed('stages/' + SONG.stage);
 		#end
 
 		#if HSCRIPT_ALLOWED
-		startHScriptsNamed('stages/' + SONG.stage + '.hx');
+		startHScriptsNamed('stages/' + SONG.stage);
 		#end
 
 		Conductor.songPosition = -5000 / Conductor.songPosition;
@@ -397,13 +393,13 @@ class PlayState extends MusicBeatState
 		createHud();
 
 		#if LUA_ALLOWED
-		for (notetype in noteTypes) startLuasNamed('custom_notetypes/' + notetype + '.lua');
-		for (event in eventsPushed) startLuasNamed('custom_events/' + event + '.lua');
+		for (notetype in noteTypes) startLuasNamed('custom_notetypes/' + notetype);
+		for (event in eventsPushed) startLuasNamed('custom_events/' + event);
 		#end
 
 		#if HSCRIPT_ALLOWED
-		for (notetype in noteTypes) startHScriptsNamed('custom_notetypes/' + notetype + '.hx');
-		for (event in eventsPushed) startHScriptsNamed('custom_events/' + event + '.hx');
+		for (notetype in noteTypes) startHScriptsNamed('custom_notetypes/' + notetype);
+		for (event in eventsPushed) startHScriptsNamed('custom_events/' + event);
 		#end
 
 		noteTypes = null;
@@ -600,6 +596,8 @@ class PlayState extends MusicBeatState
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
+
+		callOnScripts('onCreatePost');
 
 		cacheCountdown();
 		cachePopUpScore();
@@ -1454,17 +1452,24 @@ class PlayState extends MusicBeatState
 		#if HSCRIPT_ALLOWED // hscript
 		var doPush:Bool = false;
 		var scriptFile:String = 'characters/' + name;
-		var replacePath:String = Paths.getHX(scriptFile);
 
-		if (Paths.fileExists(replacePath, TEXT))
+		if (Paths.fileExists(scriptFile, TEXT))
 		{
-			if (SScript.global.exists(scriptFile + '.hx')) doPush = false;
+			for (hx in hscriptArray)
+			{
+				if (hx.origin == scriptFile)
+				{
+					doPush = false;
+					break;
+				}
+			}
+
 			if (doPush) initHScript(scriptFile + '.hx');
 		}
 		#end
 	}
 
-	public function getLuaObject(tag:String, text:Bool = true):Dynamic
+	public function getLuaObject(tag:String, text:Bool = true):FlxSprite
 	{
 		#if LUA_ALLOWED
 		if (modchartSprites.exists(tag)) return modchartSprites.get(tag);
@@ -3924,21 +3929,27 @@ class PlayState extends MusicBeatState
 	{
 		var finishCallback:Void->Void = function():Void endSong(); // In case you want to change it in a specific song.
 
-		switch (SONG.songID)
+		var mode:String = Paths.formatToSongPath(ClientPrefs.cutscenesOnMode);
+		allowPlayCutscene = mode.contains(gameMode) || ClientPrefs.cutscenesOnMode == 'Everywhere';
+
+		if (allowPlayCutscene)
 		{
-			case 'eggnog':
+			switch (SONG.songID)
 			{
-				finishCallback = function():Void
+				case 'eggnog':
 				{
-					var blackShit:Sprite = new Sprite(-FlxG.width * FlxG.camera.zoom, -FlxG.height * FlxG.camera.zoom);
-					blackShit.makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-					blackShit.scrollFactor.set();
-					add(blackShit);
-
-					camHUD.visible = false;
-					inCutscene = true;
-
-					FlxG.sound.play(Paths.getSound('Lights_Shut_off'), 1, false, null, true, function():Void endSong());
+					finishCallback = function():Void
+					{
+						var blackShit:Sprite = new Sprite(-FlxG.width * FlxG.camera.zoom, -FlxG.height * FlxG.camera.zoom);
+						blackShit.makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
+						blackShit.scrollFactor.set();
+						add(blackShit);
+	
+						camHUD.visible = false;
+						inCutscene = true;
+	
+						FlxG.sound.play(Paths.getSound('Lights_Shut_off'), 1, false, null, true, function():Void endSong());
+					}
 				}
 			}
 		}
@@ -4787,6 +4798,10 @@ class PlayState extends MusicBeatState
 
 			popUpScore(note);
 
+			if (!note.noteSplashData.disabled && note.noteSplashData.quick) {
+				spawnNoteSplashOnNote(note);
+			}
+
 			if (!note.healthDisabled) {
 				health += note.hitHealth * healthGain;
 			}
@@ -4889,7 +4904,7 @@ class PlayState extends MusicBeatState
 		{
 			if (script != null)
 			{
-				script.call('onDestroy');
+				script.executeFunction('onDestroy');
 				script.destroy();
 			}
 
@@ -5226,11 +5241,12 @@ class PlayState extends MusicBeatState
 
 		if (Paths.fileExists(scriptToLoad, TEXT))
 		{
-			#if sys
-			scriptToLoad.substr(scriptToLoad.indexOf(':') + 1);
-			#end
-
-			if (SScript.global.exists(scriptToLoad)) return false;
+			for (hx in hscriptArray)
+			{
+				if (hx.origin == scriptToLoad) {
+					return false;
+				}
+			}
 	
 			initHScript(scriptToLoad);
 			return true;
@@ -5241,51 +5257,47 @@ class PlayState extends MusicBeatState
 
 	public function initHScript(file:String):Void
 	{
+		var makeError:HScript->Void = function(newScript:HScript):Void
+		{
+			newScript.destroy();
+			hscriptArray.remove(newScript);
+			newScript = null;
+		}
+
 		try
 		{
 			var newScript:HScript = new HScript(file);
+			hscriptArray.push(newScript);
 
-			if (newScript.parsingException != null)
+			if (newScript.exception != null)
 			{
-				addTextToDebug('ERROR ON LOADING ($file): ${newScript.parsingException.message.substr(0, newScript.parsingException.message.indexOf('\n'))}', FlxColor.RED);
+				debugTrace('ERROR ON LOADING - ${newScript.exception.message}', false, 'error', FlxColor.RED);
 
-				newScript.destroy();
+				makeError(newScript);
 				return;
 			}
 
-			hscriptArray.push(newScript);
-
-			if (newScript.exists('onCreate'))
+			if (newScript.variables.exists('onCreate'))
 			{
-				var callValue:SCall = newScript.call('onCreate');
+				var retVal:Dynamic = newScript.executeFunction('onCreate');
 
-				if (!callValue.succeeded)
+				if (newScript.exception != null)
 				{
-					for (e in callValue.exceptions)
-					{
-						if (e != null) {
-							addTextToDebug('ERROR ($file: onCreate) - ${e.message.substr(0, e.message.indexOf('\n'))}', FlxColor.RED);
-						}
-					}
+					debugTrace('ERROR (onCreate) - ${newScript.exception.message}', false, 'error', FlxColor.RED);
+					makeError(newScript);
 
-					newScript.destroy();
-					hscriptArray.remove(newScript);
-
-					Debug.logWarn('failed to initialize sscript interp!!! ($file)');
+					return;
 				}
-				else Debug.logInfo('initialized sscript interp successfully: $file');
 			}
-			
+
+			Debug.logInfo('initialized hscript interp successfully: $file');
 		}
 		catch (e:Error)
 		{
-			addTextToDebug('ERROR ($file) - ' + e.message.substr(0, e.message.indexOf('\n')), FlxColor.RED);
-			var newScript:HScript = cast (SScript.global.get(file), HScript);
+			debugTrace('ERROR - $e', false, 'error', FlxColor.RED);
 
-			if (newScript != null)
-			{
-				newScript.destroy();
-				hscriptArray.remove(newScript);
+			if (hscriptArray.length > 0) {
+				makeError(hscriptArray[hscriptArray.length - 1]);
 			}
 		}
 	}
@@ -5358,38 +5370,32 @@ class PlayState extends MusicBeatState
 		excludeValues.push(Function_Continue);
 
 		var len:Int = hscriptArray.length;
-		if (len < 1) return returnVal;
+
+		if (len < 1) {
+			return returnVal;
+		}
 
 		for (i in 0...len)
 		{
 			var script:HScript = hscriptArray[i];
-			if (script == null || !script.exists(funcToCall) || exclusions.contains(script.origin)) continue;
+
+			if (script == null || !script.active || !script.variables.exists(funcToCall) || exclusions.contains(script.origin)) {
+				continue;
+			}
 
 			var myValue:Dynamic = null;
 
 			try
 			{
-				var callValue:Dynamic = script.call(funcToCall, args);
+				returnVal = script.executeFunction(funcToCall, args);
 
-				if (!callValue.succeeded)
+				if (script.exception != null)
 				{
-					var e:Exception = callValue.exceptions[0];
-
-					if (e != null) {
-						debugTrace('ERROR (${script.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), true, 'error', FlxColor.RED);
-					}
+					script.active = false;
+					debugTrace('ERROR ($funcToCall) - ${script.exception}', true, 'error', FlxColor.RED);
 				}
-				else
-				{
-					myValue = callValue.returnValue;
-
-					if ((myValue == Function_StopHScript || myValue == Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-					{
-						returnVal = myValue;
-						break;
-					}
-
-					if (myValue != null && !excludeValues.contains(myValue)) returnVal = myValue;
+				else {
+					if ((returnVal == Function_StopHScript || returnVal == Function_StopAll) && !excludeValues.contains(returnVal) && !ignoreStops) break;
 				}
 			}
 		}
@@ -5427,7 +5433,7 @@ class PlayState extends MusicBeatState
 		for (script in hscriptArray)
 		{
 			if (exclusions.contains(script.origin)) continue;
-			script.set(variable, arg);
+			script.setVar(variable, arg);
 		}
 		#end
 	}
@@ -5719,10 +5725,10 @@ class PlayState extends MusicBeatState
 		{
 			var target:Dynamic = null;
 	
-			if (instance.variables.exists(splitProps[0]))
+			if (PlayState.instance.variables.exists(splitProps[0]))
 			{
-				var retVal:Dynamic = instance.variables.get(splitProps[0]);
-
+				var retVal:Dynamic = PlayState.instance.variables.get(splitProps[0]);
+	
 				if (retVal != null) {
 					target = retVal;
 				}
@@ -5736,7 +5742,10 @@ class PlayState extends MusicBeatState
 				if (i >= splitProps.length - 1) { // Last array
 					target[j] = value;
 				}
-				else target = target[j]; // Anything else
+				
+				else { // Anything else
+					target = target[j];
+				}
 			}
 
 			return target;
@@ -5748,9 +5757,9 @@ class PlayState extends MusicBeatState
 			return value;
 		}
 
-		if (instance.variables.exists(variable))
+		if (PlayState.instance.variables.exists(variable))
 		{
-			instance.variables.set(variable, value);
+			PlayState.instance.variables.set(variable, value);
 			return value;
 		}
 
@@ -5765,13 +5774,18 @@ class PlayState extends MusicBeatState
 		if (splitProps.length > 1)
 		{
 			var target:Dynamic = null;
-	
-			if (instance.variables.exists(splitProps[0]))
+
+			if (PlayState.instance.variables.exists(splitProps[0]))
 			{
-				var retVal:Dynamic = instance.variables.get(splitProps[0]);
-				if (retVal != null) target = retVal;
+				var retVal:Dynamic = PlayState.instance.variables.get(splitProps[0]);
+
+				if (retVal != null) {
+					target = retVal;
+				}
 			}
-			else target = Reflect.getProperty(instance, splitProps[0]);
+			else {
+				target = Reflect.getProperty(instance, splitProps[0]);
+			}
 
 			for (i in 1...splitProps.length)
 			{
@@ -5786,10 +5800,13 @@ class PlayState extends MusicBeatState
 			return instance.get(variable);
 		}
 
-		if (instance.variables.exists(variable))
+		if (PlayState.instance.variables.exists(variable))
 		{
-			var retVal:Dynamic = instance.variables.get(variable);
-			if (retVal != null) return retVal;
+			var retVal:Dynamic = PlayState.instance.variables.get(variable);
+
+			if (retVal != null) {
+				return retVal;
+			}
 		}
 
 		return Reflect.getProperty(instance, variable);

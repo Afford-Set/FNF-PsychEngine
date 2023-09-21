@@ -792,6 +792,10 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 			popUpScore(note);
 
+			if (!note.noteSplashData.disabled && note.noteSplashData.quick) {
+				spawnNoteSplashOnNote(note);
+			}
+
 			var spr:StrumNote = playerStrums.members[note.noteData];
 			if (spr != null) spr.playAnim('confirm', true);
 

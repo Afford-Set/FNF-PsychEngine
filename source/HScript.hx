@@ -11,28 +11,32 @@ import llua.Convert;
 #end
 
 import flixel.FlxBasic;
+import openfl.errors.Error;
 import flixel.util.FlxColor;
 
 #if HSCRIPT_ALLOWED
-import tea.SScript;
-import tea.backend.SScriptException;
+import hscript.Parser;
+import hscript.Interp;
 #end
 
 using StringTools;
 
 #if HSCRIPT_ALLOWED
-#if (SScript < "5.0.0")
-#error "HScript version is only allowed above 5.0.0";
-#else
-class HScript extends SScript
+class HScript extends Interp
 {
+	public var active:Bool = true;
+	public var parser:Parser;
+
 	#if LUA_ALLOWED
 	public var parentLua(default, set):FunkinLua = null;
 	#end
+	
+	public var exception:Error;
 
 	#if LUA_ALLOWED
 	public static function initHaxeModuleForLua(parent:FunkinLua):Void
 	{
+		#if HSCRIPT_ALLOWED
 		if (parent.hscript == null)
 		{
 			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
@@ -40,16 +44,15 @@ class HScript extends SScript
 			parent.hscript = new HScript();
 			parent.hscript.parentLua = parent;
 		}
+		#end
 	}
 
 	public static function initHaxeModuleCodeForLua(parent:FunkinLua, code:String):Void
 	{
-		if (parent.hscript == null)
-		{
-			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
+		initHaxeModuleForLua(parent);
 
-			parent.hscript = new HScript(code);
-			parent.hscript.parentLua = parent;
+		if (parent.hscript != null) {
+			parent.hscript.executeCode(code);
 		}
 	}
 	#end
@@ -58,52 +61,76 @@ class HScript extends SScript
 
 	public function new(?file:String):Void
 	{
-		if (file == null) file = '';
-		super(file, false, false);
+		super();
 
-		if (scriptFile != null && scriptFile.length > 0) {
-			origin = scriptFile;
+		var content:String = null;
+
+		if (file != null && file.length > 0) {
+			content = Paths.getTextFromFile(file);
+		}
+
+		if (content != null) {
+			origin = file;
 		}
 
 		preset();
-		execute();
+		executeCode(content);
 	}
 
-	override function preset():Void
+	function preset():Void
 	{
-		super.preset();
+		parser = new Parser();
+		parser.allowJSON = parser.allowMetadata = parser.allowTypes = true;
+
+		scriptObject = PlayState.instance; // allow use vars from playstate without "game" thing
+
+		setVar('Date', Date);
+		setVar('DateTools', DateTools);
+		setVar('Math', Math);
+		setVar('Reflect', Reflect);
+		setVar('Std', Std);
+		setVar('HScript', HScript);
+		setVar('StringTools', StringTools);
+		setVar('Type', Type);
+
+		#if sys
+		setVar('File', sys.io.File);
+		setVar('FileSystem', sys.FileSystem);
+		setVar('Sys', Sys);
+		#end
+
+		setVar('Assets', openfl.Assets);
 
 		// Some very commonly used classes
-		set('FlxG', flixel.FlxG);
-		set('FlxSprite', flixel.FlxSprite);
-		set('FlxCamera', flixel.FlxCamera);
-		set('FlxTimer', flixel.util.FlxTimer);
-		set('FlxTween', flixel.tweens.FlxTween);
-		set('FlxEase', flixel.tweens.FlxEase);
-		set('FlxColor', CustomFlxColor);
-		set('PlayState', PlayState);
-		set('Sprite', Sprite);
-		set('Paths', Paths);
-		set('Conductor', Conductor);
-		set('ClientPrefs', ClientPrefs);
-		set('Character', Character);
-		set('Alphabet', Alphabet);
-		set('Note', Note);
-		set('CustomSubState', CustomSubState);
-		set('CustomSubstate', CustomSubState);
+		setVar('FlxG', flixel.FlxG);
+		setVar('FlxSprite', flixel.FlxSprite);
+		setVar('FlxCamera', flixel.FlxCamera);
+		setVar('FlxTimer', flixel.util.FlxTimer);
+		setVar('FlxTween', flixel.tweens.FlxTween);
+		setVar('FlxEase', flixel.tweens.FlxEase);
+		setVar('FlxColor', CustomFlxColor);
+		setVar('PlayState', PlayState);
+		setVar('Sprite', Sprite);
+		setVar('Paths', Paths);
+		setVar('Conductor', Conductor);
+		setVar('ClientPrefs', ClientPrefs);
+		setVar('Character', Character);
+		setVar('Alphabet', Alphabet);
+		setVar('Note', Note);
+		setVar('CustomSubState', CustomSubState);
+		setVar('CustomSubstate', CustomSubState);
 		#if RUNTIME_SHADERS_ALLOWED
-		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
+		setVar('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
-		set('ShaderFilter', openfl.filters.ShaderFilter);
-		set('StringTools', StringTools);
+		setVar('ShaderFilter', openfl.filters.ShaderFilter);
 
 		// Functions & Variables
-		set('setVar', function(name:String, value:Dynamic):Void
+		setVar('setVar', function(name:String, value:Dynamic):Void
 		{
 			return PlayState.instance.variables.set(name, value);
 		});
 
-		set('getVar', function(name:String):Dynamic
+		setVar('getVar', function(name:String):Dynamic
 		{
 			var result:Dynamic = null;
 			if (PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
@@ -111,12 +138,12 @@ class HScript extends SScript
 			return result;
 		});
 
-		set('removeVar', function(name:String):Bool
+		setVar('removeVar', function(name:String):Bool
 		{
 			return PlayState.instance.variables.remove(name);
 		});
 
-		set('debugPrint', function(text:String, ?color:FlxColor = null):Void
+		setVar('debugPrint', function(text:String, ?color:FlxColor = null):Void
 		{
 			if (color == null) color = FlxColor.WHITE;
 			PlayState.instance.addTextToDebug(text, color);
@@ -124,7 +151,7 @@ class HScript extends SScript
 
 		// For adding your own callbacks
 
-		set('createGlobalCallback', function(name:String, func:Dynamic):Void // not very tested but should work
+		setVar('createGlobalCallback', function(name:String, func:Dynamic):Void // not very tested but should work
 		{
 			#if LUA_ALLOWED
 			for (script in PlayState.instance.luaArray)
@@ -140,7 +167,7 @@ class HScript extends SScript
 
 		// tested
 		#if LUA_ALLOWED
-		set('createCallback', function(name:String, func:Dynamic, ?funk:FunkinLua = null):Void
+		setVar('createCallback', function(name:String, func:Dynamic, ?funk:FunkinLua = null):Void
 		{
 			if (funk == null) funk = parentLua;
 			
@@ -151,7 +178,7 @@ class HScript extends SScript
 		});
 		#end
 
-		set('addHaxeLibrary', function(libName:String, ?libPackage:String = ''):Void
+		setVar('addHaxeLibrary', function(libName:String, ?libPackage:String = ''):Void
 		{
 			try
 			{
@@ -161,7 +188,7 @@ class HScript extends SScript
 					str = libPackage + '.';
 				}
 
-				set(libName, Type.resolveClass(str + libName));
+				setVar(libName, Type.resolveClass(str + libName));
 			}
 			catch (e:Dynamic)
 			{
@@ -179,67 +206,66 @@ class HScript extends SScript
 		});
 
 		#if LUA_ALLOWED
-		set('parentLua', parentLua);
+		setVar('parentLua', parentLua);
 		#end
 
-		set('this', this);
-		set('game', PlayState.instance);
-		set('buildTarget', CoolUtil.getBuildTarget());
-		set('customSubstate', CustomSubState.instance);
-		set('customSubstateName', CustomSubState.name);
+		setVar('this', this);
+		setVar('game', PlayState.instance);
+		setVar('buildTarget', CoolUtil.getBuildTarget());
+		setVar('customSubstate', CustomSubState.instance);
+		setVar('customSubstateName', CustomSubState.name);
 
-		set('Function_Stop', PlayState.Function_Stop);
-		set('Function_Continue', PlayState.Function_Continue);
-		set('Function_StopLua', PlayState.Function_StopLua); //doesnt do much cuz HScript has a lower priority than Lua
-		set('Function_StopHScript', PlayState.Function_StopHScript);
-		set('Function_StopAll', PlayState.Function_StopAll);
-		
-		set('add', function(obj:FlxBasic):Void PlayState.instance.add(obj));
-		set('addBehindGF', function(obj:FlxBasic):Void PlayState.instance.addBehindGF(obj));
-		set('addBehindDad', function(obj:FlxBasic):Void PlayState.instance.addBehindDad(obj));
-		set('addBehindBF', function(obj:FlxBasic):Void PlayState.instance.addBehindBF(obj));
-		set('insert', function(pos:Int, obj:FlxBasic):Void PlayState.instance.insert(pos, obj));
-		set('remove', function(obj:FlxBasic, splice:Bool = false):Void PlayState.instance.remove(obj, splice));
+		setVar('Function_Stop', PlayState.Function_Stop);
+		setVar('Function_Continue', PlayState.Function_Continue);
+
+		#if LUA_ALLOWED
+		setVar('Function_StopLua', PlayState.Function_StopLua);
+		#end
+
+		setVar('Function_StopHScript', PlayState.Function_StopHScript);
+		setVar('Function_StopAll', PlayState.Function_StopAll);
+
+		setVar('add', function(obj:FlxBasic):Void PlayState.instance.add(obj));
+		setVar('addBehindGF', function(obj:FlxBasic):Void PlayState.instance.addBehindGF(obj));
+		setVar('addBehindDad', function(obj:FlxBasic):Void PlayState.instance.addBehindDad(obj));
+		setVar('addBehindBF', function(obj:FlxBasic):Void PlayState.instance.addBehindBF(obj));
+		setVar('insert', function(pos:Int, obj:FlxBasic):Void PlayState.instance.insert(pos, obj));
+		setVar('remove', function(obj:FlxBasic, splice:Bool = false):Void PlayState.instance.remove(obj, splice));
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):SCall
+	public function executeCode(?codeToRun:String):Dynamic
 	{
-		if (funcToRun == null) return null;
-
-		if (!exists(funcToRun))
+		if (codeToRun != null && active)
 		{
-			PlayState.debugTrace(origin + ' - No HScript function named: $funcToRun', false, 'error', FlxColor.RED);
-			return null;
-		}
-
-		var callValue:SCall = call(funcToRun, funcArgs);
-
-		if (!callValue.succeeded)
-		{
-			var e:SScriptException = callValue.exceptions[0];
-
-			if (e != null)
-			{
-				var msg:String = e.toString();
-
-				#if LUA_ALLOWED if (parentLua != null) {
-					msg = origin + ":" + parentLua.lastCalledFunction + " - " + msg;
-				}
-				else #end msg = '$origin - $msg';
-
-				PlayState.debugTrace(msg, #if LUA_ALLOWED parentLua == null #else true #end, 'error', FlxColor.RED);
+			try {
+				return execute(parser.parseString(codeToRun, origin));
 			}
-
-			return null;
+			catch (e:Error) {
+				exception = e;
+			}
 		}
 
-		return callValue;
+		return null;
 	}
 
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):SCall
+	public function executeFunction(funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 	{
-		if (funcToRun == null) return null;
-		return call(funcToRun, funcArgs);
+		if (funcToRun != null && active)
+		{
+			if (variables.exists(funcToRun))
+			{
+				if (funcArgs == null) funcArgs = [];
+
+				try {
+					return Reflect.callMethod(null, variables.get(funcToRun), funcArgs);
+				}
+				catch (e:Error) {
+					exception = e;
+				}
+			}
+		}
+
+		return null;
 	}
 
 	public static function implementForLua(funk:FunkinLua):Void
@@ -247,35 +273,35 @@ class HScript extends SScript
 		#if LUA_ALLOWED
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 		{
-			var retVal:SCall = null;
+			initHaxeModuleForLua(funk);
 
-			initHaxeModuleCodeForLua(funk, codeToRun);
-
-			if (varsToBring != null)
+			if (funk.hscript.active)
 			{
-				for (key in Reflect.fields(varsToBring)) {
-					funk.hscript.set(key, Reflect.field(varsToBring, key));
-				}
-			}
-
-			retVal = funk.hscript.executeCode(funcToRun, funcArgs);
-
-			if (retVal != null)
-			{
-				if (retVal.succeeded) {
-					return (retVal.returnValue == null || PlayState.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
+				if (varsToBring != null)
+				{
+					for (key in Reflect.fields(varsToBring)) {
+						funk.hscript.setVar(key, Reflect.field(varsToBring, key));
+					}
 				}
 
-				var e:SScriptException = retVal.exceptions[0];
+				var retVal:Dynamic = funk.hscript.executeCode(codeToRun);
 
-				if (e != null) {
-					PlayState.debugTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, 'error', FlxColor.RED);
+				if (funcToRun != null)
+				{
+					var retFunc:Dynamic = funk.hscript.executeFunction(funcToRun, funcArgs);
+
+					if (retFunc != null) {
+						retVal = retFunc;
+					}
 				}
 
-				return null;
-			}
-			else if (funk.hscript.returnValue != null) {
-				return funk.hscript.returnValue;
+				if (funk.hscript.exception != null)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - ${funk.hscript.exception}', false, 'error', FlxColor.RED);
+				}
+
+				return retVal;
 			}
 
 			return null;
@@ -283,55 +309,78 @@ class HScript extends SScript
 		
 		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null):Null<Dynamic>
 		{
-			var callValue:Null<Dynamic> = funk.hscript.executeFunction(funcToRun, funcArgs);
-
-			if (!callValue.succeeded)
+			if (funk.hscript.active)
 			{
-				var e:Exception = callValue.exceptions[0];
+				var retVal:Dynamic = funk.hscript.executeFunction(funcToRun, funcArgs);
 
-				if (e != null) {
-					PlayState.debugTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false, 'error', FlxColor.RED);
+				if (funk.hscript.exception != null)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - ${funk.hscript.exception}', false, 'error', FlxColor.RED);
 				}
-
-				return null;
+	
+				return retVal;
 			}
-			else return callValue.returnValue;
+
+			return null;
 		});
 
-		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = ''):Void // This function is unnecessary because import already exists in SScript as a native feature
+		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = ''):Void // This function is unnecessary because import already exists in HScript as a native feature
 		{
-			var str:String = '';
+			initHaxeModuleForLua(funk);
 
-			if (libPackage.length > 0) {
-				str = libPackage + '.';
-			}
-			else if (libName == null) libName = '';
-
-			var c:Class<Dynamic> = Type.resolveClass(str + libName);
-
-			if (c != null) SScript.globalVariables[libName] = c;
-
-			if (funk.hscript != null)
+			if (funk.hscript.active)
 			{
-				try {
-					if (c != null) funk.hscript.set(libName, c);
+				var str:String = '';
+
+				if (libPackage.length > 0) {
+					str = libPackage + '.';
 				}
-				catch (e:Dynamic) {
-					PlayState.debugTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, 'error', FlxColor.RED);
+				else if (libName == null) {
+					libName = '';
+				}
+	
+				var c:Dynamic = funk.hscript.resolveClassOrEnum(str + libName);
+	
+				try {
+					funk.hscript.setVar(libName, c);
+				}
+				catch (e:Error)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - $e', false, 'error', FlxColor.RED);
 				}
 			}
 		});
 		#end
 	}
 
-	override public function destroy():Void
+	function resolveClassOrEnum(name:String):Dynamic
 	{
-		origin = null;
-		#if LUA_ALLOWED
-		parentLua = null;
-		#end
+		var c:Dynamic = Type.resolveClass(name);
 
-		super.destroy();
+		if (c == null) {
+			c = Type.resolveEnum(name);
+		}
+
+		return c;
+	}
+
+	public function destroy():Void
+	{
+		active = false;
+		parser = null;
+		origin = null;
+		parentLua = null;
+
+		__instanceFields = [];
+		binops.clear();
+		customClasses.clear();
+		declared = [];
+		importBlocklist = [];
+		locals.clear();
+
+		resetVariables();
 	}
 
 	#if LUA_ALLOWED
@@ -395,5 +444,4 @@ class CustomFlxColor
 		return cast FlxColor.fromString(str);
 	}
 }
-#end
 #end

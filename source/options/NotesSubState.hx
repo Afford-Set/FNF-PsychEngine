@@ -116,7 +116,7 @@ class NotesSubState extends MusicBeatSubState
 		colorGradientSelector.offset.y = 5;
 		add(colorGradientSelector);
 
-		colorPalette = new Sprite(820, 580);
+		colorPalette = new Sprite(820, 580, true);
 		colorPalette.loadGraphic(Paths.getImage('noteColorMenu/palette', false));
 		colorPalette.scale.set(20, 20);
 		colorPalette.updateHitbox();
@@ -408,56 +408,60 @@ class NotesSubState extends MusicBeatSubState
 		{
 			hexTypeNum = -1;
 
-			var mousePoint:FlxPoint = pointerFlxPoint();
-
-			modeNotes.forEachAlive(function(note:Sprite):Void
+			if (pointerOverlaps(modeNotes))
 			{
-				if (curSelectedMode != note.ID && mousePoint.x >= objPoint(note).x && mousePoint.y >= objPoint(note).y && mousePoint.x < objPoint(note).x + note.width && mousePoint.y < objPoint(note).y + note.height)
+				modeNotes.forEachAlive(function(note:FlxSprite):Void
 				{
-					modeBG.visible = notesBG.visible = false;
-					curSelectedMode = note.ID;
-					onModeColumn = true;
+					if (curSelectedMode != note.ID && pointerOverlaps(note))
+					{
+						modeBG.visible = notesBG.visible = false;
 
-					updateNotes();
-					FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
-				}
-			});
+						curSelectedMode = note.ID;
+						onModeColumn = true;
+						updateNotes();
 
-			myNotes.forEachAlive(function(note:StrumNote):Void
+						FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
+					}
+				});
+			}
+			else if (pointerOverlaps(myNotes))
 			{
-				if (curSelectedNote != note.ID && mousePoint.x >= objPoint(note).x && mousePoint.y >= objPoint(note).y && mousePoint.x < objPoint(note).x + note.width && mousePoint.y < objPoint(note).y + note.height)
+				myNotes.forEachAlive(function(note:StrumNote):Void
 				{
-					modeBG.visible = notesBG.visible = false;
+					if (curSelectedNote != note.ID && pointerOverlaps(note))
+					{
+						modeBG.visible = notesBG.visible = false;
 
-					curSelectedNote = note.ID;
-					onModeColumn = false;
+						curSelectedNote = note.ID;
+						onModeColumn = false;
 
-					bigNote.rgbShader.parent = Note.globalRgbShaders[note.ID];
-					bigNote.shader = Note.globalRgbShaders[note.ID].shader;
+						bigNote.rgbShader.parent = Note.globalRgbShaders[note.ID];
+						bigNote.shader = Note.globalRgbShaders[note.ID].shader;
 
-					updateNotes();
-					FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
-				}
-			});
+						updateNotes();
 
-			if (mousePoint.x >= objPoint(colorWheel).x && mousePoint.y >= objPoint(colorWheel).y && mousePoint.x < objPoint(colorWheel).x + colorWheel.width && mousePoint.y < objPoint(colorWheel).y + colorWheel.height)
+						FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
+					}
+				});
+			}
+			else if (pointerOverlaps(colorWheel))
 			{
 				_storedColor = getShaderColor();
 				holdingOnObj = colorWheel;
 			}
-			else if (mousePoint.x >= objPoint(colorGradient).x && mousePoint.y >= objPoint(colorGradient).y && mousePoint.x < objPoint(colorGradient).x + colorGradient.width && mousePoint.y < objPoint(colorGradient).y + colorGradient.height)
+			else if (pointerOverlaps(colorGradient))
 			{
 				_storedColor = getShaderColor();
 				holdingOnObj = colorGradient;
 			}
-			else if (mousePoint.x >= objPoint(colorPalette).x && mousePoint.y >= objPoint(colorPalette).y && mousePoint.x < objPoint(colorPalette).x + colorPalette.width && mousePoint.y < objPoint(colorPalette).y + colorPalette.height)
+			else if (pointerOverlaps(colorPalette))
 			{
 				setShaderColor(colorPalette.pixels.getPixel32(Std.int((pointerX() - colorPalette.x) / colorPalette.scale.x), Std.int((pointerY() - colorPalette.y) / colorPalette.scale.y)));
 
 				FlxG.sound.play(Paths.getSound('scrollMenu'), 0.6);
 				updateColors();
 			}
-			else if (pointerY() >= skinNote.y && pointerY() < skinNote.y + skinNote.height && Math.abs(pointerX() - 1000) <= 84)
+			else if (pointerOverlaps(skinNote))
 			{
 				onPixel = !onPixel;
 
@@ -560,14 +564,9 @@ class NotesSubState extends MusicBeatSubState
 		}
 	}
 
-	function objPoint(obj:FlxObject):FlxPoint
-	{
-		return obj.getScreenPosition(camera);
-	}
-
 	function pointerOverlaps(obj:FlxBasic):Bool
 	{
-		if (!controls.controllerMode) return FlxG.mouse.overlaps(obj, camera);
+		if (!controls.controllerMode) return FlxG.mouse.overlaps(obj);
 		return FlxG.overlap(controllerPointer, obj);
 	}
 
@@ -585,8 +584,8 @@ class NotesSubState extends MusicBeatSubState
 
 	function pointerFlxPoint():FlxPoint
 	{
-		if (!controls.controllerMode) return FlxG.mouse.getScreenPosition(camera);
-		return controllerPointer.getScreenPosition(null, camera);
+		if (!controls.controllerMode) return FlxG.mouse.getScreenPosition();
+		return controllerPointer.getScreenPosition(null);
 	}
 
 	function centerHexTypeLine():Void
