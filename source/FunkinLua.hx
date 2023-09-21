@@ -634,7 +634,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic> = null):Dynamic
 		{
-			return PlayState.callMethodFromObject(Type.resolveClass(PlayState.convertObjectToNew(classVar)), funcToRun, args);
+			return PlayState.callMethodFromObject(Type.resolveClass(PlayState.convertObjectToNew(className)), funcToRun, args);
 		});
 
 		Lua_helper.add_callback(lua, "createInstance", function(variableToSave:String, className:String, ?args:Array<Dynamic> = null):Bool
