@@ -165,7 +165,7 @@ class FunkinLua
 		set('rating', 0);
 		set('ratingName', '');
 		set('ratingFC', '');
-		set('psychVersion', MainMenuState.psychEngineVersion.trim());
+		set('version', MainMenuState.psychEngineVersion.trim());
 
 		set('inGameOver', false);
 		set('mustHitSection', false);
@@ -491,8 +491,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "getPropertyFromClass", function(classVar:String, variable:String, ?allowMaps:Bool = false):Dynamic
 		{
-			classVar = PlayState.convertObjectToNew(classVar);
-			var myClass:Dynamic = Type.resolveClass(classVar);
+			var myClass:Dynamic = Type.resolveClass(PlayState.convertObjectToNew(classVar));
 
 			if (myClass == null)
 			{
@@ -518,8 +517,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "setPropertyFromClass", function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false):Dynamic
 		{
-			classVar = PlayState.convertObjectToNew(classVar);
-			var myClass:Dynamic = Type.resolveClass(classVar);
+			var myClass:Dynamic = Type.resolveClass(PlayState.convertObjectToNew(classVar));
 
 			if (myClass == null)
 			{
@@ -636,8 +634,7 @@ class FunkinLua
 
 		Lua_helper.add_callback(lua, "callMethodFromClass", function(className:String, funcToRun:String, ?args:Array<Dynamic> = null):Dynamic
 		{
-			className = PlayState.convertObjectToNew(className);
-			return PlayState.callMethodFromObject(Type.resolveClass(className), funcToRun, args);
+			return PlayState.callMethodFromObject(Type.resolveClass(PlayState.convertObjectToNew(classVar)), funcToRun, args);
 		});
 
 		Lua_helper.add_callback(lua, "createInstance", function(variableToSave:String, className:String, ?args:Array<Dynamic> = null):Bool
@@ -1858,15 +1855,18 @@ class FunkinLua
 		{
 			var obj:Dynamic = PlayState.getObjectDirectly(obj, false);
 
-			if (obj.playAnim != null)
+			if (obj != null)
 			{
-				obj.playAnim(name, forced, reverse, startFrame);
-				return true;
-			}
-			else
-			{
-				obj.animation.play(name, forced, reverse, startFrame);
-				return true;
+				if (obj.playAnim != null)
+				{
+					obj.playAnim(name, forced, reverse, startFrame);
+					return true;
+				}
+				else
+				{
+					obj.animation.play(name, forced, reverse, startFrame);
+					return true;
+				}
 			}
 
 			return false;
