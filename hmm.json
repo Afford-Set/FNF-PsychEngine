@@ -96,6 +96,13 @@
 			"url": "https://github.com/kevinresol/hxvm-lua"
 		},
 		{
+			"name": "hxCodec",
+			"type": "git",
+			"dir": null,
+			"ref": "main",
+			"url": "https://github.com/polybiusproxy/hxCodec"
+		},
+		{
 			"name": "faxe",
 			"type": "git",
 			"dir": null,

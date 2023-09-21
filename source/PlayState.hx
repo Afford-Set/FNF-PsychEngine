@@ -5690,18 +5690,17 @@ class PlayState extends MusicBeatState
 	public static function debugTrace(text:String, ignoreCheck:Bool = false, type:String = 'normal', color:FlxColor = FlxColor.WHITE):Void
 	{
 		#if MODS_ALLOWED
-		if (ignoreCheck || PlayState.instance.debugMode)
-		{
+		if (ignoreCheck || PlayState.instance.debugMode) {
 			PlayState.instance.addTextToDebug(text, color);
-
-			switch (type)
-			{
-				case 'error': Debug.logError(text);
-				case 'warn' | 'deprecated': Debug.logWarn(text);
-				default: Debug.logInfo(text);
-			}
 		}
 		#end
+
+		switch (type)
+		{
+			case 'error': Debug.logError(text);
+			case 'warn' | 'deprecated': Debug.logWarn(text);
+			default: Debug.logInfo(text);
+		}
 	}
 
 	public static function getTween(options:Dynamic):LuaTweenOptions
