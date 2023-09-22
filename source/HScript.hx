@@ -371,7 +371,10 @@ class HScript extends Interp
 		active = false;
 		parser = null;
 		origin = null;
+
+		#if LUA_ALLOWED
 		parentLua = null;
+		#end
 
 		__instanceFields = [];
 		binops.clear();
