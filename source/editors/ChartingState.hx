@@ -90,7 +90,9 @@ class ChartingState extends MusicBeatUIState
 		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"],
 		['Set Camera Zoom', "Value 1: New camera zoom\n(Default: Stage Camera Zoom)"],
 		['Set Camera Speed', "Value 1: New camera speed\n(Default: Stage Camera Speed)"],
-		['Move Camera', "Value 1: Target (Dad, GF, BF)\n\nIf empty, camera moves to\ncharacter by current section."]
+		['Move Camera', "Value 1: Target (Dad, GF, BF)\n\nIf empty, camera moves to\ncharacter by current section."],
+		['Camera Flash', "Value 1: Arguments - Camera, Duration\nExample: \"game, 1\"\n\nValue 2: Color"],
+		['Camera Fade', "Value 1: Arguments - Camera, Duration, Fade in (boolean value)\nExample: \"game, 1, true\"\n\nValue 2: Color"]
 	];
 
 	private var blockPressWhileTypingOn:Array<FlxUIInputText> = [];

@@ -41,7 +41,11 @@ class FlxVideo extends FlxBasic
 		#if desktop
 		var video:VideoHandler = new VideoHandler();
 		video.play(newPath);
-		video.onEndReached.add(finishVideo);
+		video.onEndReached.add(function():Void
+		{
+			video.dispose();
+			finishVideo();
+		});
 		#elseif web
 		var video:Video = new Video();
 		video.x = 0;

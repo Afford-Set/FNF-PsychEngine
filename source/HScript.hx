@@ -268,9 +268,9 @@ class HScript extends Interp
 		return null;
 	}
 
+	#if LUA_ALLOWED
 	public static function implementForLua(funk:FunkinLua):Void
 	{
-		#if LUA_ALLOWED
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 		{
 			initHaxeModuleForLua(funk);
@@ -352,8 +352,8 @@ class HScript extends Interp
 				}
 			}
 		});
-		#end
 	}
+	#end
 
 	function resolveClassOrEnum(name:String):Dynamic
 	{

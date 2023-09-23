@@ -143,7 +143,7 @@ class ClientPrefs
 	}
 
 	#if LUA_ALLOWED
-	public static function implementPrefsForLua(lua:FunkinLua):Void // Some settings for lua, no jokes
+	public static function implementForLua(lua:FunkinLua):Void // Some settings for lua, no jokes
 	{
 		lua.set('downscroll', downScroll);
 		lua.set('middlescroll', middleScroll);

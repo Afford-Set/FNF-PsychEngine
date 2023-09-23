@@ -1,10 +1,5 @@
 package;
 
-#if LUA_ALLOWED
-import llua.Lua;
-import llua.State;
-#end
-
 import flixel.FlxG;
 import flixel.FlxObject;
 
@@ -13,17 +8,15 @@ class CustomSubState extends MusicBeatSubState
 	public static var name:String = 'unnamed';
 	public static var instance:CustomSubState;
 
+	#if LUA_ALLOWED
 	public static function implementForLua(funk:FunkinLua):Void
 	{
-		#if LUA_ALLOWED
-		var lua:State = funk.lua;
-
-		Lua_helper.add_callback(lua, "openCustomSubstate", openCustomSubstate);
-		Lua_helper.add_callback(lua, "closeCustomSubstate", closeCustomSubstate);
-		Lua_helper.add_callback(lua, "insertToCustomSubstate", insertToCustomSubstate);
-		#end
+		funk.set("openCustomSubstate", openCustomSubstate);
+		funk.set("closeCustomSubstate", closeCustomSubstate);
+		funk.set("insertToCustomSubstate", insertToCustomSubstate);
 	}
-	
+	#end
+
 	public static function openCustomSubstate(name:String, ?pauseGame:Bool = false):Void
 	{
 		if (pauseGame)

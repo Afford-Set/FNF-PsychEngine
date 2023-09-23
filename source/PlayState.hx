@@ -299,6 +299,9 @@ class PlayState extends MusicBeatState
 		persistentUpdate = true;
 		persistentDraw = true;
 
+		var mode:String = Paths.formatToSongPath(ClientPrefs.cutscenesOnMode);
+		allowPlayCutscene = mode.contains(gameMode) || ClientPrefs.cutscenesOnMode == 'Everywhere';
+
 		if (SONG == null) SONG = Song.loadFromJson('tutorial');
 
 		#if DISCORD_ALLOWED
@@ -1506,21 +1509,11 @@ class PlayState extends MusicBeatState
 		#if VIDEOS_ALLOWED
 		if (Paths.fileExists(Paths.getVideo(name), BINARY))
 		{
-			var bg:Sprite = new Sprite(-FlxG.width, -FlxG.height);
-			bg.makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-			bg.scrollFactor.set();
-			bg.updateHitbox();
-			bg.cameras = [camHUD];
-			add(bg);
-
 			var video:FlxVideo = new FlxVideo(name);
 			video.finishCallback = function():Void
 			{
 				remove(video, true);
 				video.destroy();
-
-				remove(bg, true);
-				bg.destroy();
 
 				startAndEnd();
 			}
@@ -3837,6 +3830,37 @@ class PlayState extends MusicBeatState
 				}
 				else {
 					cameraMovementSection();
+				}
+			}
+			case 'Camera Flash':
+			{
+				var array:Array<String> = [for (i in value1.trim().split(',')) i.trim()];
+
+				var color:FlxColor = CoolUtil.getColorFromString(value2);
+				var duration:Float = (array[1] != null && array[1].length > 0) ? Std.parseInt(array[1]) : -1;
+
+				if (Math.isNaN(duration)) duration = -1;
+
+				var camera:FlxCamera = cameraFromString((value2 != null && value2.length > 0) ? value2 : 'game');
+
+				if (duration > 0) {
+					camera.flash(color, duration);
+				}
+			}
+			case 'Camera Fade':
+			{
+				var array:Array<String> = [for (i in value1.trim().split(',')) i.trim()];
+
+				var color:FlxColor = CoolUtil.getColorFromString(value2);
+				var duration:Float = (array[1] != null && array[1].length > 0) ? Std.parseInt(array[1]) : -1;
+				var fadeIn:Bool = (array[2] != null && array[2].length > 0) ? array[1] == 'true' : false;
+
+				if (Math.isNaN(duration)) duration = -1;
+
+				var camera:FlxCamera = cameraFromString((value2 != null && value2.length > 0) ? value2 : 'game');
+
+				if (duration > 0) {
+					camera.fade(color, duration, fadeIn);
 				}
 			}
 		}
