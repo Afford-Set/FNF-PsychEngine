@@ -869,16 +869,9 @@ class FunkinLua
 		set("noteTweenX", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
 		{
 			PlayState.cancelTween(tag);
-
 			if (note < 0) note = 0;
 
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
+			var testicle:StrumNote = game.strumLineNotes.members[note];
 
 			if (testicle != null)
 			{
@@ -897,16 +890,9 @@ class FunkinLua
 		set("noteTweenY", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
 		{
 			PlayState.cancelTween(tag);
-
 			if (note < 0) note = 0;
 
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
+			var testicle:StrumNote = game.strumLineNotes.members[note];
 
 			if (testicle != null)
 			{
@@ -925,16 +911,9 @@ class FunkinLua
 		set("noteTweenAngle", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
 		{
 			PlayState.cancelTween(tag);
-
 			if (note < 0) note = 0;
 
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
+			var testicle:StrumNote = game.strumLineNotes.members[note];
 
 			if (testicle != null)
 			{
@@ -955,17 +934,53 @@ class FunkinLua
 			PlayState.cancelTween(tag);
 			if (note < 0) note = 0;
 
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
+			var testicle:StrumNote = game.strumLineNotes.members[note];
 
 			if (testicle != null)
 			{
 				game.modchartTweens.set(tag, FlxTween.tween(testicle, {direction: value}, duration,
+				{
+					ease: PlayState.getTweenEaseByString(ease),
+					onComplete: function(twn:FlxTween):Void
+					{
+						game.callOnLuas('onTweenCompleted', [tag]);
+						game.modchartTweens.remove(tag);
+					}
+				}));
+			}
+		});
+
+		set("noteTweenAngle", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
+		{
+			PlayState.cancelTween(tag);
+			if (note < 0) note = 0;
+
+			var testicle:StrumNote = game.strumLineNotes.members[note];
+
+			if (testicle != null)
+			{
+				game.modchartTweens.set(tag, FlxTween.tween(testicle, {angle: value}, duration,
+				{
+					ease: PlayState.getTweenEaseByString(ease),
+					onComplete: function(twn:FlxTween):Void
+					{
+						game.callOnLuas('onTweenCompleted', [tag]);
+						game.modchartTweens.remove(tag);
+					}
+				}));
+			}
+		});
+
+		set("noteTweenAlpha", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
+		{
+			PlayState.cancelTween(tag);
+			if (note < 0) note = 0;
+
+			var testicle:StrumNote = game.strumLineNotes.members[note];
+
+			if (testicle != null)
+			{
+				game.modchartTweens.set(tag, FlxTween.tween(testicle, {alpha: value}, duration,
 				{
 					ease: PlayState.getTweenEaseByString(ease),
 					onComplete: function(twn:FlxTween):Void
@@ -1014,60 +1029,6 @@ class FunkinLua
 			}
 
 			return released;
-		});
-
-		set("noteTweenAngle", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
-		{
-			PlayState.cancelTween(tag);
-			if (note < 0) note = 0;
-
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
-
-			if (testicle != null)
-			{
-				game.modchartTweens.set(tag, FlxTween.tween(testicle, {angle: value}, duration,
-				{
-					ease: PlayState.getTweenEaseByString(ease),
-					onComplete: function(twn:FlxTween):Void
-					{
-						game.callOnLuas('onTweenCompleted', [tag]);
-						game.modchartTweens.remove(tag);
-					}
-				}));
-			}
-		});
-
-		set("noteTweenAlpha", function(tag:String, note:Int, value:Dynamic, duration:Float, ease:String):Void
-		{
-			PlayState.cancelTween(tag);
-			if (note < 0) note = 0;
-
-			var testicle:StrumNote = null;
-
-			if (testicle == null)
-			{
-				var strumGroup:FlxTypedGroup<StrumNote> = note < Note.pointers.length ? PlayState.instance.opponentStrums : PlayState.instance.playerStrums;
-				testicle = strumGroup.members[note % Note.pointers.length];
-			}
-
-			if (testicle != null)
-			{
-				game.modchartTweens.set(tag, FlxTween.tween(testicle, {alpha: value}, duration,
-				{
-					ease: PlayState.getTweenEaseByString(ease),
-					onComplete: function(twn:FlxTween):Void
-					{
-						game.callOnLuas('onTweenCompleted', [tag]);
-						game.modchartTweens.remove(tag);
-					}
-				}));
-			}
 		});
 
 		set("cancelTween", function(tag:String):Void
@@ -1626,13 +1587,12 @@ class FunkinLua
 
 		set("cameraSetTarget", function(target:String):Bool
 		{
-			var charType:String = null;
+			var charType:String = 'bf';
 
 			switch (target.toLowerCase().trim())
 			{
 				case 'gf' | 'girlfriend' | '2': charType = 'gf';
 				case 'dad' | 'opponent' | '1' | 'true': charType = 'dad';
-				case 'bf' | 'boyfriend' | '0' | 'false': charType = 'bf';
 			}
 
 			game.cameraMovement(charType);

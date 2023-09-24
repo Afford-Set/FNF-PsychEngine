@@ -132,7 +132,6 @@
 	<haxelib name="discord_rpc" if="DISCORD_ALLOWED" />
 	<haxelib name="hscript-improved" if="HSCRIPT_ALLOWED" />
 
-	<haxedef name="openflPos" />
 	<haxedef name="hscriptPos" />
 
 	<haxelib name="faxe" if='switch'/>

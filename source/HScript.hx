@@ -157,7 +157,7 @@ class HScript extends Interp
 			for (script in PlayState.instance.luaArray)
 			{
 				if (script != null && script.lua != null && !script.closed) {
-					Lua_helper.add_callback(script.lua, name, func);
+					script.set(name, func);
 				}
 			}
 			#end

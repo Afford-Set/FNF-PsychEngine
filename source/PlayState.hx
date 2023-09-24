@@ -2057,6 +2057,18 @@ class PlayState extends MusicBeatState
 			generateStaticArrows(0);
 			generateStaticArrows(1);
 
+			for (i in 0...playerStrums.length)
+			{
+				setOnScripts('defaultPlayerStrumX' + i, playerStrums.members[i].x);
+				setOnScripts('defaultPlayerStrumY' + i, playerStrums.members[i].y);
+			}
+
+			for (i in 0...opponentStrums.length)
+			{
+				setOnScripts('defaultOpponentStrumX' + i, opponentStrums.members[i].x);
+				setOnScripts('defaultOpponentStrumY' + i, opponentStrums.members[i].y);
+			}
+
 			startedCountdown = true;
 			Conductor.songPosition = -Conductor.crochet * 5;
 
@@ -2649,44 +2661,30 @@ class PlayState extends MusicBeatState
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
 			babyArrow.downScroll = ClientPrefs.downScroll;
 
-			var defaultY:Float = babyArrow.y;
-
 			if (!skipArrowStartTween)
 			{
-				babyArrow.y -= 10;
 				babyArrow.alpha = 0;
-
-				FlxTween.tween(babyArrow, {y: defaultY, alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
+				FlxTween.tween(babyArrow, {alpha: targetAlpha}, 1, {ease: FlxEase.circOut, startDelay: 0.5 + (0.2 * i)});
 			}
 			else {
 				babyArrow.alpha = targetAlpha;
 			}
 
-			switch (player)
+			if (player > 0) {
+				playerStrums.add(babyArrow);
+			}
+			else
 			{
-				case 1:
+				if (ClientPrefs.middleScroll)
 				{
-					setOnScripts('defaultPlayerStrumX' + i, babyArrow.x);
-					setOnScripts('defaultPlayerStrumY' + i, defaultY);
+					babyArrow.x += 310;
 
-					playerStrums.add(babyArrow);
-				}
-				case 0:
-				{
-					if (ClientPrefs.middleScroll)
-					{
-						babyArrow.x += 310;
-
-						if (i > 1) { // Up and Right
-							babyArrow.x += FlxG.width / 2 + 25;
-						}
+					if (i > 1) { // Up and Right
+						babyArrow.x += FlxG.width / 2 + 25;
 					}
-
-					setOnScripts('defaultOpponentStrumX' + i, babyArrow.x);
-					setOnScripts('defaultOpponentStrumY' + i, defaultY);
-
-					opponentStrums.add(babyArrow);
 				}
+
+				opponentStrums.add(babyArrow);
 			}
 
 			strumLineNotes.add(babyArrow);
@@ -4305,7 +4303,7 @@ class PlayState extends MusicBeatState
 
 	private function popUpScore(daNote:Note):Void
 	{
-		if (daNote != null)
+		if (daNote != null && !daNote.ratingDisabled)
 		{
 			if (daNote.isSustainNote)
 			{
@@ -4512,10 +4510,13 @@ class PlayState extends MusicBeatState
 				Conductor.songPosition = lastTime;
 
 				#if REPLAYS_ALLOWED
-				keyPresses.push({
-					time: Conductor.songPosition,
-					key: key
-				});
+				if (keyPresses != null)
+				{
+					keyPresses.push({
+						time: Conductor.songPosition,
+						key: key
+					});
+				}
 				#end
 			}
 
@@ -4567,10 +4568,13 @@ class PlayState extends MusicBeatState
 		}
 
 		#if REPLAYS_ALLOWED
-		keyReleases.push({
-			time: Conductor.songPosition,
-			key: key
-		});
+		if (keyReleases != null)
+		{
+			keyReleases.push({
+				time: Conductor.songPosition,
+				key: key
+			});
+		}
 		#end
 	}
 
@@ -5329,8 +5333,8 @@ class PlayState extends MusicBeatState
 
 	public function callOnScripts(funcToCall:String, args:Array<Dynamic> = null, ignoreStops:Bool = false, exclusions:Array<String> = null, excludeValues:Array<Dynamic> = null):Dynamic
 	{
-		if (args == null) args = [];
-		if (exclusions == null) exclusions = [];
+		if (args == null) args = new Array();
+		if (exclusions == null) exclusions = new Array();
 		if (excludeValues == null) excludeValues = [Function_Continue];
 
 		var result:Dynamic = callOnLuas(funcToCall, args, ignoreStops, exclusions, excludeValues);
@@ -5344,8 +5348,8 @@ class PlayState extends MusicBeatState
 		var returnVal:Dynamic = Function_Continue;
 
 		#if LUA_ALLOWED
-		if (args == null) args = [];
-		if (exclusions == null) exclusions = [];
+		if (args == null) args = new Array();
+		if (exclusions == null) exclusions = new Array();
 		if (excludeValues == null) excludeValues = [Function_Continue];
 
 		var len:Int = luaArray.length;
@@ -5388,8 +5392,8 @@ class PlayState extends MusicBeatState
 		var returnVal:Dynamic = Function_Continue;
 
 		#if HSCRIPT_ALLOWED
-		if (exclusions == null) exclusions = [];
-		if (excludeValues == null) excludeValues = [];
+		if (exclusions == null) exclusions = new Array();
+		if (excludeValues == null) excludeValues = new Array();
 
 		excludeValues.push(Function_Continue);
 
@@ -5430,7 +5434,7 @@ class PlayState extends MusicBeatState
 
 	public function setOnScripts(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void
 	{
-		if (exclusions == null) exclusions = [];
+		if (exclusions == null) exclusions = new Array();
 
 		setOnLuas(variable, arg, exclusions);
 		setOnHScript(variable, arg, exclusions);
@@ -5439,7 +5443,7 @@ class PlayState extends MusicBeatState
 	public function setOnLuas(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void
 	{
 		#if LUA_ALLOWED
-		if (exclusions == null) exclusions = [];
+		if (exclusions == null) exclusions = new Array();
 
 		for (script in luaArray)
 		{
@@ -5452,7 +5456,7 @@ class PlayState extends MusicBeatState
 	public function setOnHScript(variable:String, arg:Dynamic, exclusions:Array<String> = null):Void
 	{
 		#if HSCRIPT_ALLOWED
-		if (exclusions == null) exclusions = [];
+		if (exclusions == null) exclusions = new Array();
 
 		for (script in hscriptArray)
 		{
@@ -6072,7 +6076,7 @@ class PlayState extends MusicBeatState
 			case 'states.stages.objects.PhillyTrain':
 				return 'PhillyTrain';
 			case 'substates.GameOverSubState' | 'substates.GameOverSubstate' | 'GameOverSubstate':
-				return 'GameOverSubstate';
+				return 'GameOverSubState';
 			case 'substates.GameplayChangersSubstate' | 'substates.GameplayChangersSubState' | 'GameplayChangersSubstate':
 				return 'GameplayChangersSubState';
 			case 'substates.PauseSubState':
