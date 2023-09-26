@@ -413,7 +413,7 @@ class Paths
 					bitmap = loadBitmapFromGPU(bitmap.clone());
 				}
 
-				var newGraphic:FlxGraphic = FlxG.bitmap.add(bitmap, false, path);
+				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, path);
 				newGraphic.persist = true;
 				newGraphic.destroyOnNoUse = false;
 				currentTrackedAssets.set(path, newGraphic);

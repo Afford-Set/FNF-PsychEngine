@@ -88,11 +88,11 @@
 			"url": "https://github.com/null4ik-2j6k/linc_discord-rpc"
 		},
 		{
-			"name": "hscript-improved",
+			"name": "hscript",
 			"type": "git",
 			"dir": null,
 			"ref": "master",
-			"url": "https://github.com/TheLeerName/hscript-improved"
+			"url": "https://github.com/null4ik-2j6k/hscript"
 		},
 		{
 			"name": "linc_luajit",

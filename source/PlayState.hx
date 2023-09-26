@@ -5718,7 +5718,7 @@ class PlayState extends MusicBeatState
 	public static function debugTrace(text:String, ignoreCheck:Bool = false, type:String = 'normal', color:FlxColor = FlxColor.WHITE):Void
 	{
 		#if MODS_ALLOWED
-		if (ignoreCheck || PlayState.instance.debugMode) {
+		if (PlayState.instance != null && (ignoreCheck || PlayState.instance.debugMode)) {
 			PlayState.instance.addTextToDebug(text, color);
 		}
 		#end
