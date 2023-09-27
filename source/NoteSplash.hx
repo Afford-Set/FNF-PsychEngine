@@ -69,10 +69,10 @@ class NoteSplash extends FlxSprite
 		if (note != null && note.noteSplashData.texture != null) {
 			texture = note.noteSplashData.texture;
 		}
-		else if (note.mustPress && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.length > 0) {
+		else if (note.mustPress && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.trim().length > 0) {
 			texture = PlayState.SONG.splashSkin;
 		}
-		else if (!note.mustPress && PlayState.SONG.splashSkin2 != null && PlayState.SONG.splashSkin2.length > 0) {
+		else if (!note.mustPress && PlayState.SONG.splashSkin2 != null && PlayState.SONG.splashSkin2.trim().length > 0) {
 			texture = PlayState.SONG.splashSkin2;
 		}
 		else {

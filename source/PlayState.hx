@@ -4328,7 +4328,7 @@ class PlayState extends MusicBeatState
 				{
 					daNote.rating = daRating.name;
 
-					if (daRating.noteSplash && !daNote.noteSplashData.disabled && !daNote.noteSplashData.quick) {
+					if (daRating.noteSplash && !daNote.noteSplashData.disabled && !daNote.noteSplashData.quick && !daNote.noteSplashData.opponent) {
 						spawnNoteSplashOnNote(daNote);
 					}
 
@@ -4709,12 +4709,17 @@ class PlayState extends MusicBeatState
 			if (note != null) suffix = note.animSuffix;
 
 			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, direction)))] + 'miss' + suffix;
-			char.playAnim(animToPlay, true);
-	
-			if (char != gf && combo > 5 && gf != null && gf.animOffsets.exists('sad'))
+			var ret:Dynamic = callOnScripts('onCharMiss', [char.curCharacter, animToPlay]);
+
+			if (ret != Function_Stop)
 			{
-				gf.playAnim('sad');
-				gf.specialAnim = true;
+				char.playAnim(animToPlay, true);
+
+				if (char != gf && combo > 5 && gf != null && gf.animOffsets.exists('sad'))
+				{
+					gf.playAnim('sad');
+					gf.specialAnim = true;
+				}
 			}
 		}
 
@@ -4761,6 +4766,11 @@ class PlayState extends MusicBeatState
 		}
 
 		strumPlayAnim(true, note.noteData, Conductor.stepCrochet * 1.25 / 1000 / playbackRate);
+
+		if (!note.noteSplashData.disabled && note.noteSplashData.opponent) {
+			spawnNoteSplashOnNote(note);
+		}
+
 		note.hitByOpponent = true;
 
 		var result:Dynamic = callOnLuas('opponentNoteHit', [notes.members.indexOf(note), Math.abs(note.noteData), note.noteType, note.isSustainNote]);
@@ -4790,7 +4800,7 @@ class PlayState extends MusicBeatState
 			{
 				noteMiss(note);
 
-				if (!note.noteSplashData.disabled && !note.isSustainNote) {
+				if (!note.noteSplashData.disabled && !note.noteSplashData.opponent && !note.isSustainNote) {
 					spawnNoteSplashOnNote(note);
 				}
 
@@ -4827,7 +4837,7 @@ class PlayState extends MusicBeatState
 
 			popUpScore(note);
 
-			if (!note.noteSplashData.disabled && note.noteSplashData.quick) {
+			if (!note.noteSplashData.disabled && note.noteSplashData.quick && !note.noteSplashData.opponent) {
 				spawnNoteSplashOnNote(note);
 			}
 
@@ -4896,7 +4906,7 @@ class PlayState extends MusicBeatState
 	{
 		if (note != null)
 		{
-			var strum:StrumNote = playerStrums.members[note.noteData];
+			var strum:StrumNote = note.mustPress ? playerStrums.members[note.noteData] : opponentStrums.members[note.noteData];
 
 			if (strum != null) {
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note);

@@ -508,7 +508,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			{
 				daNote.rating = daRating.name;
 
-				if (daRating.noteSplash && !daNote.noteSplashData.disabled && !daNote.noteSplashData.quick) {
+				if (daRating.noteSplash && !daNote.noteSplashData.disabled && !daNote.noteSplashData.quick && !daNote.noteSplashData.opponent) {
 					spawnNoteSplashOnNote(daNote);
 				}
 
@@ -746,6 +746,10 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			strum.resetAnim = Conductor.stepCrochet * 1.25 / 1000 / playbackRate;
 		}
 
+		if (!note.noteSplashData.disabled && note.noteSplashData.opponent) {
+			spawnNoteSplashOnNote(note);
+		}
+
 		note.hitByOpponent = true;
 
 		if (!note.isSustainNote)
@@ -770,7 +774,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			{
 				noteMiss(note);
 
-				if (!note.noteSplashData.disabled && !note.isSustainNote) {
+				if (!note.noteSplashData.disabled && !note.noteSplashData.opponent && !note.isSustainNote) {
 					spawnNoteSplashOnNote(note);
 				}
 
@@ -792,7 +796,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 			popUpScore(note);
 
-			if (!note.noteSplashData.disabled && note.noteSplashData.quick) {
+			if (!note.noteSplashData.disabled && note.noteSplashData.quick && !note.noteSplashData.opponent) {
 				spawnNoteSplashOnNote(note);
 			}
 
@@ -835,7 +839,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		if (note != null)
 		{
-			var strum:StrumNote = playerStrums.members[note.noteData];
+			var strum:StrumNote = note.mustPress ? playerStrums.members[note.noteData] : opponentStrums.members[note.noteData];
 
 			if (strum != null) {
 				spawnNoteSplash(strum.x, strum.y, note.noteData, note);
