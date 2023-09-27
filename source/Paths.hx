@@ -426,7 +426,7 @@ class Paths
 		if (!getFileLocation)
 		{
 			if (ClientPrefs.naughtyness) {
-				Debug.logError('oh no its returning null NOOOO');
+				Debug.logError('oh no its returning null NOOOO ($key)');
 			}
 
 			Debug.logError('Could not find a image asset with key "$key".');

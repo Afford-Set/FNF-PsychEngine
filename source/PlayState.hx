@@ -2650,16 +2650,35 @@ class PlayState extends MusicBeatState
 
 		for (i in 0...Note.pointers.length)
 		{
-			var targetAlpha:Float = 1;
-
-			if (player < 1)
-			{
-				if (!ClientPrefs.opponentStrums) targetAlpha = 0;
-				else if (ClientPrefs.middleScroll) targetAlpha = 0.35;
-			}
-
 			var babyArrow:StrumNote = new StrumNote(strumLineX, strumLineY, i, player);
 			babyArrow.downScroll = ClientPrefs.downScroll;
+			babyArrow.visible = false;
+
+			var targetAlpha:Float = 1;
+
+			switch (player)
+			{
+				case 1: playerStrums.add(babyArrow);
+				case 0:
+				{
+					if (!ClientPrefs.opponentStrums) targetAlpha = FlxMath.EPSILON;
+					else if (ClientPrefs.middleScroll) targetAlpha = 0.35;
+
+					if (ClientPrefs.middleScroll)
+					{
+						babyArrow.x += 310;
+
+						if (i > 1) { // Up and Right
+							babyArrow.x += FlxG.width / 2 + 25;
+						}
+					}
+
+					opponentStrums.add(babyArrow);
+				}
+			}
+
+			strumLineNotes.add(babyArrow);
+			babyArrow.postAddedToGroup();
 
 			if (!skipArrowStartTween)
 			{
@@ -2670,25 +2689,7 @@ class PlayState extends MusicBeatState
 				babyArrow.alpha = targetAlpha;
 			}
 
-			if (player > 0) {
-				playerStrums.add(babyArrow);
-			}
-			else
-			{
-				if (ClientPrefs.middleScroll)
-				{
-					babyArrow.x += 310;
-
-					if (i > 1) { // Up and Right
-						babyArrow.x += FlxG.width / 2 + 25;
-					}
-				}
-
-				opponentStrums.add(babyArrow);
-			}
-
-			strumLineNotes.add(babyArrow);
-			babyArrow.postAddedToGroup();
+			babyArrow.visible = true;
 		}
 	}
 

@@ -26,6 +26,11 @@ class CustomFlxColor
 	public static var MAGENTA(default, null):Int = fromFlxColor(FlxColor.MAGENTA);
 	public static var CYAN(default, null):Int = fromFlxColor(FlxColor.CYAN);
 
+	public static inline function fromInt(integer:Int):Int
+	{
+		return fromFlxColor(FlxColor.fromInt(integer));
+	}
+
 	public static inline function fromRGB(red:Int, green:Int, blue:Int, alpha:Int = 255):Int
 	{
 		return fromFlxColor(FlxColor.fromRGB(red, green, blue, alpha));
@@ -34,6 +39,11 @@ class CustomFlxColor
 	public static inline function fromRGBFloat(red:Int, green:Int, blue:Int, alpha:Int = 1):Int
 	{	
 		return fromFlxColor(FlxColor.fromRGBFloat(red, green, blue, alpha));
+	}
+
+	public static inline function fromCMYK(cyan:Float, magenta:Float, yellow:Float, black:Float, alpha:Float = 1):Int
+	{
+		return fromFlxColor(FlxColor.fromCMYK(cyan, magenta, yellow, black, alpha));
 	}
 
 	public static inline function fromHSB(hue:Float, sat:Float, brt:Float, alpha:Float = 1):Int
