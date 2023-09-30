@@ -19,6 +19,8 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 
+import openfl.errors.Error;
+
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
@@ -201,7 +203,7 @@ class FunkinLua
 		set('dadName', PlayState.SONG.player2);
 		set('gfName', PlayState.SONG.gfVersion);
 
-		ClientPrefs.implementForLua(this);
+		ClientPrefs.implementForLua(this); // Some settings, no jokes
 
 		set('scriptName', scriptName);
 		set('currentModDirectory', Paths.currentModDirectory);
@@ -2756,7 +2758,7 @@ class FunkinLua
 
 				return true;
 			}
-			catch (e:Dynamic) {
+			catch (e:Error) {
 				PlayState.debugTrace("saveFile: Error trying to save " + path + ": " + e, false, 'error', FlxColor.RED);
 			}
 
@@ -2775,7 +2777,7 @@ class FunkinLua
 					return true;
 				}
 			}
-			catch (e:Dynamic) {
+			catch (e:Error) {
 				PlayState.debugTrace("deleteFile: Error trying to delete " + path + ": " + e, false, 'error', FlxColor.RED);
 			}
 
@@ -3102,7 +3104,7 @@ class FunkinLua
 				return;
 			}
 		}
-		catch (e:Dynamic)
+		catch (e:Error)
 		{
 			Debug.logError(e);
 			return;
@@ -3159,7 +3161,7 @@ class FunkinLua
 
 			return result;
 		}
-		catch (e:Dynamic) {
+		catch (e:Error) {
 			Debug.logError(e);
 		}
 		#end

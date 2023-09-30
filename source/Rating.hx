@@ -21,7 +21,7 @@ class Rating
 		var window:String = name + 'Window';
 
 		try {
-			hitWindow = Reflect.getProperty(ClientPrefs, window);
+			hitWindow = Reflect.field(ClientPrefs, window);
 		}
 		catch (e:Dynamic) Debug.logError(e);
 	}

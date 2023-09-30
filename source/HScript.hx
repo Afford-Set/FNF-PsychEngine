@@ -190,7 +190,7 @@ class HScript extends Interp
 
 				setVar(libName, Type.resolveClass(str + libName));
 			}
-			catch (e:Dynamic)
+			catch (e:Error)
 			{
 				var msg:String = e.message.substr(0, e.message.indexOf('\n'));
 

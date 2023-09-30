@@ -72,7 +72,7 @@ class NoteTypesConfig
 
 				switch (split[0]) // special cases
 				{
-					case 'extraData': 
+					case 'extraData':
 					{
 						note.extraData.set(split[1], line.value);
 						continue;
