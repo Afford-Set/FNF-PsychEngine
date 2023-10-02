@@ -95,10 +95,8 @@ class ClientPrefs
 		{
 			if (Type.typeof(Reflect.getProperty(ClientPrefs, field)) != TFunction && !prefBlackList.contains(field))
 			{
-				var valueFromSave:Dynamic = Reflect.getProperty(FlxG.save.data, field);
-
-				if (valueFromSave != null) {
-					Reflect.setProperty(ClientPrefs, field, valueFromSave);
+				if (Reflect.hasField(FlxG.save.data, field)) {
+					Reflect.setProperty(ClientPrefs, field, Reflect.getProperty(FlxG.save.data, field));
 				}
 
 				switch (field)

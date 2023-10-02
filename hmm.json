@@ -50,7 +50,7 @@
 			"type": "git",
 			"dir": null,
 			"ref": "main",
-			"url": "https://github.com/null4ik-2j6k/hxcpp-4.3.12"
+			"url": "https://github.com/null4ik-2j6k/hxcpp"
 		},
 		{
 			"name": "flixel",
