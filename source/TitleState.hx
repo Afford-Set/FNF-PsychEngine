@@ -42,7 +42,7 @@ typedef TitleData =
 
 	backgroundSprite:String,
 
-	bpm:Int
+	bpm:Float
 }
 
 class TitleState extends MusicBeatState

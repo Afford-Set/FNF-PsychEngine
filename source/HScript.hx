@@ -65,11 +65,11 @@ class HScript extends Interp
 
 		var content:String = null;
 
-		if (file != null && file.length > 0) {
+		if (file != null && file.trim().length > 0) {
 			content = Paths.getTextFromFile(file);
 		}
 
-		if (content != null) {
+		if (content != null && content.trim().length > 0) {
 			origin = file;
 		}
 
