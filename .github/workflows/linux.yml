@@ -16,6 +16,7 @@ jobs:
           sudo apt-get install libvlccore-dev
           sudo apt-get -y install libidn12
           sudo apt-get install gcc-multilib g++-multilib haxe -y
+          sudo apt-get update
           haxelib setup ~/haxelib
           haxelib install hmm --quiet
           haxelib run hmm install
