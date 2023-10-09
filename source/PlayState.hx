@@ -5294,15 +5294,8 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 
-	public function initHScript(file:String):Void
+	public function initHScript(file:String):HScript
 	{
-		var makeError:HScript->Void = function(newScript:HScript):Void
-		{
-			newScript.destroy();
-			hscriptArray.remove(newScript);
-			newScript = null;
-		}
-
 		try
 		{
 			var newScript:HScript = new HScript(file);
@@ -5312,33 +5305,47 @@ class PlayState extends MusicBeatState
 			{
 				debugTrace('ERROR ON LOADING - ${newScript.exception.message}', false, 'error', FlxColor.RED);
 
-				makeError(newScript);
-				return;
+				newScript.destroy();
+				hscriptArray.remove(newScript);
+				newScript = null;
+
+				return null;
 			}
 
 			if (newScript.variables.exists('onCreate'))
 			{
-				var retVal:Dynamic = newScript.executeFunction('onCreate');
+				newScript.executeFunction('onCreate');
 
 				if (newScript.exception != null)
 				{
 					debugTrace('ERROR (onCreate) - ${newScript.exception.message}', false, 'error', FlxColor.RED);
-					makeError(newScript);
 
-					return;
+					newScript.destroy();
+					hscriptArray.remove(newScript);
+					newScript = null;
+
+					return null;
 				}
 			}
 
 			Debug.logInfo('initialized hscript interp successfully: $file');
+			return newScript;
 		}
 		catch (e:Error)
 		{
 			debugTrace('ERROR - $e', false, 'error', FlxColor.RED);
 
-			if (hscriptArray.length > 0) {
-				makeError(hscriptArray[hscriptArray.length - 1]);
+			if (hscriptArray.length > 0)
+			{
+				var script:HScript = hscriptArray[hscriptArray.length - 1];
+
+				script.destroy();
+				hscriptArray.remove(script);
+				script = null;
 			}
 		}
+
+		return null;
 	}
 	#end
 
