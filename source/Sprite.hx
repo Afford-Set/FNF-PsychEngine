@@ -17,10 +17,10 @@ class Sprite extends FlxSprite
 		antialiasing = ClientPrefs.globalAntialiasing && !noAntialiasing;
 	}
 
-	override public function makeGraphic(Width:Int, Height:Int, Color:FlxColor = FlxColor.WHITE, Unique:Bool = false, ?Key:String):FlxSprite
+	override public function makeGraphic(width:Int, height:Int, color:FlxColor = FlxColor.WHITE, unique:Bool = false, ?key:String):FlxSprite
 	{
 		antialiasing = false;
-		return super.makeGraphic(Width, Height, Color, Unique, Key);
+		return super.makeGraphic(width, height, color, unique, key);
 	}
 
 	public function playAnim(name:String, forced:Bool = false, ?reverse:Bool = false, ?startFrame:Int = 0):Void
