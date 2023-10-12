@@ -239,7 +239,6 @@ class NoteOffsetState extends MusicBeatState
 	var holdTime:Float = 0;
 
 	var menu:String = 'combo';
-	var curMenu:Int = 0;
 
 	var holdingObjectType:Null<Bool> = null;
 
@@ -491,9 +490,7 @@ class NoteOffsetState extends MusicBeatState
 		if ((!controls.controllerMode && controls.ACCEPT_P) || (controls.controllerMode && FlxG.gamepads.anyJustPressed(START)))
 		{
 			var menusArrayShit:Array<String> = ['combo', 'offset', 'dance'];
-
-			curMenu = CoolUtil.boundSelection(curMenu + 1, menusArrayShit.length);
-			menu = menusArrayShit[curMenu];
+			menu = menusArrayShit[CoolUtil.boundSelection(menusArrayShit.indexOf(menu) + 1, menusArrayShit.length)];
 
 			updateMode();
 			updateNoteDelay();

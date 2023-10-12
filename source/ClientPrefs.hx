@@ -10,6 +10,10 @@ import flixel.util.FlxColor;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxMobileControlsID;
+#end
+
 using StringTools;
 
 class ClientPrefs
@@ -194,9 +198,9 @@ class ClientPrefs
 		'note_down'		=> [DPAD_DOWN, A],
 		'note_right'	=> [DPAD_RIGHT, B],
 
-		'ui_up'			=> [DPAD_UP, LEFT_STICK_DIGITAL_UP],
 		'ui_left'		=> [DPAD_LEFT, LEFT_STICK_DIGITAL_LEFT],
 		'ui_down'		=> [DPAD_DOWN, LEFT_STICK_DIGITAL_DOWN],
+		'ui_up'			=> [DPAD_UP, LEFT_STICK_DIGITAL_UP],
 		'ui_right'		=> [DPAD_RIGHT, LEFT_STICK_DIGITAL_RIGHT],
 
 		'reset'			=> [BACK],
@@ -205,24 +209,57 @@ class ClientPrefs
 		'pause'			=> [START]
 	];
 
+	#if MOBILE_CONTROLS
+	public static var mobileBinds:Map<String, Array<FlxMobileControlsID>> =
+	[
+		'note_left'		=> [LEFT],
+		'note_down'		=> [DOWN],
+		'note_up'		=> [UP],
+		'note_right'	=> [RIGHT],
+
+		'ui_left'		=> [LEFT],
+		'ui_down'		=> [DOWN],
+		'ui_up'			=> [UP],
+		'ui_right'		=> [RIGHT],
+
+		'reset'			=> [C],
+		'accept'		=> [A],
+		'back'			=> [B],
+		'pause'			=> [B, A]
+	];
+	#end
+
 	public static var defaultKeys:Map<String, Array<FlxKey>> = null;
 	public static var defaultButtons:Map<String, Array<FlxGamepadInputID>> = null;
 
-	public static function resetKeys(?controller:Null<Bool> = null):Void //Null = both, False = Keyboard, True = Controller
+	#if MOBILE_CONTROLS
+	public static var defaultPads:Map<String, Array<FlxMobileControlsID>> = null;
+	#end
+
+	public static function resetKeys(?controller:String = null):Void //Null = all, Key = Keyboard, Gamepad = Controller, Pad = Mobile Buttons
 	{
-		if (controller != true)
+		if (controller == null || controller.toLowerCase().trim() == 'key')
 		{
 			for (key in keyBinds.keys()) {
 				if (defaultKeys.exists(key)) keyBinds.set(key, defaultKeys.get(key).copy());
 			}
 		}
 
-		if (controller != false)
+		if (controller == null || controller.toLowerCase().trim() == 'gamepad')
 		{
 			for (button in gamepadBinds.keys()) {
 				if (defaultButtons.exists(button)) gamepadBinds.set(button, defaultButtons.get(button).copy());
 			}
 		}
+
+		#if MOBILE_CONTROLS
+		if (controller == null || controller.toLowerCase().trim() == 'pad')
+		{
+			for (button in mobileBinds.keys()) {
+				if (defaultPads.exists(button)) mobileBinds.set(button, defaultPads.get(button).copy());
+			}
+		}
+		#end
 	}
 
 	public static function clearInvalidKeys(key:String):Void
@@ -232,6 +269,11 @@ class ClientPrefs
 
 		while (keyBind != null && keyBind.contains(NONE)) keyBind.remove(NONE);
 		while (gamepadBind != null && gamepadBind.contains(NONE)) gamepadBind.remove(NONE);
+
+		#if MOBILE_CONTROLS
+		var mobileBind:Array<FlxMobileControlsID> = mobileBinds.get(key);
+		while (mobileBind != null && mobileBind.contains(NONE)) mobileBind.remove(NONE);
+		#end
 	}
 
 	public static function saveBinds():Void
@@ -240,6 +282,11 @@ class ClientPrefs
 		save.bind('controls_v3', CoolUtil.getSavePath());
 		save.data.keyboard = keyBinds;
 		save.data.gamepad = gamepadBinds;
+
+		#if MOBILE_CONTROLS
+		save.data.mobile = mobileBinds;
+		#end
+
 		save.flush();
 	}
 
@@ -267,6 +314,17 @@ class ClientPrefs
 					if (gamepadBinds.exists(control)) gamepadBinds.set(control, keys);
 				}
 			}
+
+			#if MOBILE_CONTROLS
+			if (save.data.mobile != null)
+			{
+				var loadedControls:Map<String, Array<FlxMobileControlsID>> = save.data.mobile;
+
+				for (control => keys in loadedControls) {
+					if (mobileBinds.exists(control)) mobileBinds.set(control, keys);
+				}
+			}
+			#end
 
 			reloadVolumeKeys();
 		}
@@ -397,6 +455,10 @@ class ClientPrefs
 
 		defaultKeys = keyBinds.copy();
 		defaultButtons = gamepadBinds.copy();
+
+		#if MOBILE_CONTROLS
+		defaultPads = mobileBinds.copy();
+		#end
 
 		for (field in Type.getClassFields(ClientPrefs))
 		{

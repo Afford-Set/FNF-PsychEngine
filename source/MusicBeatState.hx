@@ -3,11 +3,15 @@ package;
 import Section;
 import Conductor;
 
+import flixel.FlxG;
 import flixel.FlxState;
+import flixel.FlxCamera;
 import flixel.addons.transition.FlxTransitionableState;
 
 class MusicBeatState extends FlxState
 {
+	public static var instance:MusicBeatState = null;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -24,10 +28,17 @@ class MusicBeatState extends FlxState
 		return Controls.instance;
 	}
 
+	#if MOBILE_CONTROLS
+	public var camControls:FlxCamera;
+	public var virtualPad(default, null):FlxVirtualPad;
+	#end
+
 	override function create():Void
 	{
 		var skip:Bool = FlxTransitionableState.skipNextTransOut; #if MODS_ALLOWED
 		Paths.updatedModsOnState = false; #end
+
+		instance = this;
 
 		super.create();
 
@@ -37,6 +48,15 @@ class MusicBeatState extends FlxState
 
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
+
+		#if MOBILE_CONTROLS
+		camControls = new FlxCamera();
+		camControls.bgColor.alpha = 0;
+		FlxG.cameras.add(camControls, false);
+
+		virtualPad = new FlxVirtualPad(LEFT_FULL, A_B_C);
+		add(virtualPad);
+		#end
 	}
 
 	public static var timePassedOnState:Float = 0;

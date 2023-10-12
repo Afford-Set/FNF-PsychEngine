@@ -5,8 +5,14 @@ import Conductor;
 
 import flixel.FlxSubState;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxVirtualPad;
+#end
+
 class MusicBeatSubState extends FlxSubState
 {
+	public static var instance:MusicBeatSubState = null;
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -23,9 +29,20 @@ class MusicBeatSubState extends FlxSubState
 		return Controls.instance;
 	}
 
+	#if MOBILE_CONTROLS
+	public var virtualPad(default, null):FlxVirtualPad;
+	#end
+
 	override function create():Void
 	{
+		instance = this;
+
 		super.create();
+
+		#if MOBILE_CONTROLS
+		virtualPad = new FlxVirtualPad(LEFT_FULL, A_B_C);
+		add(virtualPad);
+		#end
 	}
 
 	override function update(elapsed:Float):Void

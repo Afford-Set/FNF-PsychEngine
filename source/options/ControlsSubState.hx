@@ -18,6 +18,10 @@ import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
 import flixel.input.gamepad.FlxGamepadManager;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxMobileControlsID;
+#end
+
 using StringTools;
 
 class ControlsSubState extends MusicBeatSubState
@@ -66,7 +70,7 @@ class ControlsSubState extends MusicBeatSubState
 
 	var gamepadColor:FlxColor = 0xfffd7194;
 	var keyboardColor:FlxColor = 0xff7192fd;
-	var onKeyboardMode:Bool = true;
+	var mode:String = #if MOBILE_CONTROLS 'pad' #else 'key' #end;
 
 	var controllerSpr:Sprite;
 
@@ -109,8 +113,13 @@ class ControlsSubState extends MusicBeatSubState
 			controllerSpr.loadGraphic(Paths.getImage('ui/controllertype'), true, 82, 60);
 		}
 
+		if (controllerSpr.width < 246) {
+			throw new openfl.errors.Error('Width of file "controllertype.png" must be 246');
+		}
+
 		controllerSpr.animation.add('keyboard', [0], 1, false);
 		controllerSpr.animation.add('gamepad', [1], 1, false);
+		controllerSpr.animation.add('pad', [2], 1, false);
 		add(controllerSpr);
 
 		var text:Alphabet = new Alphabet(60, 90, 'CTRL', false);
@@ -145,7 +154,7 @@ class ControlsSubState extends MusicBeatSubState
 		{
 			var option:Array<Dynamic> = options[i];
 
-			if (option[0] || onKeyboardMode)
+			if (option[0] || mode == 'key')
 			{
 				if (option.length > 1)
 				{
@@ -201,21 +210,34 @@ class ControlsSubState extends MusicBeatSubState
 			var textX:Float = 350 + n * 300;
 			var key:String = null;
 
-			if (onKeyboardMode)
+			switch (mode)
 			{
-				var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option[2]);
-				var gottenKey:Null<FlxKey> = savKey[n];
-
-				var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
-				key = InputFormatter.getKeyName(newKey);
-			}
-			else
-			{
-				var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option[2]);
-				var gottenKey:Null<FlxGamepadInputID> = savKey[n];
-
-				var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
-				key = InputFormatter.getGamepadName(newKey);
+				case 'key':
+				{
+					var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option[2]);
+					var gottenKey:Null<FlxKey> = savKey[n];
+	
+					var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
+					key = InputFormatter.getKeyName(newKey);
+				}
+				case 'gamepad':
+				{
+					var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option[2]);
+					var gottenKey:Null<FlxGamepadInputID> = savKey[n];
+	
+					var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
+					key = InputFormatter.getGamepadName(newKey);
+				}
+				#if MOBILE_CONTROLS
+				case 'pad':
+				{
+					var savKey:Array<FlxMobileControlsID> = ClientPrefs.mobileBinds.get(option[2]);
+					var gottenKey:Null<FlxMobileControlsID> = savKey[n];
+	
+					var newKey:FlxMobileControlsID = (gottenKey != null) ? gottenKey : NONE;
+					key = InputFormatter.getPadName(newKey);
+				}
+				#end
 			}
 
 			var attach:Alphabet = new Alphabet(textX + 210, 248, key, false);
@@ -243,7 +265,7 @@ class ControlsSubState extends MusicBeatSubState
 
 	function playstationCheck(alpha:Alphabet):Void
 	{
-		if (onKeyboardMode) return;
+		if (mode != 'gamepad') return;
 
 		var gamepad:FlxGamepad = FlxG.gamepads.firstActive;
 		var model:FlxGamepadModel = gamepad != null ? gamepad.detectedModel : UNKNOWN;
@@ -310,7 +332,7 @@ class ControlsSubState extends MusicBeatSubState
 
 		if (!binding)
 		{
-			if (FlxG.keys.justPressed.ESCAPE || FlxG.gamepads.anyJustPressed(B))
+			if (FlxG.keys.justPressed.ESCAPE || FlxG.gamepads.anyJustPressed(B) #if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(B) #end)
 			{
 				ClientPrefs.saveBinds();
 				FlxG.sound.play(Paths.getSound('cancelMenu'));
@@ -320,15 +342,26 @@ class ControlsSubState extends MusicBeatSubState
 				return;
 			}
 
-			if (FlxG.keys.justPressed.CONTROL || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER) || FlxG.gamepads.anyJustPressed(RIGHT_SHOULDER)) swapMode();
+			if (FlxG.keys.justPressed.CONTROL || FlxG.gamepads.anyJustPressed(LEFT_SHOULDER) || FlxG.gamepads.anyJustPressed(RIGHT_SHOULDER)) {
+				swapMode();
+			}
+
+			#if mobile
+			if (FlxG.mouse.overlaps(controllerSpr) && FlxG.mouse.justPressed) swapMode();
+			#end
 
 			if (FlxG.keys.justPressed.LEFT || FlxG.keys.justPressed.RIGHT || FlxG.gamepads.anyJustPressed(DPAD_LEFT) || FlxG.gamepads.anyJustPressed(DPAD_RIGHT) ||
-				FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_LEFT) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_RIGHT)) updateAlt(true);
+				FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_LEFT) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_RIGHT)
+				#if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(LEFT) || virtualPad.mobileControlsJustPressed(RIGHT) #end) updateAlt(true);
 
-			if (FlxG.keys.justPressed.UP || FlxG.gamepads.anyJustPressed(DPAD_UP) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_UP)) updateText(-1);
-			else if (FlxG.keys.justPressed.DOWN || FlxG.gamepads.anyJustPressed(DPAD_DOWN) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_DOWN)) updateText(1);
+			if (FlxG.keys.justPressed.UP || FlxG.gamepads.anyJustPressed(DPAD_UP) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_UP) #if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(UP) #end) {
+				updateText(-1);
+			}
+			else if (FlxG.keys.justPressed.DOWN || FlxG.gamepads.anyJustPressed(DPAD_DOWN) || FlxG.gamepads.anyJustPressed(LEFT_STICK_DIGITAL_DOWN) #if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(DOWN) #end) {
+				updateText(1);
+			}
 
-			if (FlxG.keys.justPressed.ENTER || FlxG.gamepads.anyJustPressed(START) || FlxG.gamepads.anyJustPressed(A))
+			if (FlxG.keys.justPressed.ENTER || FlxG.gamepads.anyJustPressed(START) || FlxG.gamepads.anyJustPressed(A) #if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(A) #end)
 			{
 				var altNum:Int = curAlt ? 1 : 0;
 
@@ -375,7 +408,7 @@ class ControlsSubState extends MusicBeatSubState
 				{
 					var resetToDefault:Void->Void = function():Void // Reset to Default
 					{
-						ClientPrefs.resetKeys(!onKeyboardMode);
+						ClientPrefs.resetKeys(mode);
 						ClientPrefs.reloadVolumeKeys();
 	
 						var lastSel:Int = curSelected;
@@ -406,7 +439,7 @@ class ControlsSubState extends MusicBeatSubState
 			var altNum:Int = curAlt ? 1 : 0;
 			var curOption:Array<Dynamic> = options[curOptions[curSelected]];
 
-			if (FlxG.keys.pressed.ESCAPE || FlxG.gamepads.anyPressed(B))
+			if (FlxG.keys.pressed.ESCAPE || FlxG.gamepads.anyPressed(B) #if MOBILE_CONTROLS || virtualPad.mobileControlsJustPressed(B) #end)
 			{
 				holdingEsc += elapsed;
 
@@ -416,7 +449,7 @@ class ControlsSubState extends MusicBeatSubState
 					closeBinding();
 				}
 			}
-			else if (FlxG.keys.pressed.BACKSPACE || FlxG.gamepads.anyPressed(BACK))
+			else if (FlxG.keys.pressed.BACKSPACE || FlxG.gamepads.anyPressed(BACK) #if MOBILE_CONTROLS || virtualPad.mobileControlsPressed(C) #end)
 			{
 				holdingEsc += elapsed;
 
@@ -425,7 +458,17 @@ class ControlsSubState extends MusicBeatSubState
 					ClientPrefs.keyBinds.get(curOption[2])[altNum] = NONE;
 					ClientPrefs.clearInvalidKeys(curOption[2]);
 
-					updateBind(Math.floor(curSelected * 2) + altNum, onKeyboardMode ? InputFormatter.getKeyName(NONE) : InputFormatter.getGamepadName(NONE));
+					var name:String = switch (mode)
+					{
+						case 'key': InputFormatter.getKeyName(NONE);
+						case 'gamepad': InputFormatter.getGamepadName(NONE);
+						#if MOBILE_CONTROLS
+						case 'pad': InputFormatter.getPadName(NONE);
+						#end
+						default: null;
+					};
+
+					updateBind(Math.floor(curSelected * 2) + altNum, name);
 
 					FlxG.sound.play(Paths.getSound('cancelMenu'));
 					closeBinding();
@@ -439,69 +482,121 @@ class ControlsSubState extends MusicBeatSubState
 				var curKeys:Array<FlxKey> = ClientPrefs.keyBinds.get(curOption[2]);
 				var curButtons:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(curOption[2]);
 
-				if (onKeyboardMode)
+				#if MOBILE_CONTROLS
+				var curPads:Array<FlxMobileControlsID> = ClientPrefs.mobileBinds.get(curOption[2]);
+				#end
+
+				switch (mode)
 				{
-					if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY)
+					case 'key':
 					{
-						var keyPressed:Int = FlxG.keys.firstJustPressed();
-						var keyReleased:Int = FlxG.keys.firstJustReleased();
-
-						if (keyPressed > -1 && keyPressed != FlxKey.ESCAPE && keyPressed != FlxKey.BACKSPACE)
+						if (FlxG.keys.justPressed.ANY || FlxG.keys.justReleased.ANY)
 						{
-							curKeys[altNum] = keyPressed;
-							changed = true;
-						}
-						else if (keyReleased > -1 && (keyReleased == FlxKey.ESCAPE || keyReleased == FlxKey.BACKSPACE))
-						{
-							curKeys[altNum] = keyReleased;
-							changed = true;
-						}
-					}
-				}
-				else if (FlxG.gamepads.anyJustPressed(ANY) || FlxG.gamepads.anyJustPressed(LEFT_TRIGGER) || FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER) || FlxG.gamepads.anyJustReleased(ANY))
-				{
-					var keyPressed:Null<FlxGamepadInputID> = NONE;
-					var keyReleased:Null<FlxGamepadInputID> = NONE;
+							var keyPressed:Int = FlxG.keys.firstJustPressed();
+							var keyReleased:Int = FlxG.keys.firstJustReleased();
 
-					if (FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)) keyPressed = LEFT_TRIGGER; //it wasnt working for some reason
-					else if (FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER)) keyPressed = RIGHT_TRIGGER; //it wasnt working for some reason
-					else
-					{
-						for (i in 0...FlxG.gamepads.numActiveGamepads)
-						{
-							var gamepad:FlxGamepad = FlxG.gamepads.getByID(i);
-
-							if (gamepad != null)
+							if (keyPressed > -1 && keyPressed != FlxKey.ESCAPE && keyPressed != FlxKey.BACKSPACE)
 							{
-								keyPressed = gamepad.firstJustPressedID();
-								keyReleased = gamepad.firstJustReleasedID();
-
-								if (keyPressed == null) keyPressed = NONE;
-								if (keyReleased == null) keyReleased = NONE;
-								if (keyPressed != NONE || keyReleased != NONE) break;
+								curKeys[altNum] = keyPressed;
+								changed = true;
+							}
+							else if (keyReleased > -1 && (keyReleased == FlxKey.ESCAPE || keyReleased == FlxKey.BACKSPACE))
+							{
+								curKeys[altNum] = keyReleased;
+								changed = true;
 							}
 						}
 					}
+					case 'gamepad':
+					{
+						if (FlxG.gamepads.anyJustPressed(ANY) || FlxG.gamepads.anyJustPressed(LEFT_TRIGGER) || FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER) || FlxG.gamepads.anyJustReleased(ANY))
+						{
+							var keyPressed:Null<FlxGamepadInputID> = NONE;
+							var keyReleased:Null<FlxGamepadInputID> = NONE;
 
-					if (keyPressed != NONE && keyPressed != FlxGamepadInputID.BACK && keyPressed != FlxGamepadInputID.B)
-					{
-						curButtons[altNum] = keyPressed;
-						changed = true;
+							if (FlxG.gamepads.anyJustPressed(LEFT_TRIGGER)) {
+								keyPressed = LEFT_TRIGGER; //it wasnt working for some reason
+							}
+							else if (FlxG.gamepads.anyJustPressed(RIGHT_TRIGGER)) {
+								keyPressed = RIGHT_TRIGGER; //it wasnt working for some reason
+							}
+							else
+							{
+								for (i in 0...FlxG.gamepads.numActiveGamepads)
+								{
+									var gamepad:FlxGamepad = FlxG.gamepads.getByID(i);
+
+									if (gamepad != null)
+									{
+										keyPressed = gamepad.firstJustPressedID();
+										keyReleased = gamepad.firstJustReleasedID();
+
+										if (keyPressed == null) keyPressed = NONE;
+										if (keyReleased == null) keyReleased = NONE;
+										if (keyPressed != NONE || keyReleased != NONE) break;
+									}
+								}
+							}
+
+							if (keyPressed != NONE && keyPressed != FlxGamepadInputID.BACK && keyPressed != FlxGamepadInputID.B)
+							{
+								curButtons[altNum] = keyPressed;
+								changed = true;
+							}
+							else if (keyReleased != NONE && (keyReleased == FlxGamepadInputID.BACK || keyReleased == FlxGamepadInputID.B))
+							{
+								curButtons[altNum] = keyReleased;
+								changed = true;
+							}
+						}
 					}
-					else if (keyReleased != NONE && (keyReleased == FlxGamepadInputID.BACK || keyReleased == FlxGamepadInputID.B))
+					#if MOBILE_CONTROLS
+					case 'pad':
 					{
-						curButtons[altNum] = keyReleased;
-						changed = true;
+						if (virtualPad.mobileControlsJustPressed(ANY) || virtualPad.mobileControlsJustReleased(ANY))
+						{
+							var keyPressed:Int = virtualPad.firstJustPressed();
+							var keyReleased:Int = virtualPad.firstJustReleased();
+
+							if (keyPressed > -1 && keyPressed != FlxMobileControlsID.B)
+							{
+								curPads[altNum] = keyPressed;
+								changed = true;
+							}
+							else if (keyReleased > -1 && keyReleased == FlxMobileControlsID.B)
+							{
+								curPads[altNum] = keyReleased;
+								changed = true;
+							}
+						}
 					}
+					#end
 				}
 
 				if (changed)
 				{
-					if (onKeyboardMode) {
-						if (curKeys[altNum] == curKeys[1 - altNum]) curKeys[1 - altNum] = FlxKey.NONE;
-					}
-					else {
-						if (curButtons[altNum] == curButtons[1 - altNum]) 	curButtons[1 - altNum] = FlxGamepadInputID.NONE;
+					switch (mode)
+					{
+						case 'key':
+						{
+							if (curKeys[altNum] == curKeys[1 - altNum]) {
+								curKeys[1 - altNum] = FlxKey.NONE;
+							}
+						}
+						case 'gamepad':
+						{
+							if (curButtons[altNum] == curButtons[1 - altNum]) {
+								curButtons[1 - altNum] = FlxGamepadInputID.NONE;
+							}
+						}
+						#if MOBILE_CONTROLS
+						case 'pad':
+						{
+							if (curPads[altNum] == curPads[1 - altNum]) {
+								curPads[1 - altNum] = FlxMobileControlsID.NONE;
+							}
+						}
+						#end
 					}
 
 					var option:String = options[curOptions[curSelected]][2];
@@ -511,21 +606,34 @@ class ControlsSubState extends MusicBeatSubState
 					{
 						var key:String = null;
 
-						if (onKeyboardMode)
+						switch (mode)
 						{
-							var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option);
-							var gottenKey:Null<FlxKey> = savKey[n];
+							case 'key':
+							{
+								var savKey:Array<FlxKey> = ClientPrefs.keyBinds.get(option);
+								var gottenKey:Null<FlxKey> = savKey[n];
 
-							var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
-							key = InputFormatter.getKeyName(newKey);
-						}
-						else
-						{
-							var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option);
-							var gottenKey:Null<FlxGamepadInputID> = savKey[n];
+								var newKey:FlxKey = (gottenKey != null) ? gottenKey : NONE;
+								key = InputFormatter.getKeyName(newKey);
+							}
+							case 'gamepad':
+							{
+								var savKey:Array<FlxGamepadInputID> = ClientPrefs.gamepadBinds.get(option);
+								var gottenKey:Null<FlxGamepadInputID> = savKey[n];
 
-							var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
-							key = InputFormatter.getGamepadName(newKey);
+								var newKey:FlxGamepadInputID = (gottenKey != null) ? gottenKey : NONE;
+								key = InputFormatter.getGamepadName(newKey);
+							}
+							#if MOBILE_CONTROLS
+							case 'pad':
+							{
+								var savKey:Array<FlxMobileControlsID> = ClientPrefs.mobileBinds.get(option[2]);
+								var gottenKey:Null<FlxMobileControlsID> = savKey[n];
+
+								var newKey:FlxMobileControlsID = (gottenKey != null) ? gottenKey : NONE;
+								key = InputFormatter.getPadName(newKey);
+							}
+							#end
 						}
 
 						updateBind(Math.floor(curSelected * 2) + n, key);
@@ -590,11 +698,12 @@ class ControlsSubState extends MusicBeatSubState
 
 	function swapMode():Void
 	{
-		onKeyboardMode = !onKeyboardMode;
+		var modsArrayShit:Array<String> = ['key', 'gamepad', #if MOBILE_CONTROLS 'pad' #end];
+		mode = modsArrayShit[CoolUtil.boundSelection(modsArrayShit.indexOf(mode) + 1, modsArrayShit.length)];
 
 		curSelected = 0;
 		curAlt = false;
-		controllerSpr.playAnim(onKeyboardMode ? 'keyboard' : 'gamepad');
+		controllerSpr.playAnim(mode);
 
 		createTexts();
 	}

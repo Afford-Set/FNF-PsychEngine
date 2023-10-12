@@ -40,6 +40,10 @@ import openfl.errors.Error;
 import openfl.display.Sprite;
 import openfl.display.StageScaleMode;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxVirtualPad;
+#end
+
 using StringTools;
 
 private typedef GameVariables =
@@ -61,6 +65,10 @@ private typedef GameVariables =
 
 class Main extends Sprite
 {
+	#if MOBILE_CONTROLS
+	public static var virtualPad(get, never):FlxVirtualPad;
+	#end
+
 	var variables:GameVariables = {
 		width: 1280, // WINDOW width
 		height: 720, // WINDOW height
@@ -306,6 +314,29 @@ class Main extends Sprite
 		#if (sys && desktop)
 		Sys.exit(1);
 		#end
+	}
+	#end
+
+	#if MOBILE_CONTROLS
+	static function get_virtualPad():FlxVirtualPad
+	{
+		if (MusicBeatSubState.instance.virtualPad != null) {
+			return MusicBeatSubState.instance.virtualPad;
+		}
+
+		if (MusicBeatUISubState.instance.virtualPad != null) {
+			return MusicBeatUISubState.instance.virtualPad;
+		}
+
+		if (MusicBeatState.instance.virtualPad != null) {
+			return MusicBeatState.instance.virtualPad;
+		}
+
+		if (MusicBeatUIState.instance.virtualPad != null) {
+			return MusicBeatUIState.instance.virtualPad;
+		}
+
+		return null;
 	}
 	#end
 }

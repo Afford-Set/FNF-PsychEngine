@@ -53,6 +53,13 @@
 			"url": "https://github.com/null4ik-2j6k/hxcpp"
 		},
 		{
+			"name": "extension-androidtools",
+			"type": "git",
+			"dir": null,
+			"ref": "main",
+			"url": "https://github.com/MAJigsaw77/extension-androidtools"
+		},
+		{
 			"name": "flixel",
 			"type": "git",
 			"dir": null,
