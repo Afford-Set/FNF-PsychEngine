@@ -5,6 +5,10 @@ import Conductor;
 
 import flixel.addons.ui.FlxUISubState;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxVirtualPad;
+#end
+
 class MusicBeatUISubState extends FlxUISubState
 {
 	public static var instance:MusicBeatUISubState = null;

@@ -37,6 +37,9 @@
 	<define name="REPLAYS_ALLOWED" if="desktop" />
 	<define name="TITLE_SCREEN_EASTER_EGG" if="officialBuild"/> <!-- DELETE THE if="officialBuild" for enabling this on an unofficial build -->
 
+	<!--Mobile Controls Define-->
+	<define name="MOBILE_CONTROLS" if="mobile" /> <!--Can be added windows, mac or linux-->
+
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
@@ -72,6 +75,8 @@
 		<assets path="assets/secrets" rename="assets" exclude="*.ogg" if="MP3_ALLOWED"/>
 		<assets path="assets/secrets" rename="assets" exclude="*.mp3" unless="MP3_ALLOWED"/>
 	</section>
+
+	<assets path="assets/mobile" if="MOBILE_CONTROLS"/>
 
 	<section if="PRELOAD_ALL">
 		<library name="songs"         preload="true" />
@@ -181,9 +186,6 @@
 
 	<!--Enable this for Nape release builds for a serious peformance improvement-->
 	<haxedef name="NAPE_RELEASE_BUILD" unless="debug" />
-
-	<!--Mobile Controls Define-->
-	<define name="MOBILE_CONTROLS" if="mobile" /> <!--Can be added windows, mac or linux-->
 
 	<!--Used for Izzy Engine's crash handler-->
 	<haxedef name="HXCPP_STACK_LINE" if="CRASH_HANDLER desktop" />

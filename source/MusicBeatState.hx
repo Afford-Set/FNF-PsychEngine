@@ -8,6 +8,10 @@ import flixel.FlxState;
 import flixel.FlxCamera;
 import flixel.addons.transition.FlxTransitionableState;
 
+#if MOBILE_CONTROLS
+import mobile.flixel.FlxVirtualPad;
+#end
+
 class MusicBeatState extends FlxState
 {
 	public static var instance:MusicBeatState = null;
