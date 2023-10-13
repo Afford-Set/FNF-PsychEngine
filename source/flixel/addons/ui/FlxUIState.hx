@@ -343,7 +343,7 @@ class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 		getEvent(code, target, null);
 	}
 
-	public function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
+	public function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		// define per subclass
 	}
