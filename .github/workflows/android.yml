@@ -15,12 +15,14 @@ jobs:
         uses: actions/setup-java@main
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
       - name: Setup Android NDK
         id: setup-ndk
         uses: nttld/setup-ndk@main
         with:
           ndk-version: r21e
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
       - name: Restore Previous Cache
         if: ${{ always() }}
         id: cache-debug-build-android-restore
