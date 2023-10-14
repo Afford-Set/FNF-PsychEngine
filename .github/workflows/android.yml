@@ -5,7 +5,8 @@ jobs:
   Build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v2.3.0
+      - name: Checkout
+        uses: actions/checkout@v2.3.0
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
@@ -47,7 +48,9 @@ jobs:
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
       - name: Compile
-        run: haxelib run openfl build android -final
+        run: |
+          haxelib run openfl setup android
+          haxelib run openfl build android -final
         env:
           cert_pass: nullfunni
           cert_alias_pass: nullfunni

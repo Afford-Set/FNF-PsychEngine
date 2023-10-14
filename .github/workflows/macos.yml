@@ -5,7 +5,8 @@ jobs:
   Build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
