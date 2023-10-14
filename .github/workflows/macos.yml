@@ -6,10 +6,11 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: krdlab/setup-haxe@master
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
         with:
           haxe-version: latest
-      - name: Install Haxelib
+      - name: Install Haxe Libraries
         run: |
           haxelib setup ~/haxelib
           haxelib install hmm --quiet

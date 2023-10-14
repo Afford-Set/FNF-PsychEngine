@@ -1,4 +1,4 @@
-name: Windows
+name: HTML5
 on: [push, pull_request]
 
 jobs:
@@ -6,19 +6,20 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2.3.0
-      - uses: krdlab/setup-haxe@master
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
         with:
           haxe-version: latest
-      - name: Install Haxelib
+      - name: Install Haxe Libraries
         run: |
           haxelib setup C:/haxelib
           haxelib install hmm --quiet
           haxelib run hmm install
         shell: cmd
       - name: Compile
-        run: haxelib run openfl build windows
+        run: haxelib run openfl build html5
       - name: Publish Artifact
         uses: actions/upload-artifact@v2.2.4
         with:
-          name: Windows Build
-          path: export/release/windows/bin
+          name: HTML5 Build
+          path: export/release/html5/bin

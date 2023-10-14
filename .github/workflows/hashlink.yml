@@ -6,11 +6,13 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2.3.0
-      - uses: krdlab/setup-haxe@master
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
         with:
           haxe-version: latest
-      - uses: cedx/setup-hashlink@main
-      - name: Install Haxelib
+      - name: Setup Hashlink
+        uses: cedx/setup-hashlink@main
+      - name: Install Haxe Libraries
         run: |
           haxelib setup C:/haxelib
           haxelib install hmm --quiet
