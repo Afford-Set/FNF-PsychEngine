@@ -113,7 +113,7 @@ class ControlsSubState extends MusicBeatSubState
 			controllerSpr.loadGraphic(Paths.getImage('ui/controllertype'), true, 82, 60);
 		}
 
-		if (controllerSpr.width < 246) {
+		if (controllerSpr.width != 246) {
 			throw new openfl.errors.Error('Width of file "controllertype.png" must be 246');
 		}
 
