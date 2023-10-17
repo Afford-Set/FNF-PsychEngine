@@ -113,10 +113,6 @@ class ControlsSubState extends MusicBeatSubState
 			controllerSpr.loadGraphic(Paths.getImage('ui/controllertype'), true, 82, 60);
 		}
 
-		if (controllerSpr.width != 246) {
-			throw new openfl.errors.Error('Width of file "controllertype.png" must be 246');
-		}
-
 		controllerSpr.animation.add('keyboard', [0], 1, false);
 		controllerSpr.animation.add('gamepad', [1], 1, false);
 		controllerSpr.animation.add('pad', [2], 1, false);

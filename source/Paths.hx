@@ -220,7 +220,7 @@ class Paths
 		#if MODS_ALLOWED
 		if (!ignoreMods)
 		{
-			if (FileSystem.exists(key)) {
+			if (FileSystem.exists(key) && !OpenFlAssets.exists(key, type)) {
 				return true;
 			}
 
@@ -242,7 +242,7 @@ class Paths
 		#if MODS_ALLOWED
 		if (!ignoreMods)
 		{
-			if (FileSystem.exists(key)) {
+			if (FileSystem.exists(key) && !OpenFlAssets.exists(key, TEXT)) {
 				return File.getContent(key);
 			}
 
@@ -276,7 +276,7 @@ class Paths
 		#if MODS_ALLOWED
 		if (!ignoreMods)
 		{
-			if (FileSystem.exists(file)) return file;
+			if (FileSystem.exists(file) && !OpenFlAssets.exists(file, type)) return file;
 
 			var modded:String = modFolders(file, library);
 			if (FileSystem.exists(modded)) return modded;
