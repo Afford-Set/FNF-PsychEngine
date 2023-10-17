@@ -1,5 +1,5 @@
 # Friday Night Funkin' - Psych Engine (Null Edition)
-Null Edition (former Alsuh Engine) - fanmade version of Psych Engine by Null4ik_2j6k, 
+**Null Edition** (former Alsuh Engine) - fanmade version of Psych Engine by `Null4ik_2j6k`.
 
 Psych Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
@@ -9,19 +9,20 @@ Psych Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301
 Install Visual Studio Community 2022.
 3. Install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/).
 4. While installing VSC, don't click on any of the options to install workloads. Instead, go to the individual components tab and choose the following:
-- MSVC v143 - VS 2022 C++ x64/x86 build tools
-- Windows SDK (10.0.20348.0) and (10.0.22621.0)
+- `MSVC v143 - VS 2022 C++ x64/x86 build tools`
+- `Windows SDK (10.0.20348.0) and (10.0.22621.0)`
 
 5. Open up a Command Prompt/PowerShell or Terminal, type `haxelib install hmm` after it finishes, simply type `haxelib run hmm install` in order to install all the needed libraries for *Psych Engine!*
 
 If the compiler gives an error saying that hxCodec cannot be found read this issue to fix it: ShadowMario/FNF-PsychEngine#12770
 
-## Supported platforms:
-- Hashlink
-- Windows
-- Linux
-- MacOS
-- HTML5
+## Building
+Finally, we are ready to build.
+
+- Run `haxelib run openfl build <target>`, replacing `<target>` with the supported platform you want to build (see below).
+- The build will be in `FNF-PsychEngine/export/release/<target>/bin`, with `<target>` being the target you built to in the previous step.
+- Incase you added the `-debug` flag the files will be inside `FNF-PsychEngine/export/debug/<target>/bin`.
+- Only the` bin` folder is necessary to run the game. The other ones in `export/release/<target>` are not.
 
 ## Customization:
 
@@ -53,14 +54,15 @@ _____________________________________
 # Features
 
 ## Attractive animated dialogue boxes:
-
 ![](https://user-images.githubusercontent.com/44785097/127706669-71cd5cdb-5c2a-4ecc-871b-98a276ae8070.gif)
 
-
 ## Mod Support
-* Probably one of the main points of this engine, you can code in .lua files outside of the source code, making your own weeks without even messing with the source!
+* Probably one of the main points of this engine, you can code in `.lua` and `.hx` files outside of the source code, making your own weeks without even messing with the source!
 * Comes with a Mod Organizing/Disabling Menu.
 
+## MP3 Support
+* MP3 files are the main sound files of this engine for `C++` platforms, `HTML5` and `Flash`, replacing `.ogg`.
+* For those who chose this edition of the engine and installed the mod folder, you must convert the sound files.
 
 ## Atleast one change to every week:
 ### Week 1:
