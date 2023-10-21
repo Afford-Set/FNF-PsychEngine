@@ -1,1 +1,1 @@
-Drop your custom gfDanceTitle.json file of title data here
+Drop your custom gfDanceTitle.json file here

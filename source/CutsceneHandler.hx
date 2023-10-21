@@ -28,6 +28,7 @@ class CutsceneHandler extends FlxBasic
 			if (music != null)
 			{
 				FlxG.sound.playMusic(Paths.getMusic(music), 0, false);
+				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
 				FlxG.sound.music.fadeIn();
 			}
 
@@ -84,7 +85,7 @@ class CutsceneHandler extends FlxBasic
 
 	public function timer(time:Float, func:Void->Void):Void
 	{
-		timedEvents.push([time, func]);
+		timedEvents.push([time / PlayState.instance.playbackRate, func]);
 		timedEvents.sort(sortByTime);
 	}
 

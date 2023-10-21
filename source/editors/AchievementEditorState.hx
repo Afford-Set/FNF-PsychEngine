@@ -33,6 +33,7 @@ import flixel.addons.ui.FlxUITabMenu;
 import flixel.addons.ui.FlxUICheckBox;
 import flixel.addons.ui.FlxUIInputText;
 import flixel.addons.ui.FlxUINumericStepper;
+import flixel.addons.ui.interfaces.IFlxUIWidget;
 import flixel.system.debug.interaction.tools.Pointer;
 import flixel.addons.transition.FlxTransitionableState;
 
@@ -41,71 +42,11 @@ using StringTools;
 class AchievementEditorState extends MusicBeatUIState
 {
 	#if ACHIEVEMENTS_ALLOWED
-	var award:AchievementFile = null;
+	var award:Achievement = null;
 
 	var icon:AttachedAchievement = null;
 	var text:Alphabet = null;
 	var bg:Sprite = null;
-
-	var misses:Int = 0;
-	var diff:String = 'hard';
-	var color:Array<Int> = [255, 228, 0];
-	var name(default, set):String = 'Your Achievement';
-	var tag(default, set):String = 'your-achievement';
-	var hidden:Bool = false;
-	var week_nomiss:String = 'your-week_nomiss';
-	var lua_code:String = '';
-	var index:Int = -1;
-	var song:String = 'your-song';
-	var desc(default, set):String = 'Your description';
-
-	function set_tag(value:String):String
-	{
-		if (value == null) {
-			value = '';
-		}
-
-		tag = value;
-		icon.changeAchievement(tag, true);
-
-		return value;
-	}
-
-	function set_name(value:String):String
-	{
-		if (value == null || value.length < 1) {
-			value = 'Invalid name';
-		}
-
-		name = value;
-		text.text = name; // lol
-
-		#if DISCORD_ALLOWED
-		DiscordClient.changePresence("Achievement Editor", "Editting: " + name); // Updating Discord Rich Presence
-		#end
-
-		return value;
-	}
-
-	function set_desc(value:String):String
-	{
-		desc = value;
-
-		descText.text = desc;
-		descText.screenCenter(Y);
-		descText.y += 270;
-
-		descBox.setPosition(descText.x - 10, descText.y - 10);
-		descBox.setGraphicSize(Std.int(descText.width + 20), Std.int(descText.height + 25));
-		descBox.updateHitbox();
-
-		var visible:Bool = desc != null && desc.length > 0;
-
-		descText.visible = visible;
-		descBox.visible = visible;
-
-		return value;
-	}
 
 	private var descBox:Sprite = null;
 	private var descText:FlxText = null;
@@ -113,7 +54,7 @@ class AchievementEditorState extends MusicBeatUIState
 	override function create():Void
 	{
 		if (award == null) {
-			award = formatToAchievementFile();
+			award = Achievements.dummy();
 		}
 
 		bg = new Sprite();
@@ -130,10 +71,10 @@ class AchievementEditorState extends MusicBeatUIState
 		bg.scrollFactor.set();
 		add(bg);
 
-		text = new Alphabet(280, 270, name, false);
+		text = new Alphabet(280, 270, award.name, false);
 		add(text);
 
-		icon = new AttachedAchievement(text.x - 105, text.y, tag);
+		icon = new AttachedAchievement(text.x - 105, text.y, award.save_tag);
 		icon.sprTracker = text;
 		add(icon);
 
@@ -148,7 +89,6 @@ class AchievementEditorState extends MusicBeatUIState
 		descText.borderSize = 2.4;
 		add(descText);
 
-		reloadVariables();
 		addEditorBox();
 		reloadAllShit();
 
@@ -184,6 +124,7 @@ class AchievementEditorState extends MusicBeatUIState
 	var tagInputText:FlxUIInputText = null;
 	var descInputText:FlxUIInputText = null;
 	var luaFileInputText:FlxUIInputText = null;
+	var hxFileInputText:FlxUIInputText = null;
 	var weekInputText:FlxUIInputText = null;
 	var indexStepper:FlxUINumericStepper = null;
 	var bgColorStepperR:FlxUINumericStepper = null;
@@ -202,40 +143,48 @@ class AchievementEditorState extends MusicBeatUIState
 		var tab_group:FlxUI = new FlxUI(null, UI_box);
 		tab_group.name = "Achievement";
 
-		awardNameInputText = new FlxUIInputText(10, 25, 150, name, 8);
+		awardNameInputText = new FlxUIInputText(10, 25, 150, award.name, 8);
 		blockPressWhileTypingOn.push(awardNameInputText);
 
-		tagInputText = new FlxUIInputText(10, awardNameInputText.y + 40, 75, tag, 8);
+		tagInputText = new FlxUIInputText(10, awardNameInputText.y + 40, 75, award.save_tag, 8);
 		blockPressWhileTypingOn.push(tagInputText);
 
-		descInputText = new FlxUIInputText(10, tagInputText.y + 40, 230, desc, 8);
+		descInputText = new FlxUIInputText(10, tagInputText.y + 40, 230, award.desc, 8);
 		blockPressWhileTypingOn.push(descInputText);
 
-		luaFileInputText = new FlxUIInputText(10, descInputText.y + 40, 75, lua_code #if !LUA_ALLOWED + ' (platform not supported)' #end, 8);
+		luaFileInputText = new FlxUIInputText(10, descInputText.y + 40, 75, award.lua_code, 8);
 		blockPressWhileTypingOn.push(luaFileInputText);
 
-		weekInputText = new FlxUIInputText(10, luaFileInputText.y + 48, 100, week_nomiss, 8);
+		hxFileInputText = new FlxUIInputText(10, luaFileInputText.y + 40, 75, award.hx_code, 8);
+		blockPressWhileTypingOn.push(hxFileInputText);
+
+		weekInputText = new FlxUIInputText(10, hxFileInputText.y + 40, 100, award.week_nomiss, 8);
 		blockPressWhileTypingOn.push(weekInputText);
 
-		indexStepper = new FlxUINumericStepper(weekInputText.x + weekInputText.width + 72, awardNameInputText.y, 1, index, -1);
+		indexStepper = new FlxUINumericStepper(weekInputText.x + weekInputText.width + 72, awardNameInputText.y, 1, award.index, -1);
 
 		bgColorStepperR = new FlxUINumericStepper(10, weekInputText.y + 40, 20, 255, 0, 255, 0);
 		bgColorStepperG = new FlxUINumericStepper(bgColorStepperR.x + 86, bgColorStepperR.y, 20, 255, 0, 255, 0);
 		bgColorStepperB = new FlxUINumericStepper(bgColorStepperG.x + 86, bgColorStepperG.y, 20, 255, 0, 255, 0);
 
 		hiddenCheckbox = new FlxUICheckBox(10, bgColorStepperR.y + 35, null, null, 'Is Hidden?', 100, function():Void {
-			hidden = hiddenCheckbox.checked;
+			award.hidden = hiddenCheckbox.checked == true;
 		});
 
-		songInputText = new FlxUIInputText(hiddenCheckbox.x + hiddenCheckbox.width + 25, hiddenCheckbox.y + 5, 84, song, 8);
+		songInputText = new FlxUIInputText(hiddenCheckbox.x + hiddenCheckbox.width + 25, hiddenCheckbox.y + 5, 84, award.song, 8);
 		blockPressWhileTypingOn.push(songInputText);
 
 		loadButton = new FlxButton(32, songInputText.y + 30, 'Load', loadAchievement);
 		saveButton = new FlxButton(loadButton.x + loadButton.width + 20, loadButton.y, 'Save', saveAchievement);
-		resetButton = new FlxButton(loadButton.x + loadButton.width - 30, loadButton.y + loadButton.height + 5, 'Reset', reset);
 
-		diffInputText = new FlxUIInputText(songInputText.x, weekInputText.y, 75, song, 8);
-		missesStepper = new FlxUINumericStepper(tagInputText.x + tagInputText.width + 96, tagInputText.y + 15, 1, misses, -1);
+		resetButton = new FlxButton(loadButton.x + loadButton.width - 30, loadButton.y + loadButton.height + 5, 'Reset', function():Void
+		{
+			award = Achievements.dummy();
+			reloadAllShit();
+		});
+
+		diffInputText = new FlxUIInputText(songInputText.x, weekInputText.y, 75, award.diff, 8);
+		missesStepper = new FlxUINumericStepper(tagInputText.x + tagInputText.width + 96, tagInputText.y + 15, 1, award.misses, -1);
 
 		tab_group.add(awardNameInputText);
 		tab_group.add(tagInputText);
@@ -259,6 +208,7 @@ class AchievementEditorState extends MusicBeatUIState
 		tab_group.add(new FlxText(tagInputText.x, tagInputText.y - 18, 0, 'Achievement save tag:'));
 		tab_group.add(new FlxText(descInputText.x, descInputText.y - 18, 0, 'Achievement description:'));
 		tab_group.add(new FlxText(luaFileInputText.x, luaFileInputText.y - 18, 0, 'Lua file\'s path:'));
+		tab_group.add(new FlxText(hxFileInputText.x, hxFileInputText.y - 18, 0, 'HX file\'s path:'));
 		tab_group.add(new FlxText(weekInputText.x, weekInputText.y - 18, 0, 'Week ID to unlock:'));
 		tab_group.add(new FlxText(indexStepper.x, indexStepper.y - 18, 0, 'Index:'));
 		tab_group.add(new FlxText(10, bgColorStepperR.y - 18, 0, 'Selected background Color R/G/B:'));
@@ -269,103 +219,105 @@ class AchievementEditorState extends MusicBeatUIState
 		UI_box.addGroup(tab_group);
 	}
 
-	function reloadVariables():Void
-	{
-		misses = award.misses;
-		diff = award.diff;
-		color = award.color;
-		name = award.name;
-		tag = award.save_tag;
-		hidden = award.hidden;
-		week_nomiss = award.week_nomiss;
-		lua_code = award.lua_code;
-		index = award.index;
-		song = award.song;
-		desc = award.desc;
-	}
-
-	function formatToAchievementFile():AchievementFile
-	{
-		return {
-			misses: misses,
-			diff: diff,
-			color: color,
-			name: name,
-			desc: desc,
-			save_tag: tag,
-			hidden: hidden,
-			week_nomiss: week_nomiss,
-			lua_code: lua_code,
-			index: index,
-			song: song
-		};
-	}
-
 	function reloadAllShit():Void
 	{
-		awardNameInputText.text = name;
-		tagInputText.text = tag;
-		descInputText.text = desc;
-		luaFileInputText.text = lua_code;
-		diffInputText.text = diff;
-		weekInputText.text = week_nomiss;
-		indexStepper.value = index;
-		missesStepper.value = misses;
-		bgColorStepperR.value = color[0];
-		bgColorStepperG.value = color[1];
-		bgColorStepperB.value = color[2];
-		hiddenCheckbox.checked = hidden;
-		songInputText.text = song;
+		awardNameInputText.text = award.name;
+		tagInputText.text = award.save_tag;
+		descInputText.text = award.desc;
+		luaFileInputText.text = award.lua_code;
+		hxFileInputText.text = award.hx_code;
+		diffInputText.text = award.diff;
+		weekInputText.text = award.week_nomiss;
+		indexStepper.value = award.index;
+		missesStepper.value = award.misses;
+		bgColorStepperR.value = award.color[0];
+		bgColorStepperG.value = award.color[1];
+		bgColorStepperB.value = award.color[2];
+		hiddenCheckbox.checked = award.hidden;
+		songInputText.text = award.song;
 
 		updateBG();
 	}
 
 	function updateBG():Void
 	{
-		bg.color = FlxColor.fromRGB(color[0], color[1], color[2]);
+		bg.color = FlxColor.fromRGB(award.color[0], award.color[1], award.color[2]);
 	}
 
-	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
+	override function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
 		{
-			if (sender == awardNameInputText) {
-				name = awardNameInputText.text.trim();
+			if (sender == awardNameInputText)
+			{
+				if (awardNameInputText.text == null || awardNameInputText.text.length < 1) {
+					awardNameInputText.text = 'Invalid name';
+				}
+
+				award.name = awardNameInputText.text.trim();
+				text.text = award.name; // lol
+
+				#if DISCORD_ALLOWED
+				DiscordClient.changePresence("Achievement Editor", "Editting: " + award.name); // Updating Discord Rich Presence
+				#end
 			}
-			else if (sender == tagInputText) {
-				tag = tagInputText.text.trim();
+			else if (sender == tagInputText)
+			{
+				if (tagInputText.text == null) {
+					tagInputText.text = '';
+				}
+		
+				award.save_tag = tagInputText.text.trim();
+				icon.changeAchievement(award.save_tag, true);
 			}
-			else if (sender == descInputText) {
-				desc = descInputText.text.trim();
+			else if (sender == descInputText)
+			{
+				award.desc = descInputText.text.trim();
+
+				descText.text = award.desc;
+				descText.screenCenter(Y);
+				descText.y += 270;
+		
+				descBox.setPosition(descText.x - 10, descText.y - 10);
+				descBox.setGraphicSize(Std.int(descText.width + 20), Std.int(descText.height + 25));
+				descBox.updateHitbox();
+
+				var visible:Bool = award.desc != null && award.desc.length > 0;
+
+				descText.visible = visible;
+				descBox.visible = visible;
 			}
 			else if (sender == luaFileInputText) {
-				lua_code = luaFileInputText.text.trim();
+				award.lua_code = luaFileInputText.text.trim();
+			}
+			else if (sender == hxFileInputText) {
+				award.hx_code = hxFileInputText.text.trim();
 			}
 			else if (sender == diffInputText) {
-				diff = diffInputText.text.trim();
+				award.diff = diffInputText.text.trim();
 			}
 			else if (sender == weekInputText) {
-				week_nomiss = weekInputText.text.trim();
+				award.week_nomiss = weekInputText.text.trim();
 			}
 			else if (sender == songInputText) {
-				song = songInputText.text.trim();
+				award.song = songInputText.text.trim();
 			}
 		}
 		else if (id == FlxUINumericStepper.CHANGE_EVENT && (sender is FlxUINumericStepper))
 		{
 			if (sender == bgColorStepperR || sender == bgColorStepperG || sender == bgColorStepperB)
 			{
-				color[0] = Math.round(bgColorStepperR.value);
-				color[1] = Math.round(bgColorStepperG.value);
-				color[2] = Math.round(bgColorStepperB.value);
+				award.color[0] = Math.round(bgColorStepperR.value);
+				award.color[1] = Math.round(bgColorStepperG.value);
+				award.color[2] = Math.round(bgColorStepperB.value);
 
 				updateBG();
 			}
 			else if (sender == indexStepper) {
-				index = Math.round(indexStepper.value);
+				award.index = Math.round(indexStepper.value);
 			}
 			else if (sender == missesStepper) {
-				misses = Math.round(missesStepper.value);
+				award.misses = Math.round(missesStepper.value);
 			}
 		}
 	}
@@ -427,14 +379,6 @@ class AchievementEditorState extends MusicBeatUIState
 		super.update(elapsed);
 	}
 
-	function reset():Void // sorry but a im lazy and dead inside
-	{
-		FlxTransitionableState.skipNextTransIn = true;
-		FlxTransitionableState.skipNextTransOut = true;
-
-		FlxG.resetState();
-	}
-
 	var _file:FileReference = null;
 
 	function loadAchievement():Void
@@ -465,7 +409,7 @@ class AchievementEditorState extends MusicBeatUIState
 
 			if (rawJson != null)
 			{
-				var loadedAchievement:AchievementFile = Achievements.getAchievementFile(fullPath);
+				var loadedAchievement:Achievement = Achievements.getAchievementFile(fullPath);
 				var cutName:String = _file.name.substr(0, _file.name.length - 5);
 
 				try
@@ -473,7 +417,6 @@ class AchievementEditorState extends MusicBeatUIState
 					Debug.logInfo("Successfully loaded file: " + cutName);
 					award = loadedAchievement;
 
-					reloadVariables();
 					reloadAllShit();
 				}
 				catch (e:Dynamic) {
@@ -520,8 +463,7 @@ class AchievementEditorState extends MusicBeatUIState
 
 	function saveAchievement():Void
 	{
-		award = formatToAchievementFile();
-		var data:String = Json.stringify(award, "\t");
+		var data:String = Json.stringify(award, '\t');
 
 		if (data.length > 0)
 		{
@@ -531,9 +473,9 @@ class AchievementEditorState extends MusicBeatUIState
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 
 			#if MODS_ALLOWED
-			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('achievements/' + #end tag + '.json' #if sys )) #end);
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.modFolders('achievements/' + #end award.save_tag + '.json' #if sys )) #end);
 			#else
-			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('achievements/' + #end tag + '.json' #if sys )) #end);
+			_file.save(data.trim(), #if sys CoolUtil.convPathShit(Paths.getJson('achievements/' + #end award.save_tag + '.json' #if sys )) #end);
 			#end
 		}
 	}

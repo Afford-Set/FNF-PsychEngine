@@ -2141,7 +2141,7 @@ class ChartingState extends MusicBeatUIState
 					holdingShift = 4;
 				}
 
-				var daTime:Float = 700 * FlxG.elapsed * holdingShift;
+				var daTime:Float = 700 * elapsed * holdingShift;
 
 				if (FlxG.keys.pressed.W) {
 					FlxG.sound.music.time -= daTime;

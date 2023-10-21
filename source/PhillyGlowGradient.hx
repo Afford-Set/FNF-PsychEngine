@@ -21,7 +21,7 @@ class PhillyGlowGradient extends Sprite
 
 	override function update(elapsed:Float):Void
 	{
-		var newHeight:Int = Math.round(height - 1000 * elapsed);
+		var newHeight:Int = Math.round(height - 1000 * elapsed * PlayState.instance.playbackRate);
 
 		if (newHeight > 0)
 		{

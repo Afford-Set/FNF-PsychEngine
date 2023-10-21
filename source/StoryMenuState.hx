@@ -202,6 +202,14 @@ class StoryMenuState extends MusicBeatState
 		super.create();
 	}
 
+	override function closeSubState():Void
+	{
+		persistentUpdate = true;
+		changeSelection();
+
+		super.closeSubState();
+	}
+
 	var blockedInput:Bool = false;
 
 	var holdTime:Float = 0;

@@ -1,1 +1,1 @@
-Put your week image here!
+Put your custom week image here!

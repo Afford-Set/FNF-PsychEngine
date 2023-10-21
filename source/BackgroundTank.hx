@@ -1,6 +1,5 @@
 package;
 
-import openfl.filters.BitmapFilterType;
 import flixel.FlxG;
 import flixel.math.FlxAngle;
 
@@ -24,7 +23,7 @@ class BackgroundTank extends BGSprite
 		super.update(elapsed);
 
 		var daAngleOffset:Float = 1;
-		tankAngle += elapsed * tankSpeed;
+		tankAngle += elapsed * tankSpeed * PlayState.instance.playbackRate;
 
 		angle = tankAngle - 90 + 15;
 

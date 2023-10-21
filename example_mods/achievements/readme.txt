@@ -1,1 +1,1 @@
-Put your custom achievement .json files here!
+Put your custom achievement .json, .hx and .lua files here!

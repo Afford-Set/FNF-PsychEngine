@@ -41,11 +41,13 @@ class DialogueBox extends FlxSpriteGroup
 			case 'senpai':
 			{
 				FlxG.sound.playMusic(Paths.getMusic('Lunchbox'), 0);
+				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
 				FlxG.sound.music.fadeIn(1, 0, 0.8);
 			}
 			case 'thorns':
 			{
 				FlxG.sound.playMusic(Paths.getMusic('LunchboxScary'), 0);
+				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
 				FlxG.sound.music.fadeIn(1, 0, 0.8);
 			}
 		}
@@ -56,7 +58,7 @@ class DialogueBox extends FlxSpriteGroup
 		bgFade.alpha = 0;
 		add(bgFade);
 
-		new FlxTimer().start(0.83, function(tmr:FlxTimer):Void
+		new FlxTimer().start(0.83 / PlayState.instance.playbackRate, function(tmr:FlxTimer):Void
 		{
 			bgFade.alpha += (1 / 5) * 0.7;
 
@@ -156,7 +158,7 @@ class DialogueBox extends FlxSpriteGroup
 		swagDialogue.color = 0xFF3F2021;
 		swagDialogue.callback = function():Void
 		{
-			FlxG.sound.play(Paths.getSound('pixelText'), 0.6);
+			FlxG.sound.play(Paths.getSound('pixelText'), 0.6).pitch = PlayState.instance.playbackRate;
 
 			if (typeThing != null) {
 				typeThing();
@@ -214,7 +216,7 @@ class DialogueBox extends FlxSpriteGroup
 					if (!isEnding)
 					{
 						isEnding = true;
-						FlxG.sound.play(Paths.getSound('clickText'), 0.8);
+						FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
 
 						switch (PlayState.SONG.songID)
 						{
@@ -222,7 +224,7 @@ class DialogueBox extends FlxSpriteGroup
 								FlxG.sound.music.fadeOut(2.2, 0);
 						}
 
-						new FlxTimer().start(0.2, function(tmr:FlxTimer):Void
+						new FlxTimer().start(0.2 / PlayState.instance.playbackRate, function(tmr:FlxTimer):Void
 						{
 							box.alpha -= 1 / 5;
 							bgFade.alpha -= 1 / 5 * 0.7;
@@ -233,7 +235,7 @@ class DialogueBox extends FlxSpriteGroup
 							dropText.alpha = swagDialogue.alpha;
 						}, 5);
 
-						new FlxTimer().start(1.2, function(tmr:FlxTimer):Void
+						new FlxTimer().start(1.2 / PlayState.instance.playbackRate, function(tmr:FlxTimer):Void
 						{
 							if (finishThing != null) {
 								finishThing();
@@ -245,7 +247,7 @@ class DialogueBox extends FlxSpriteGroup
 				}
 				else
 				{
-					FlxG.sound.play(Paths.getSound('clickText'), 0.8);
+					FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
 
 					dialogueList.remove(dialogueList[0]);
 					startDialogue();
@@ -253,7 +255,7 @@ class DialogueBox extends FlxSpriteGroup
 			}
 			else if (dialogueStarted)
 			{
-				FlxG.sound.play(Paths.getSound('clickText'), 0.8);
+				FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
 				swagDialogue.skip();
 
 				if (skipDialogueThing != null) {
@@ -272,7 +274,7 @@ class DialogueBox extends FlxSpriteGroup
 		cleanDialog();
 
 		swagDialogue.resetText(dialogueList[0]);
-		swagDialogue.start(0.04, true);
+		swagDialogue.start(0.04 / PlayState.instance.playbackRate, true);
 		swagDialogue.completeCallback = function():Void
 		{
 			handSelect.visible = true;

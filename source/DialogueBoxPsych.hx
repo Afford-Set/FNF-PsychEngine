@@ -59,6 +59,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		if (song != null && song != '' && song != 'none')
 		{
 			FlxG.sound.playMusic(Paths.getMusic(song), 0);
+			FlxG.sound.music.pitch = PlayState.instance.playbackRate;
 			FlxG.sound.music.fadeIn(2, 0, 1);
 		}
 		
@@ -186,7 +187,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 
 		if (!dialogueEnded)
 		{
-			bgFade.alpha += 0.5 * elapsed;
+			bgFade.alpha += 0.5 * elapsed * PlayState.instance.playbackRate;
 			if (bgFade.alpha > 0.5) bgFade.alpha = 0.5;
 
 			if (Controls.instance.ACCEPT_P)
@@ -284,22 +285,22 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 							{
 								case 'left':
 								{
-									char.x -= scrollSpeed * elapsed;
+									char.x -= scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.x < char.startingPos + offsetPos) char.x = char.startingPos + offsetPos;
 								}
 								case 'center':
 								{
-									char.y += scrollSpeed * elapsed;
+									char.y += scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.y > char.startingPos + FlxG.height) char.y = char.startingPos + FlxG.height;
 								}
 								case 'right':
 								{
-									char.x += scrollSpeed * elapsed;
+									char.x += scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.x > char.startingPos - offsetPos) char.x = char.startingPos - offsetPos;
 								}
 							}
 
-							char.alpha -= 3 * elapsed;
+							char.alpha -= 3 * elapsed * PlayState.instance.playbackRate;
 							if (char.alpha < FlxMath.EPSILON) char.alpha = FlxMath.EPSILON;
 						}
 						else
@@ -308,22 +309,22 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 							{
 								case 'left':
 								{
-									char.x += scrollSpeed * elapsed;
+									char.x += scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.x > char.startingPos) char.x = char.startingPos;
 								}
 								case 'center':
 								{
-									char.y -= scrollSpeed * elapsed;
+									char.y -= scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.y < char.startingPos) char.y = char.startingPos;
 								}
 								case 'right':
 								{
-									char.x -= scrollSpeed * elapsed;
+									char.x -= scrollSpeed * elapsed * PlayState.instance.playbackRate;
 									if (char.x < char.startingPos) char.x = char.startingPos;
 								}
 							}
 
-							char.alpha += 3 * elapsed;
+							char.alpha += 3 * elapsed * PlayState.instance.playbackRate;
 							if (char.alpha > 1) char.alpha = 1;
 						}
 					}
@@ -343,7 +344,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 
 			if (bgFade != null)
 			{
-				bgFade.alpha -= 0.5 * elapsed;
+				bgFade.alpha -= 0.5 * elapsed * PlayState.instance.playbackRate;
 
 				if (bgFade.alpha <= 0)
 				{
@@ -363,12 +364,12 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 				{
 					switch (arrayCharacters[i].jsonFile.dialogue_pos)
 					{
-						case 'left': leChar.x -= scrollSpeed * elapsed;
-						case 'center': leChar.y += scrollSpeed * elapsed;
-						case 'right': leChar.x += scrollSpeed * elapsed;
+						case 'left': leChar.x -= scrollSpeed * elapsed * PlayState.instance.playbackRate;
+						case 'center': leChar.y += scrollSpeed * elapsed * PlayState.instance.playbackRate;
+						case 'right': leChar.x += scrollSpeed * elapsed * PlayState.instance.playbackRate;
 					}
 
-					leChar.alpha -= elapsed * 10;
+					leChar.alpha -= elapsed * 10 * PlayState.instance.playbackRate;
 				}
 			}
 
@@ -456,7 +457,7 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		lastBoxType = boxType;
 
 		daText.text = curDialogue.text;
-		daText.delay = curDialogue.speed;
+		daText.delay = curDialogue.speed / PlayState.instance.playbackRate;
 		daText.sound = curDialogue.sound;
 
 		if (daText.sound == null || daText.sound.trim() == '') daText.sound = 'dialogue';

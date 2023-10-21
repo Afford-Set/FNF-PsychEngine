@@ -690,6 +690,28 @@ class FunkinLua
 			}
 		});
 
+		set("unlockAchievement", function(save_tag:String = null):Bool
+		{
+			#if ACHIEVEMENTS_ALLOWED
+			if (save_tag != null && save_tag.length > 0 && Achievements.exists(save_tag))
+			{
+				if (!Achievements.isAchievementUnlocked(save_tag))
+				{
+					Achievements.unlockAchievement(save_tag);
+					PlayState.instance.startAchievement(save_tag);
+				}
+
+				return true;
+			}
+
+			PlayState.debugTrace("unlockAchievement: Invalid save tag.", false, 'error', FlxColor.RED);
+			#else
+			PlayState.debugTrace("unlockAchievement: Platform unsupported for Achievements!", false, 'error', FlxColor.RED);
+			#end
+
+			return false;
+		});
+
 		set("loadSong", function(?name:String = null, ?difficultyNum:Int = -1):Void
 		{
 			if (name == null || name.length < 1) name = PlayState.SONG.songID;

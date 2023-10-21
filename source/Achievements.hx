@@ -14,7 +14,7 @@ import flixel.util.FlxSave;
 using StringTools;
 
 #if ACHIEVEMENTS_ALLOWED
-typedef AchievementFile =
+typedef Achievement =
 {
 	var name:String;
 	var desc:String;
@@ -25,6 +25,7 @@ typedef AchievementFile =
 	var ?song:String;
 	var ?week_nomiss:String;
 	var ?lua_code:String;
+	var ?hx_code:String;
 	var ?color:Array<Int>;
 	var ?diff:String;
 	var ?index:Int;
@@ -65,6 +66,24 @@ class Achievements
 		}
 	}
 
+	public static function dummy():Achievement
+	{
+		return {
+			misses: 0,
+			diff: 'hard',
+			color: [255, 228, 0],
+			name: 'Your Achievement',
+			desc: 'Your description',
+			save_tag: 'your-achievement',
+			hidden: false,
+			week_nomiss: 'your-week_nomiss',
+			lua_code: '',
+			hx_code: '',
+			index: -1,
+			song: 'your-song'
+		};
+	}
+
 	public static function exists(name:String):Bool
 	{
 		return achievementList.contains(name);
@@ -89,7 +108,7 @@ class Achievements
 		return achievementList.indexOf(name);
 	}
 
-	public static function onLoadJson(i:AchievementFile):AchievementFile
+	public static function onLoadJson(i:Achievement):Achievement
 	{
 		if (i.misses == null) {
 			i.misses = 0;
@@ -164,22 +183,21 @@ class Achievements
 			
 				if (!awardsLoaded.contains(sexList[i]))
 				{
-					var award:AchievementFile = getAchievementFile(fileToCheck);
+					var award:Achievement = getAchievementFile(fileToCheck);
 
 					if (award != null)
 					{
 						award = onLoadJson(award);
-						var loadedAward:Achievement = new Achievement(award);
 
-						if (loadedAward.index < 0)
+						if (award.index < 0)
 						{
-							achievementList.push(loadedAward.save_tag);
-							achievementsStuff.push(loadedAward);
+							achievementList.push(award.save_tag);
+							achievementsStuff.push(award);
 						}
 						else
 						{
-							achievementList.insert(loadedAward.index, loadedAward.save_tag);
-							achievementsStuff.insert(loadedAward.index, loadedAward);
+							achievementList.insert(award.index, award.save_tag);
+							achievementsStuff.insert(award.index, award);
 						}
 
 						awardsLoaded.push(sexList[i]);
@@ -240,7 +258,7 @@ class Achievements
 	{
 		if (!awardsLoaded.contains(awardToCheck))
 		{
-			var award:AchievementFile = getAchievementFile(path);
+			var award:Achievement = getAchievementFile(path);
 
 			if (award != null)
 			{
@@ -253,17 +271,15 @@ class Achievements
 					#end
 				}
 
-				var loadedAward:Achievement = new Achievement(award);
-
-				if (loadedAward.index < 0)
+				if (award.index < 0)
 				{
-					achievementList.push(loadedAward.save_tag);
-					achievementsStuff.push(loadedAward);
+					achievementList.push(award.save_tag);
+					achievementsStuff.push(award);
 				}
 				else
 				{
-					achievementList.insert(loadedAward.index, loadedAward.save_tag);
-					achievementsStuff.insert(loadedAward.index, loadedAward);
+					achievementList.insert(award.index, award.save_tag);
+					achievementsStuff.insert(award.index, award);
 				}
 
 				awardsLoaded.push(awardToCheck);
@@ -271,7 +287,7 @@ class Achievements
 		}
 	}
 
-	public static function getAchievementFile(path:String):AchievementFile
+	public static function getAchievementFile(path:String):Achievement
 	{
 		var rawJson:String = null;
 
@@ -284,41 +300,6 @@ class Achievements
 		}
 
 		return null;
-	}
-}
-
-class Achievement
-{
-	public var name:String;
-	public var desc:String;
-	public var save_tag:String;
-	public var hidden:Bool;
-	public var misses:Int;
-	public var song:String;
-	public var week_nomiss:String;
-	public var lua_code:String;
-	public var color:Array<Int>;
-	public var diff:String;
-	public var index:Int;
-
-	public var folder:String;
-
-	public function new(meta:AchievementFile):Void
-	{
-		save_tag = meta.save_tag;
-
-		name = meta.name;
-		desc = meta.desc;
-		hidden = meta.hidden;
-		misses = meta.misses;
-		song = meta.song;
-		week_nomiss = meta.week_nomiss;
-		lua_code = meta.lua_code;
-		color = meta.color;
-		diff = meta.diff;
-		index = meta.index;
-
-		folder = meta.folder;
 	}
 }
 #end

@@ -30,18 +30,18 @@ class PhillyGlowParticle extends Sprite
 		scale.set(originalScale, originalScale);
 
 		scrollFactor.set(FlxG.random.float(0.3, 0.75), FlxG.random.float(0.65, 0.75));
-		velocity.set(FlxG.random.float(-40, 40), FlxG.random.float(-175, -250));
-		acceleration.set(FlxG.random.float(-10, 10), 25);
+		velocity.set(FlxG.random.float(-40, 40) * PlayState.instance.playbackRate, FlxG.random.float(-175, -250) * PlayState.instance.playbackRate);
+		acceleration.set(FlxG.random.float(-10, 10) * PlayState.instance.playbackRate, 25 * PlayState.instance.playbackRate);
 	}
 
 	override function update(elapsed:Float):Void
 	{
-		lifeTime -= elapsed;
+		lifeTime -= elapsed * PlayState.instance.playbackRate;
 
 		if (lifeTime < 0)
 		{
 			lifeTime = 0;
-			alpha -= decay * elapsed;
+			alpha -= decay * elapsed * PlayState.instance.playbackRate;
 
 			if (alpha > 0) {
 				scale.set(originalScale * alpha, originalScale * alpha);

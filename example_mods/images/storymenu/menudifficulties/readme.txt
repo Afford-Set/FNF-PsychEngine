@@ -1,1 +1,1 @@
-Put your difficulty image here!
+Put your custom difficulty image here!

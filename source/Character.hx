@@ -212,7 +212,13 @@ class Character extends Sprite
 		{
 			if (heyTimer > 0)
 			{
-				heyTimer -= elapsed;// * PlayState.instance.playbackRate;
+				var playbackRate:Float = 1;
+
+				if (PlayState.instance != null) {
+					playbackRate = PlayState.instance.playbackRate;
+				}
+
+				heyTimer -= elapsed * playbackRate;
 
 				if (heyTimer <= 0)
 				{
