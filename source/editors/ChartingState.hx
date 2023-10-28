@@ -52,7 +52,7 @@ import flixel.addons.display.FlxGridOverlay;
 
 using StringTools;
 
-class ChartingState extends MusicBeatUIState
+class ChartingState extends MusicBeatState
 {
 	public static var noteTypeList:Array<String> =
 	[

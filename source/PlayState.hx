@@ -4700,6 +4700,8 @@ class PlayState extends MusicBeatState
 	{
 		FlxG.sound.play(Paths.getSoundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2)).pitch = playbackRate;
 
+		callOnScripts('noteMissCommon');
+
 		var subtract:Float = 0.05; // score and data
 
 		if (note != null) subtract = note.missHealth;
@@ -4711,10 +4713,11 @@ class PlayState extends MusicBeatState
 			doDeathCheck(true);
 		}
 
-		combo = 0;
-
-		if (!practiceMode) songScore -= 10;
-		if (!endingSong) songMisses++;
+		if (!endingSong && (note == null || !note.isSustainNote))
+		{
+			songMisses++;
+			combo = 0;
+		}
 
 		totalPlayed++;
 		RecalculateRating(true);
@@ -4845,10 +4848,17 @@ class PlayState extends MusicBeatState
 					note.destroy();
 				}
 
+				var isSus:Bool = note.isSustainNote; // GET OUT OF MY HEAD, GET OUT OF MY HEAD, GET OUT OF MY HEAD
+				var leData:Int = note.noteData;
+				var leType:String = note.noteType;
+
+				var result:Dynamic = callOnLuas('onHitCausesMissNote', [notes.members.indexOf(note), leData, leType, isSus]);
+				if (result != Function_Stop && result != Function_StopHScript && result != Function_StopAll) callOnHScript('onHitCausesMissNote', [note]);
+
 				return;
 			}
 
-			if (!note.isSustainNote)
+			if (!note.isSustainNote && !note.comboDisabled)
 			{
 				combo++;
 				songHits++;
@@ -5094,6 +5104,18 @@ class PlayState extends MusicBeatState
 				limoCorpse.visible = false;
 				limoCorpseTwo.visible = false;
 				limoKillingState = 'KILLING';
+
+				#if ACHIEVEMENTS_ALLOWED
+				Achievements.henchmenDeath++;
+
+				var achieve:String = checkForAchievement(['roadkill_enthusiast']);
+
+				if (achieve != null) {
+					startAchievement(achieve);
+				}
+
+				Debug.logInfo('Deaths: ' + Achievements.henchmenDeath);
+				#end
 			}
 		}
 	}
@@ -5617,9 +5639,7 @@ class PlayState extends MusicBeatState
 
 							if (!changedDifficulty && isNoMisses)
 							{
-								if (storyPlaylist.length < 2 || !isStoryMode)
-								{
-									Achievements.unlockAchievement(achievementName);
+								if (storyPlaylist.length < 2 || !isStoryMode) {
 									unlock = true;
 								}
 							}
@@ -5996,10 +6016,6 @@ class PlayState extends MusicBeatState
 				return 'MusicBeatState';
 			case 'backend.MusicBeatSubState' | 'backend.MusicBeatSubstate' | 'MusicBeatSubstate':
 				return 'MusicBeatSubState';
-			case 'backend.MusicBeatUIState':
-				return 'MusicBeatUIState';
-			case 'backend.MusicBeatUISubState' | 'backend.MusicBeatUISubstate' | 'MusicBeatUISubstate':
-				return 'MusicBeatUISubState';
 			case 'backend.NoteTypesConfig':
 				return 'NoteTypesConfig';
 			case 'backend.Paths':

@@ -4,15 +4,11 @@ import Section;
 import Conductor;
 
 import flixel.FlxG;
-import flixel.FlxState;
 import flixel.FlxCamera;
+import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 
-#if MOBILE_CONTROLS
-import mobile.flixel.FlxVirtualPad;
-#end
-
-class MusicBeatState extends FlxState
+class MusicBeatState extends FlxUIState
 {
 	public static var instance:MusicBeatState = null;
 
@@ -59,6 +55,7 @@ class MusicBeatState extends FlxState
 		FlxG.cameras.add(camControls, false);
 
 		virtualPad = new FlxVirtualPad(LEFT_FULL, A_B_C);
+		virtualPad.cameras = [camControls];
 		add(virtualPad);
 		#end
 	}

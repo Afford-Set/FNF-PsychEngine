@@ -151,6 +151,11 @@ function goodNoteHit(note:Note)
 	// Function called when you hit a note (after note hit calculations)
 }
 
+function onHitCausesMissNote(note:Note)
+{
+	// Works the same as goodNoteHit, but for causes miss notes
+}
+
 function opponentNoteHit(note:Note)
 {
 	// Works the same as goodNoteHit, but for Opponent's notes being hit
@@ -166,6 +171,11 @@ function noteMiss(note:Note)
 {
 	// Called after the note miss calculations
 	// Player missed a note by letting it go offscreen
+}
+
+function noteMissCommon()
+{
+	// Called after the calling functions "noteMiss" or "noteMissPress"
 }
 
 

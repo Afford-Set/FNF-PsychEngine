@@ -39,7 +39,7 @@ import flixel.addons.transition.FlxTransitionableState;
 
 using StringTools;
 
-class AchievementEditorState extends MusicBeatUIState
+class AchievementEditorState extends MusicBeatState
 {
 	#if ACHIEVEMENTS_ALLOWED
 	var award:Achievement = null;
@@ -155,17 +155,20 @@ class AchievementEditorState extends MusicBeatUIState
 		luaFileInputText = new FlxUIInputText(10, descInputText.y + 40, 75, award.lua_code, 8);
 		blockPressWhileTypingOn.push(luaFileInputText);
 
-		hxFileInputText = new FlxUIInputText(10, luaFileInputText.y + 40, 75, award.hx_code, 8);
-		blockPressWhileTypingOn.push(hxFileInputText);
-
-		weekInputText = new FlxUIInputText(10, hxFileInputText.y + 40, 100, award.week_nomiss, 8);
+		weekInputText = new FlxUIInputText(10, luaFileInputText.y + 40, 100, award.week_nomiss, 8);
 		blockPressWhileTypingOn.push(weekInputText);
 
 		indexStepper = new FlxUINumericStepper(weekInputText.x + weekInputText.width + 72, awardNameInputText.y, 1, award.index, -1);
+		blockPressWhileTypingOnStepper.push(indexStepper);
 
 		bgColorStepperR = new FlxUINumericStepper(10, weekInputText.y + 40, 20, 255, 0, 255, 0);
+		blockPressWhileTypingOnStepper.push(bgColorStepperR);
+		
 		bgColorStepperG = new FlxUINumericStepper(bgColorStepperR.x + 86, bgColorStepperR.y, 20, 255, 0, 255, 0);
+		blockPressWhileTypingOnStepper.push(bgColorStepperG);
+
 		bgColorStepperB = new FlxUINumericStepper(bgColorStepperG.x + 86, bgColorStepperG.y, 20, 255, 0, 255, 0);
+		blockPressWhileTypingOnStepper.push(bgColorStepperB);
 
 		hiddenCheckbox = new FlxUICheckBox(10, bgColorStepperR.y + 35, null, null, 'Is Hidden?', 100, function():Void {
 			award.hidden = hiddenCheckbox.checked == true;
@@ -184,12 +187,18 @@ class AchievementEditorState extends MusicBeatUIState
 		});
 
 		diffInputText = new FlxUIInputText(songInputText.x, weekInputText.y, 75, award.diff, 8);
+
 		missesStepper = new FlxUINumericStepper(tagInputText.x + tagInputText.width + 96, tagInputText.y + 15, 1, award.misses, -1);
+		blockPressWhileTypingOnStepper.push(missesStepper);
+
+		hxFileInputText = new FlxUIInputText(songInputText.x, luaFileInputText.y, 75, award.hx_code, 8);
+		blockPressWhileTypingOn.push(hxFileInputText);
 
 		tab_group.add(awardNameInputText);
 		tab_group.add(tagInputText);
 		tab_group.add(descInputText);
 		tab_group.add(luaFileInputText);
+		tab_group.add(hxFileInputText);
 		tab_group.add(weekInputText);
 		tab_group.add(indexStepper);
 		tab_group.add(bgColorStepperR);
@@ -213,7 +222,7 @@ class AchievementEditorState extends MusicBeatUIState
 		tab_group.add(new FlxText(indexStepper.x, indexStepper.y - 18, 0, 'Index:'));
 		tab_group.add(new FlxText(10, bgColorStepperR.y - 18, 0, 'Selected background Color R/G/B:'));
 		tab_group.add(new FlxText(songInputText.x, songInputText.y - 18, 0, 'Song ID to unlock:'));
-		tab_group.add(new FlxText(diffInputText.x, diffInputText.y - 26, 0, 'Difficulty ID\nto unlock:'));
+		tab_group.add(new FlxText(diffInputText.x - 25, diffInputText.y - 18, 0, 'Difficulty ID to unlock:'));
 		tab_group.add(new FlxText(missesStepper.x - 10, missesStepper.y - 26, 0, 'Minimal Misses\n(-1 to disable):'));
 
 		UI_box.addGroup(tab_group);
@@ -236,6 +245,31 @@ class AchievementEditorState extends MusicBeatUIState
 		hiddenCheckbox.checked = award.hidden;
 		songInputText.text = award.song;
 
+		award.name = awardNameInputText.text.trim();
+		text.text = award.name; // lol
+
+		if (tagInputText.text == null) {
+			tagInputText.text = '';
+		}
+
+		award.save_tag = tagInputText.text.trim();
+		icon.changeAchievement(award.save_tag, true);
+
+		award.desc = descInputText.text.trim();
+
+		descText.text = award.desc;
+		descText.screenCenter(Y);
+		descText.y += 270;
+
+		descBox.setPosition(descText.x - 10, descText.y - 10);
+		descBox.setGraphicSize(Std.int(descText.width + 20), Std.int(descText.height + 25));
+		descBox.updateHitbox();
+
+		var visible:Bool = award.desc != null && award.desc.length > 0;
+
+		descText.visible = visible;
+		descBox.visible = visible;
+
 		updateBG();
 	}
 
@@ -244,16 +278,12 @@ class AchievementEditorState extends MusicBeatUIState
 		bg.color = FlxColor.fromRGB(award.color[0], award.color[1], award.color[2]);
 	}
 
-	override function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
+	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
 		{
 			if (sender == awardNameInputText)
 			{
-				if (awardNameInputText.text == null || awardNameInputText.text.length < 1) {
-					awardNameInputText.text = 'Invalid name';
-				}
-
 				award.name = awardNameInputText.text.trim();
 				text.text = award.name; // lol
 

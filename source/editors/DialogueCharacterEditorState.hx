@@ -33,7 +33,7 @@ import flixel.addons.ui.FlxUINumericStepper;
 
 using StringTools;
 
-class DialogueCharacterEditorState extends MusicBeatUIState
+class DialogueCharacterEditorState extends MusicBeatState
 {
 	var box:Sprite;
 	var daText:TypedAlphabet = null;

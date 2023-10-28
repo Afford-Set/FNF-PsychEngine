@@ -77,7 +77,6 @@ class FunkinLua
 {
 	public static var lastCalledScript:FunkinLua = null;
 
-
 	#if LUA_ALLOWED
 	public var lua:State = null;
 	#end

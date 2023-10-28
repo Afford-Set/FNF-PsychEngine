@@ -35,7 +35,7 @@ import flixel.addons.transition.FlxTransitionableState;
 
 using StringTools;
 
-class WeekEditorState extends MusicBeatUIState
+class WeekEditorState extends MusicBeatState
 {
 	public static var weekFileName:String = 'week1';
 
@@ -496,7 +496,7 @@ class WeekEditorState extends MusicBeatUIState
 		#end
 	}
 
-	override function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
+	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
 		{
@@ -930,7 +930,7 @@ class WeekEditorState extends MusicBeatUIState
 	}
 }
 
-class WeekEditorFreeplayState extends MusicBeatUIState
+class WeekEditorFreeplayState extends MusicBeatState
 {
 	var weekFile:WeekFile = null;
 
@@ -1182,7 +1182,7 @@ class WeekEditorFreeplayState extends MusicBeatUIState
 		UI_box.addGroup(tab_group);
 	}
 
-	override function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
+	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
 		{

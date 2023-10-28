@@ -38,7 +38,7 @@ import flixel.system.debug.interaction.tools.Pointer;
 
 using StringTools;
 
-class CharacterEditorState extends MusicBeatUIState
+class CharacterEditorState extends MusicBeatState
 {
 	private var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
 	private var blockPressWhileTypingOnStepper:Array<FlxUINumericStepper> = [];
@@ -865,7 +865,7 @@ class CharacterEditorState extends MusicBeatUIState
 		UI_characterbox.addGroup(tab_group);
 	}
 
-	override function getEvent(id:String, sender:IFlxUIWidget, data:Dynamic, ?params:Array<Dynamic>):Void
+	override function getEvent(id:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void
 	{
 		if (id == FlxUIInputText.CHANGE_EVENT && (sender is FlxUIInputText))
 		{

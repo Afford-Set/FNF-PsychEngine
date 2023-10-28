@@ -788,7 +788,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 				return;
 			}
 
-			if (!note.isSustainNote)
+			if (!note.isSustainNote && !note.comboDisabled)
 			{
 				combo++;
 				songHits++;

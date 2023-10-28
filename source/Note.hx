@@ -109,6 +109,7 @@ class Note extends FlxSprite
 	public var copyAngle:Bool = true;
 	public var copyAlpha:Bool = true;
 
+	public var comboDisabled:Bool = false;
 	public var healthDisabled:Bool = true;
 	public var hitHealth:Float = 0.023;
 	public var missHealth:Float = 0.0475;

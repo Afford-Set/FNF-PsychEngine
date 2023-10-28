@@ -324,16 +324,8 @@ class Main extends Sprite
 			return MusicBeatSubState.instance.virtualPad;
 		}
 
-		if (MusicBeatUISubState.instance.virtualPad != null) {
-			return MusicBeatUISubState.instance.virtualPad;
-		}
-
 		if (MusicBeatState.instance.virtualPad != null) {
 			return MusicBeatState.instance.virtualPad;
-		}
-
-		if (MusicBeatUIState.instance.virtualPad != null) {
-			return MusicBeatUIState.instance.virtualPad;
 		}
 
 		return null;

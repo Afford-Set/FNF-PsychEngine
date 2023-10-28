@@ -124,6 +124,10 @@ function goodNoteHit(id, direction, noteType, isSustainNote)
 	-- isSustainNote: If it's a hold note, can be either true or false
 end
 
+function onHitCausesMissNote(id, direction, noteType, isSustainNote)
+	-- Works the same as goodNoteHit, but for causes miss notes
+end
+
 function opponentNoteHit(id, direction, noteType, isSustainNote)
 	-- Works the same as goodNoteHit, but for Opponent's notes being hit
 end
@@ -136,6 +140,10 @@ end
 function noteMiss(id, direction, noteType, isSustainNote)
 	-- Called after the note miss calculations
 	-- Player missed a note by letting it go offscreen
+end
+
+function noteMissCommon()
+	-- Called after the calling functions "noteMiss" or "noteMissPress"
 end
 
 
