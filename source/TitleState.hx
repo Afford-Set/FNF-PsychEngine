@@ -113,6 +113,10 @@ class TitleState extends MusicBeatState
 
 		Highscore.load();
 
+		if (FlxG.save.data.weekCompleted != null) {
+			WeekData.weekCompleted = FlxG.save.data.weekCompleted;
+		}
+
 		#if CHECK_FOR_UPDATES
 		if (ClientPrefs.checkForUpdates && !closedState)
 		{

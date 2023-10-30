@@ -3539,6 +3539,8 @@ class PlayState extends MusicBeatState
 			case 'Kill Henchmen': killHenchmen();
 			case 'Add Camera Zoom':
 			{
+				camZooming = true;
+
 				if (ClientPrefs.camZooms && FlxG.camera.zoom < 1.35)
 				{
 					if (flValue1 == null) flValue1 = 0.015;
@@ -4702,11 +4704,6 @@ class PlayState extends MusicBeatState
 
 		callOnScripts('noteMissCommon');
 
-		var subtract:Float = 0.05; // score and data
-
-		if (note != null) subtract = note.missHealth;
-		health -= subtract * healthLoss;
-
 		if (instakillOnMiss)
 		{
 			vocals.volume = 0;
@@ -4715,11 +4712,17 @@ class PlayState extends MusicBeatState
 
 		if (!endingSong && (note == null || !note.isSustainNote))
 		{
+			var subtract:Float = 0.05; // score and data
+
+			if (note != null) subtract = note.missHealth;
+			health -= subtract * healthLoss;
+
 			songMisses++;
 			combo = 0;
+
+			totalPlayed++;
 		}
 
-		totalPlayed++;
 		RecalculateRating(true);
 
 		var char:Character = boyfriend; // play character anims
@@ -4737,7 +4740,7 @@ class PlayState extends MusicBeatState
 			{
 				char.playAnim(animToPlay, true);
 
-				if (char != gf && combo > 5 && gf != null && gf.animOffsets.exists('sad'))
+				if (char != gf && combo > 5 && (note == null || !note.isSustainNote) && gf != null && gf.animOffsets.exists('sad'))
 				{
 					gf.playAnim('sad');
 					gf.specialAnim = true;
