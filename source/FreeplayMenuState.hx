@@ -421,9 +421,7 @@ class FreeplayMenuState extends MusicBeatState
 				}
 			}
 		}
-		#end
-
-		if (controls.ACCEPT_P || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(grpSongs.members[curSelected])))
+		else #end if (controls.ACCEPT_P || (FlxG.mouse.justPressed && FlxG.mouse.overlaps(grpSongs.members[curSelected])))
 		{
 			var songLowercase:String = curSong.songID;
 			var poop:String = CoolUtil.formatSong(songLowercase, curDifficulty);
