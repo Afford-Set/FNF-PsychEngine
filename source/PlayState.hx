@@ -329,12 +329,12 @@ class PlayState extends MusicBeatState
 		var defaultDirectories:Array<String> = [Paths.getLibraryPath()];
 
 		var libraryPath:String = Paths.getLibraryPath('', 'shared');
-		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
 		{
 			var libraryPath:String = Paths.getLibraryPath('', Paths.currentLevel);
-			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 		}
 
 		var foldersToCheck:Array<String> = Paths.directoriesWithFile(defaultDirectories, 'scripts/');
@@ -1189,10 +1189,10 @@ class PlayState extends MusicBeatState
 	public var grpCombo:FlxTypedGroup<ComboSprite>;
 	public var grpComboNumbers:FlxTypedGroup<ComboNumberSprite>;
 
-	public var timeBar:HealthBar;
+	public var timeBar:Bar;
 	public var timeTxt:FlxText;
 
-	public var healthBar:HealthBar;
+	public var healthBar:Bar;
 
 	public var iconP1:HealthIcon;
 	public var iconP2:HealthIcon;
@@ -1259,7 +1259,7 @@ class PlayState extends MusicBeatState
 		var path:String = 'ui/healthBar';
 		if (Paths.fileExists('images/healthBar.png', IMAGE)) path = 'healthBar';
 
-		timeBar = new HealthBar(0, (ClientPrefs.downScroll ? FlxG.height - 30 : 8), path, function():Float return songPercent, 0, 1);
+		timeBar = new Bar(0, (ClientPrefs.downScroll ? FlxG.height - 30 : 8), path, function():Float return songPercent, 0, 1);
 		timeBar.screenCenter(X);
 		timeBar.scrollFactor.set();
 		timeBar.cameras = [camHUD];
@@ -1280,7 +1280,7 @@ class PlayState extends MusicBeatState
 		var path:String = 'ui/healthBar';
 		if (Paths.fileExists('images/healthBar.png', IMAGE)) path = 'healthBar';
 
-		healthBar = new HealthBar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), path, function():Float return health, 0, 2);
+		healthBar = new Bar(0, FlxG.height * (!ClientPrefs.downScroll ? 0.89 : 0.11), path, function():Float return health, 0, 2);
 		healthBar.screenCenter(X);
 		healthBar.leftToRight = false;
 		healthBar.scrollFactor.set();
@@ -3023,7 +3023,7 @@ class PlayState extends MusicBeatState
 		iconP1.animation.curAnim.curFrame = (healthBar.percent < 20) ? 1 : ((healthBar.percent > 80 && iconP1.animation.curAnim.numFrames == 3) ? 2 : 0);
 		iconP2.animation.curAnim.curFrame = (healthBar.percent > 80) ? 1 : ((healthBar.percent < 20 && iconP2.animation.curAnim.numFrames == 3) ? 2 : 0);
 
-		if (startedCountdown && !paused) {
+		if (startedCountdown && !paused && !endingSong) {
 			Conductor.songPosition += elapsed * 1000 * playbackRate;
 		}
 
@@ -4000,10 +4000,8 @@ class PlayState extends MusicBeatState
 
 		updateTime = false;
 
-		FlxG.sound.music.volume = 0;
-
-		vocals.volume = 0;
-		vocals.pause();
+		FlxG.sound.music.stop();
+		vocals.stop();
 
 		if (ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
 			finishCallback();
@@ -5707,12 +5705,12 @@ class PlayState extends MusicBeatState
 			var foldersToCheck:Array<String> = [Paths.getPreloadPath('shaders/')];
 
 			var libraryPath:String = Paths.getLibraryPath('shaders/', 'shared');
-			foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+			foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 
 			if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
 			{
 				var libraryPath:String = Paths.getLibraryPath('shaders/', Paths.currentLevel);
-				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 			}
 
 			#if MODS_ALLOWED
@@ -6063,8 +6061,8 @@ class PlayState extends MusicBeatState
 				return 'Character';
 			case 'objects.CheckboxThingie':
 				return 'CheckboxThingie';
-			case 'objects.HealthBar':
-				return 'HealthBar';
+			case 'objects.Bar' | 'objects.HealthBar' | 'HealthBar':
+				return 'Bar';
 			case 'objects.HealthIcon':
 				return 'HealthIcon';
 			case 'objects.MenuCharacter':

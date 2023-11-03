@@ -9,7 +9,7 @@ import flixel.group.FlxSpriteGroup;
 
 using StringTools;
 
-class HealthBar extends FlxSpriteGroup
+class Bar extends FlxSpriteGroup
 {
 	public var leftBar:FlxSprite;
 	public var rightBar:FlxSprite;

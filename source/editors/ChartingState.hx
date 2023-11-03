@@ -1113,12 +1113,12 @@ class ChartingState extends MusicBeatState
 		var defaultDirectories:Array<String> = [Paths.getLibraryPath()];
 
 		var libraryPath:String = Paths.getLibraryPath('', 'shared');
-		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+		defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
 		{
 			var libraryPath:String = Paths.getLibraryPath('', Paths.currentLevel);
-			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+			defaultDirectories.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 		}
 
 		var foldersToCheck:Array<String> = Paths.directoriesWithFile(defaultDirectories, 'custom_notetypes/');
@@ -1201,11 +1201,11 @@ class ChartingState extends MusicBeatState
 		if (Paths.currentLevel != null && Paths.currentLevel.length > 0 && Paths.currentLevel != 'shared')
 		{
 			var libraryPath:String = Paths.getLibraryPath('custom_events/', Paths.currentLevel);
-			directories.push(libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+			directories.push(libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 		}
 
 		var libraryPath:String = Paths.getLibraryPath('custom_events/', 'shared');
-		directories.push(libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+		directories.push(libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 
 		directories.push(Paths.getPreloadPath('custom_events/'));
 

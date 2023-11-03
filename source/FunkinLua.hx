@@ -3362,10 +3362,10 @@ class FunkinLua
 			if (Paths.currentLevel != null && Paths.currentLevel.length > 0)
 			{
 				var libraryPath:String = Paths.getLibraryPath('shaders/', 'shared');
-				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 
 				var libraryPath:String = Paths.getLibraryPath('shaders/', Paths.currentLevel);
-				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':'), libraryPath.length));
+				foldersToCheck.insert(0, libraryPath.substring(libraryPath.indexOf(':') + 1, libraryPath.length));
 			}
 
 			#if MODS_ALLOWED

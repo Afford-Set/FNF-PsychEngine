@@ -77,7 +77,7 @@ class CharacterEditorState extends MusicBeatState
 	var characterList:Array<String> = [];
 
 	var cameraFollowPointer:Sprite;
-	var healthBar:HealthBar;
+	var healthBar:Bar;
 
 	override function create():Void
 	{
@@ -126,7 +126,7 @@ class CharacterEditorState extends MusicBeatState
 
 		loadChar(!daAnim.startsWith('bf'), false);
 
-		healthBar = new HealthBar(30, FlxG.height - 75);
+		healthBar = new Bar(30, FlxG.height - 75);
 		healthBar.scrollFactor.set();
 		healthBar.cameras = [camHUD];
 		add(healthBar);

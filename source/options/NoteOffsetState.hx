@@ -30,7 +30,7 @@ class NoteOffsetState extends MusicBeatState
 	var barPercent:Float = 0;
 	var delayMin:Int = -500;
 	var delayMax:Int = 500;
-	var timeBar:HealthBar;
+	var timeBar:Bar;
 	var timeTxt:FlxText;
 	var beatText:Alphabet;
 	var beatTween:FlxTween;
@@ -197,7 +197,7 @@ class NoteOffsetState extends MusicBeatState
 		var path:String = 'ui/healthBar';
 		if (Paths.fileExists('images/healthBar.png', IMAGE)) path = 'healthBar';
 
-		timeBar = new HealthBar(0, timeTxt.y + (timeTxt.height / 3), path, function():Float return barPercent, delayMin, delayMax);
+		timeBar = new Bar(0, timeTxt.y + (timeTxt.height / 3), path, function():Float return barPercent, delayMin, delayMax);
 		timeBar.scrollFactor.set();
 		timeBar.screenCenter(X);
 		timeBar.visible = false;
