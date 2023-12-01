@@ -50,7 +50,7 @@
 			"type": "git",
 			"dir": null,
 			"ref": "main",
-			"url": "https://github.com/null4ik-2j6k/hxcpp"
+			"url": "https://github.com/Afford-Set/hxcpp"
 		},
 		{
 			"name": "extension-androidtools",
@@ -92,14 +92,14 @@
 			"type": "git",
 			"dir": null,
 			"ref": "master",
-			"url": "https://github.com/null4ik-2j6k/linc_discord-rpc"
+			"url": "https://github.com/Afford-Set/linc_discord-rpc"
 		},
 		{
 			"name": "hscript",
 			"type": "git",
 			"dir": null,
 			"ref": "master",
-			"url": "https://github.com/null4ik-2j6k/hscript"
+			"url": "https://github.com/Afford-Set/hscript"
 		},
 		{
 			"name": "linc_luajit",

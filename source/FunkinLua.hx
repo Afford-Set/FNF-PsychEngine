@@ -162,6 +162,7 @@ class FunkinLua
 		set('misses', 0);
 		set('hits', 0);
 		set('combo', 0);
+		set('health', 0);
 
 		set('rating', 0);
 		set('ratingName', '');
@@ -1608,18 +1609,9 @@ class FunkinLua
 			}
 		});
 
-		set("cameraSetTarget", function(target:String):Bool
+		set("cameraSetTarget", function(target:Dynamic, callOnScripts:Null<Bool> = false):Void
 		{
-			var charType:String = 'bf';
-
-			switch (target.toLowerCase().trim())
-			{
-				case 'gf' | 'girlfriend' | '2': charType = 'gf';
-				case 'dad' | 'opponent' | '1' | 'true': charType = 'dad';
-			}
-
-			game.cameraMovement(charType);
-			return charType == 'dad';
+			game.cameraMovement(target, callOnScripts);
 		});
 
 		set("cameraShake", function(camera:String, intensity:Float, duration:Float):Void
@@ -2579,35 +2571,35 @@ class FunkinLua
 
 		set("keyboardJustPressed", function(name:String):Bool
 		{
-			return Reflect.getProperty(FlxG.keys.justPressed, name) == true;
+			return Reflect.getProperty(FlxG.keys.justPressed, name.toUpperCase()) == true;
 		});
 
 		set("keyboardPressed", function(name:String):Bool
 		{
-			return Reflect.getProperty(FlxG.keys.pressed, name) == true;
+			return Reflect.getProperty(FlxG.keys.pressed, name.toUpperCase()) == true;
 		});
 
 		set("keyboardReleased", function(name:String):Bool
 		{
-			return Reflect.getProperty(FlxG.keys.justReleased, name) == true;
+			return Reflect.getProperty(FlxG.keys.justReleased, name.toUpperCase()) == true;
 		});
 
 		set("anyGamepadJustPressed", function(name:String):Bool
 		{
-			return FlxG.gamepads.anyJustPressed(name);
+			return FlxG.gamepads.anyJustPressed(name.toUpperCase());
 		});
 
 		set("anyGamepadPressed", function(name:String):Bool
 		{
-			return FlxG.gamepads.anyPressed(name);
+			return FlxG.gamepads.anyPressed(name.toUpperCase());
 		});
 
 		set("anyGamepadReleased", function(name:String):Bool
 		{
-			return FlxG.gamepads.anyJustReleased(name);
+			return FlxG.gamepads.anyJustReleased(name.toUpperCase());
 		});
 
-		set("gamepadAnalogX", function(id:Int, ?leftStick:Bool = true)
+		set("gamepadAnalogX", function(id:Int, ?leftStick:Bool = true):Float
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 
@@ -2618,7 +2610,7 @@ class FunkinLua
 			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 
-		set("gamepadAnalogY", function(id:Int, ?leftStick:Bool = true)
+		set("gamepadAnalogY", function(id:Int, ?leftStick:Bool = true):Float
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 
@@ -2637,7 +2629,7 @@ class FunkinLua
 				return false;
 			}
 
-			return Reflect.getProperty(controller.justPressed, name) == true;
+			return Reflect.getProperty(controller.justPressed, name.toUpperCase()) == true;
 		});
 
 		set("gamepadPressed", function(id:Int, name:String):Bool
@@ -2648,7 +2640,7 @@ class FunkinLua
 				return false;
 			}
 
-			return Reflect.getProperty(controller.pressed, name) == true;
+			return Reflect.getProperty(controller.pressed, name.toUpperCase()) == true;
 		});
 
 		set("gamepadReleased", function(id:Int, name:String):Bool
@@ -2659,7 +2651,7 @@ class FunkinLua
 				return false;
 			}
 
-			return Reflect.getProperty(controller.justReleased, name) == true;
+			return Reflect.getProperty(controller.justReleased, name.toUpperCase()) == true;
 		});
 
 		set("keyJustPressed", function(name:String = ''):Bool
@@ -2762,6 +2754,17 @@ class FunkinLua
 			}
 
 			PlayState.debugTrace('setDataFromSave: Save file not initialized: ' + name, false, 'error', FlxColor.RED);
+		});
+
+		set("eraseSaveData", function(name:String):Void
+		{
+			if (PlayState.instance.modchartSaves.exists(name))
+			{
+				PlayState.instance.modchartSaves.get(name).erase();
+				return;
+			}
+
+			PlayState.debugTrace('eraseSaveData: Save file not initialized: ' + name, false, 'error', FlxColor.RED);
 		});
 
 		set("checkFileExists", function(filename:String):Bool

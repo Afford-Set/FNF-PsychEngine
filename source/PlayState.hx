@@ -1330,6 +1330,7 @@ class PlayState extends MusicBeatState
 	function set_health(value:Float):Float
 	{
 		health = CoolUtil.boundTo(value, 0, 2);
+		setOnScripts('health', health);
 		updateScore();
 		return health;
 	}
@@ -3888,7 +3889,7 @@ class PlayState extends MusicBeatState
 		callOnScripts('onEvent', [eventName, value1, value2, strumTime]);
 	}
 
-	public function cameraMovementSection(?sec:Null<Int>):Void
+	public function cameraMovementSection(?sec:Null<Int>, ?callOnScripts:Null<Bool> = true):Void
 	{
 		if (sec == null) sec = curSection;
 		if (sec < 0) sec = 0;
@@ -3896,39 +3897,37 @@ class PlayState extends MusicBeatState
 		if (SONG.notes[sec] != null)
 		{
 			if (gf != null && SONG.notes[sec].gfSection) {
-				cameraMovement('gf');
+				cameraMovement('gf', callOnScripts);
 			}
 			else
 			{
-				var isDad:Bool = (SONG.notes[sec].mustHitSection != true);
-				cameraMovement(isDad);
+				if (!SONG.notes[curSection].mustHitSection) {
+					cameraMovement('dad', callOnScripts);
+				}
+				else {
+					cameraMovement('boyfriend', callOnScripts);
+				}
 			}
 		}
 	}
 
 	var cameraTwn:FlxTween;
 
-	public function cameraMovement(target:Dynamic):Void
+	public function cameraMovement(target:Dynamic, callOnScripts:Bool = false):Void
 	{
-		if (target == true || target == 'dad')
+		if (target == 'dad' || target == 'opponent' || target == true)
 		{
 			camFollow.set(dad.getMidpoint().x + 150, dad.getMidpoint().y - 100);
 			camFollow.x += dad.cameraPosition[0] + opponentCameraOffset[0];
 			camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1];
 
 			tweenCamIn();
-			callOnScripts('onMoveCamera', ['dad']);
-		}
-		else if (target == 'gf')
-		{
-			camFollow.set(gf.getMidpoint().x, gf.getMidpoint().y);
-			camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0];
-			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1];
 
-			tweenCamIn();
-			callOnScripts('onMoveCamera', ['gf']);
+			if (callOnScripts) {
+				instance.callOnScripts('onMoveCamera', ['dad']);
+			}
 		}
-		else
+		else if (target == 'boyfriend' || target == 'bf' || target == false)
 		{
 			camFollow.set(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
 			camFollow.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0];
@@ -3945,7 +3944,21 @@ class PlayState extends MusicBeatState
 				});
 			}
 
-			callOnScripts('onMoveCamera', ['boyfriend']);
+			if (callOnScripts) {
+				instance.callOnScripts('onMoveCamera', ['boyfriend']);
+			}
+		}
+		else
+		{
+			camFollow.set(gf.getMidpoint().x, gf.getMidpoint().y);
+			camFollow.x += gf.cameraPosition[0] + girlfriendCameraOffset[0];
+			camFollow.y += gf.cameraPosition[1] + girlfriendCameraOffset[1];
+
+			tweenCamIn();
+
+			if (callOnScripts) {
+				instance.callOnScripts('onMoveCamera', ['gf']);
+			}
 		}
 	}
 
@@ -4000,8 +4013,13 @@ class PlayState extends MusicBeatState
 
 		updateTime = false;
 
+		FlxG.sound.music.pause();
 		FlxG.sound.music.stop();
+		FlxG.sound.music.volume = 0;
+
+		vocals.pause();
 		vocals.stop();
+		vocals.volume = 0;
 
 		if (ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
 			finishCallback();

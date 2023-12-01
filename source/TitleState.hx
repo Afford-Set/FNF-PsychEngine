@@ -122,7 +122,7 @@ class TitleState extends MusicBeatState
 		{
 			Debug.logInfo('checking new update');
 
-			var http:Http = new Http('https://raw.githubusercontent.com/null4ik-2j6k/FNF-PsychEngine/null/version.downloadMe');
+			var http:Http = new Http('https://raw.githubusercontent.com/Afford-Set/FNF-PsychEngine/null/version.downloadMe');
 			http.onData = function(data:String):Void
 			{
 				updateVersion = data.substring(0, data.indexOf(';')).trim();

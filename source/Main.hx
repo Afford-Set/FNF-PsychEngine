@@ -284,7 +284,7 @@ class Main extends Sprite
 			}
 		}
 
-		errMsg += '\nUncaught Error: ' + message + '\nPlease report this error to the GitHub page: https://github.com/null4ik-2j6k/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng';
+		errMsg += '\nUncaught Error: ' + message + '\nPlease report this error to the GitHub page: https://github.com/Afford-Set/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng';
 
 		#if (sys && desktop)
 		if (!FileSystem.exists('./crash/')) {
