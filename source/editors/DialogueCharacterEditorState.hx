@@ -79,15 +79,12 @@ class DialogueCharacterEditorState extends MusicBeatState
 	{
 		persistentUpdate = persistentDraw = true;
 
-		camGame = new FlxCamera();
+		camGame = initSwagCamera();
 		camGame.bgColor = FlxColor.fromHSL(0, 0, 0.5);
-		FlxG.cameras.reset(camGame);
 
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
 		FlxG.cameras.add(camHUD, false);
-
-		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 		
 		mainGroup = new FlxSpriteGroup();
 		mainGroup.cameras = [camGame];

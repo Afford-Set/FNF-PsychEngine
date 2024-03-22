@@ -14,12 +14,15 @@ import flash.media.Sound;
 import openfl.utils.Future;
 import openfl.errors.Error;
 import openfl.system.System;
+import openfl.utils.ByteArray;
 import openfl.utils.AssetType;
 import flixel.system.FlxAssets;
 import flash.display.BitmapData;
 import flixel.graphics.FlxGraphic;
-import animateatlas.AtlasFrameMaker;
 import lime.utils.Assets as LimeAssets;
+#if flxanimate
+import flxanimate.frames.FlxAnimateFrames;
+#end
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFramesCollection;
@@ -423,12 +426,7 @@ class Paths
 			return currentTrackedAssets.get(path);
 		}
 
-		if (!getFileLocation)
-		{
-			if (ClientPrefs.naughtyness) {
-				Debug.logError('oh no its returning null NOOOO ($key)');
-			}
-
+		if (!getFileLocation) {
 			Debug.logError('Could not find a image asset with key "$key".');
 		}
 
@@ -492,33 +490,52 @@ class Paths
 		return null;
 	}
 
-	public static function getAnimateAtlas(key:String, ?library:Null<String> = null, ?allowGPU:Null<Bool> = true, ?excludeArray:Array<String> = null, ?noAntialiasing:Bool = false, ?ignoreMods:Null<Bool> = false):FlxFramesCollection
+	public static function getAsepriteAtlas(key:String, ?library:Null<String> = null, ?allowGPU:Null<Bool> = true, ?ignoreMods:Null<Bool> = false):FlxFramesCollection
 	{
-		var imagePath:String = getImage(key + '/spritemap', library, false, true, ignoreMods);
-		var animationPath:String = getJson('images/' + key + '/Animation', library, ignoreMods);
-		var atlasPath:String = getJson('images/' + key + '/spritemap', library, ignoreMods);
+		var imagePath:String = getImage(key, library, false, true, ignoreMods);
+		var descPath:String = getJson('images/' + key, library, ignoreMods);
 
-		if (fileExists('images/' + key + '/spritemap1.json', TEXT))
+		if (fileExists(imagePath, IMAGE, ignoreMods) && fileExists(descPath, TEXT, ignoreMods))
 		{
-			Debug.logError("Only Spritemaps made with Adobe Animate 2018 are supported.");
-			return null;
-		}
+			var array:Array<String> = [imagePath, descPath];
 
-		if (fileExists(imagePath, IMAGE, ignoreMods) && fileExists(animationPath, TEXT, ignoreMods) && fileExists(atlasPath, TEXT, ignoreMods))
-		{
-			var array:Array<String> = [imagePath, animationPath, atlasPath];
-
-			if (!currentTrackedFrames.exists(array))
-			{
-				var graphic:FlxGraphic = getImage(imagePath, null, allowGPU, false, ignoreMods);
-
-				var descAnim:String = getTextFromFile(animationPath, ignoreMods);
-				var descAtlas:String = getTextFromFile(atlasPath, ignoreMods);
-
-				currentTrackedFrames.set(array, AtlasFrameMaker.construct(graphic, descAnim, descAtlas, excludeArray, noAntialiasing));
+			if (!currentTrackedFrames.exists(array)) {
+				currentTrackedFrames.set(array, FlxAtlasFrames.fromTexturePackerJson(getImage(imagePath, null, allowGPU, false, ignoreMods), getTextFromFile(descPath, ignoreMods)));
 			}
 
 			return currentTrackedFrames.get(array);
+		}
+
+		Debug.logError('Could not find a aseprite asset with key "$key".');
+		return null;
+	}
+
+	public static function getAnimateAtlas(key:String, ?library:Null<String> = null, ?allowGPU:Null<Bool> = true, ?excludeArray:Array<String> = null, ?noAntialiasing:Bool = false, ?ignoreMods:Null<Bool> = false):FlxFramesCollection
+	{
+		for (i in 0...10)
+		{
+			var st:String = '$i';
+			if (i == 0) st = '';
+
+			var originalPath:String = key;
+
+			var imagePath:String = getImage(originalPath + '/spritemap' + st, library, false, true, ignoreMods);
+			var atlasPath:String = getJson('images/' + originalPath + '/spritemap' + st, library, ignoreMods);
+	
+			if (fileExists(imagePath, IMAGE, ignoreMods) && fileExists(atlasPath, TEXT, ignoreMods))
+			{
+				var array:Array<String> = [imagePath, atlasPath];
+	
+				if (!currentTrackedFrames.exists(array))
+				{
+					var graphic:FlxGraphic = getImage(imagePath, null, allowGPU, false, ignoreMods);
+					var descAtlas:String = getTextFromFile(atlasPath, ignoreMods);
+	
+					currentTrackedFrames.set(array, FlxAnimateFrames.fromJson(Json.parse(descAtlas), graphic));
+				}
+	
+				return currentTrackedFrames.get(array);
+			}
 		}
 
 		Debug.logError('Could not find a animate asset with key "$key".');
@@ -537,8 +554,19 @@ class Paths
 			{
 				if (getFileLocation) return file;
 
-				if (!currentTrackedSounds.exists(file)) {
-					currentTrackedSounds.set(file, Sound.fromFile(file));
+				if (!currentTrackedSounds.exists(file))
+				{	#if (MP3_ALLOWED && cpp)
+					if (StringTools.endsWith(file, '.mp3'))
+					{
+						var bytes:ByteArray = ByteArray.fromFile(file);
+						var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+			
+						var sound:Sound = new Sound();
+						sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+						currentTrackedSounds.set(file, sound);
+					}
+					else #end
+						currentTrackedSounds.set(file, Sound.fromFile(file));
 				}
 
 				localTrackedAssets.push(file);
@@ -556,8 +584,19 @@ class Paths
 
 			var cutPath:String = gottenPath.substr(gottenPath.indexOf(':') + 1);
 
-			if (!currentTrackedSounds.exists(cutPath)) {
-				currentTrackedSounds.set(cutPath, OpenFlAssets.getSound(gottenPath));
+			if (!currentTrackedSounds.exists(cutPath))
+			{	#if (MP3_ALLOWED && cpp)
+				if (StringTools.endsWith(gottenPath, '.mp3'))
+				{
+					var bytes:ByteArray = OpenFlAssets.getBytes(gottenPath);
+					var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+		
+					var sound:Sound = new Sound();
+					sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+					currentTrackedSounds.set(cutPath, sound);
+				}
+				else #end
+					currentTrackedSounds.set(cutPath, OpenFlAssets.getSound(gottenPath));
 			}
 
 			localTrackedAssets.push(cutPath);
@@ -573,34 +612,64 @@ class Paths
 
 	public static function loadSound(path:String, ?ignoreMods:Bool = false):Future<Sound>
 	{
-		if (currentTrackedSounds.exists(path))
+		var cutPath:String = path.substr(path.indexOf(':') + 1);
+
+		if (currentTrackedSounds.exists(cutPath))
 		{
-			localTrackedAssets.push(path);
-			return Future.withValue(currentTrackedSounds.get(path));
+			localTrackedAssets.push(cutPath);
+			return Future.withValue(currentTrackedSounds.get(cutPath));
 		}
 		else
 		{
 			#if MODS_ALLOWED
 			if (!ignoreMods)
 			{
-				if (FileSystem.exists(path))
+				if (FileSystem.exists(cutPath) && !OpenFlAssets.exists(path))
 				{
-					return Sound.loadFromFile(path).onComplete(function(snd:Sound):Void
+					#if (MP3_ALLOWED && cpp)
+					return ByteArray.loadFromFile(cutPath).then(function(bytes:ByteArray):Future<Sound>
 					{
-						currentTrackedSounds.set(path, snd);
-						localTrackedAssets.push(path);
+						var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+			
+						var sound:Sound = new Sound();
+						sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+						currentTrackedSounds.set(cutPath, sound);
+
+						localTrackedAssets.push(cutPath);
+						return Future.withValue(sound);
 					});
+					#else
+					return Sound.loadFromFile(cutPath).onComplete(function(snd:Sound):Void
+					{
+						currentTrackedSounds.set(cutPath, snd);
+						localTrackedAssets.push(cutPath);
+					});
+					#end
 				}
 			}
 			#end
 
 			if (OpenFlAssets.exists(path, SOUND))
 			{
+				#if (MP3_ALLOWED && cpp)
+				return OpenFlAssets.loadBytes(path).then(function(bytes:ByteArray):Future<Sound>
+				{
+					var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+		
+					var sound:Sound = new Sound();
+					sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+					currentTrackedSounds.set(cutPath, sound);
+
+					localTrackedAssets.push(cutPath);
+					return Future.withValue(sound);
+				});
+				#else
 				return OpenFlAssets.loadSound(path).onComplete(function(snd:Sound):Void
 				{
-					currentTrackedSounds.set(path, snd);
-					localTrackedAssets.push(path);
+					currentTrackedSounds.set(cutPath, snd);
+					localTrackedAssets.push(cutPath);
 				});
+				#end
 			}
 		}
 

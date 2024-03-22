@@ -28,10 +28,8 @@ class MusicBeatState extends FlxUIState
 		return Controls.instance;
 	}
 
-	#if MOBILE_CONTROLS
-	public var camControls:FlxCamera;
-	public var virtualPad(default, null):FlxVirtualPad;
-	#end
+	var _swagCameraInitialized:Bool = false;
+	var _psychCameraInitialized(get, never):Bool;
 
 	override function create():Void
 	{
@@ -39,6 +37,8 @@ class MusicBeatState extends FlxUIState
 		Paths.updatedModsOnState = false; #end
 
 		instance = this;
+
+		if (!_psychCameraInitialized) initSwagCamera();
 
 		super.create();
 
@@ -48,16 +48,18 @@ class MusicBeatState extends FlxUIState
 
 		FlxTransitionableState.skipNextTransOut = false;
 		timePassedOnState = 0;
+	}
 
-		#if MOBILE_CONTROLS
-		camControls = new FlxCamera();
-		camControls.bgColor.alpha = 0;
-		FlxG.cameras.add(camControls, false);
+	public function initSwagCamera():SwagCamera
+	{
+		var camera:SwagCamera = new SwagCamera();
 
-		virtualPad = new FlxVirtualPad(LEFT_FULL, A_B_C);
-		virtualPad.cameras = [camControls];
-		add(virtualPad);
-		#end
+		FlxG.cameras.reset(camera);
+		FlxG.cameras.setDefaultDrawTarget(camera, true);
+
+		_swagCameraInitialized = true;
+
+		return camera;
 	}
 
 	public static var timePassedOnState:Float = 0;
@@ -177,5 +179,10 @@ class MusicBeatState extends FlxUIState
 		}
 
 		return 4;
+	}
+
+	inline function get__psychCameraInitialized():Bool
+	{
+		return _swagCameraInitialized;
 	}
 }

@@ -476,11 +476,11 @@ class NoteSplashDebugState extends MusicBeatState
 		if (config.offsets[animID] == null)
 		{
 			while (config.offsets[animID] == null) {
-				config.offsets.push(config.offsets[FlxMath.wrap(animID, 0, config.offsets.length-1)].copy());
+				config.offsets.push(config.offsets[FlxMath.wrap(animID, 0, config.offsets.length - 1)].copy());
 			}
 		}
 
-		return config.offsets[FlxMath.wrap(animID, 0, config.offsets.length-1)];
+		return config.offsets[FlxMath.wrap(animID, 0, config.offsets.length - 1)];
 	}
 
 	function addAnimAndCheck(spr:FlxSprite, name:String, anim:String, ?framerate:Int = 24, ?loop:Bool = false):Bool

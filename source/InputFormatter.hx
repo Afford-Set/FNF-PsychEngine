@@ -5,10 +5,6 @@ import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.input.gamepad.FlxGamepadInputID;
 
-#if MOBILE_CONTROLS
-import mobile.flixel.FlxMobileControlsID;
-#end
-
 using StringTools;
 
 class InputFormatter
@@ -200,24 +196,4 @@ class InputFormatter
 
 		return CoolUtil.formatToName(label);
 	}
-
-	#if MOBILE_CONTROLS
-	public static function getPadName(key:FlxMobileControlsID):String
-	{
-		switch (key)
-		{
-			case LEFT2: return 'Left (In Right)';
-			case DOWN2: return 'Down (In Right)'
-			case UP2: return 'Up (In Right)'
-			case RIGHT2: return 'Right (In Right)'
-			case NONE: return '---';
-			default:
-		}
-
-		var label:String = Std.string(key);
-		if (label == null || label.toLowerCase() == 'null') return '---';
-
-		return CoolUtil.formatToName(label);
-	}
-	#end
 }

@@ -87,7 +87,9 @@ class PhillyTrain extends BGSprite
 		if (!sound.playing)
 		{
 			sound.play(true);
+			#if FLX_PITCH
 			sound.pitch = PlayState.instance.playbackRate;
+			#end
 		}
 	}
 

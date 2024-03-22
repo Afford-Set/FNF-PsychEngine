@@ -99,19 +99,30 @@ class Character extends Sprite
 
 				var json:CharacterFile = getCharacterFile(characterPath);
 				var spriteType:String = 'sparrow';
-				
+
 				if (Paths.fileExists('images/' + json.image + '.txt', TEXT)) {
 					spriteType = 'packer';
 				}
-				else if (Paths.fileExists('images/' + json.image + '/Animation.json', TEXT)) {
-					spriteType = 'texture';
+				else if (Paths.fileExists('images/' + json.image + '.json', TEXT)) {
+					spriteType = 'aseprite';
+				}
+
+				for (i in 0...10)
+				{
+					var st:String = '$i';
+					if (i == 0) st = '';
+
+					if (Paths.fileExists('images/' + json.image + '/spritemap$st.json', TEXT)) {
+						spriteType = 'animate';
+					}
 				}
 
 				switch (spriteType)
 				{
 					case 'packer': frames = Paths.getPackerAtlas(json.image);
 					case 'sparrow': frames = Paths.getSparrowAtlas(json.image);
-					case 'texture': frames = Paths.getAnimateAtlas(json.image);
+					case 'aseprite': frames = Paths.getAsepriteAtlas(json.image);
+					case 'animate': frames = Paths.getAnimateAtlas(json.image);
 				}
 
 				imageFile = json.image;
@@ -221,7 +232,9 @@ class Character extends Sprite
 
 				if (heyTimer <= 0)
 				{
-					if (specialAnim && animation.curAnim.name == 'hey' || animation.curAnim.name == 'cheer')
+					var anim:String = getAnimationName();
+
+					if (specialAnim && anim == 'hey' || anim == 'cheer')
 					{
 						specialAnim = false;
 						dance();
@@ -230,36 +243,80 @@ class Character extends Sprite
 					heyTimer = 0;
 				}
 			}
-			else if (specialAnim && animation.curAnim.finished)
+			else if (specialAnim && isAnimationFinished())
 			{
 				specialAnim = false;
 				dance();
 			}
-			else if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished)
+			else if (getAnimationName().endsWith('miss') && isAnimationFinished())
 			{
 				dance();
-				animation.finish();
+				finishAnimation();
 			}
 
-			if (animation.curAnim.name.startsWith('sing')) {
+			if (getAnimationName().startsWith('sing')) {
 				holdTimer += elapsed;
 			}
 			else if (isPlayer) {
 				holdTimer = 0;
 			}
 
-			if (!isPlayer && holdTimer >= Conductor.stepCrochet * (0.0011 / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1)) * singDuration)
+			if (!isPlayer && holdTimer >= Conductor.stepCrochet * (0.0011 #if FLX_PITCH / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1) #end) * singDuration)
 			{
 				dance();
 				holdTimer = 0;
 			}
 
-			if (animation.curAnim.finished && animation.getByName(animation.curAnim.name + '-loop') != null) {
-				playAnim(animation.curAnim.name + '-loop');
+			var name:String = getAnimationName();
+
+			if (isAnimationFinished() && animOffsets.exists('$name-loop')) {
+				playAnim('$name-loop');
 			}
 		}
 
 		super.update(elapsed);
+	}
+
+	inline public function isAnimationNull():Bool
+	{
+		return animation.curAnim == null;
+	}
+
+	inline public function getAnimationName():String
+	{
+		var name:String = '';
+
+		@:privateAccess
+		if (!isAnimationNull()) name = animation.curAnim.name;
+		return (name != null) ? name : '';
+	}
+
+	public function isAnimationFinished():Bool
+	{
+		if (isAnimationNull()) return false;
+		return animation.curAnim.finished;
+	}
+
+	public function finishAnimation():Void
+	{
+		if (isAnimationNull()) return;
+		animation.curAnim.finish();
+	}
+
+	public var animPaused(get, set):Bool;
+
+	private function get_animPaused():Bool
+	{
+		if (isAnimationNull()) return false;
+		return animation.curAnim.paused;
+	}
+
+	private function set_animPaused(value:Bool):Bool
+	{
+		if (isAnimationNull()) return value;
+		animation.curAnim.paused = value;
+
+		return value;
 	}
 
 	public var danced:Bool = false;

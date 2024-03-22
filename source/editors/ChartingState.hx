@@ -1538,9 +1538,11 @@ class ChartingState extends MusicBeatState
 		voicesVolume.name = 'voices_volume';
 		blockPressWhileTypingOnStepper.push(voicesVolume);
 
+		#if FLX_PITCH
 		sliderRate = new FlxUISlider(this, 'playbackSpeed', 120, 120, 0.5, 3, 150, 15, 5, FlxColor.WHITE, FlxColor.BLACK);
 		sliderRate.nameLabel.text = 'Playback Rate';
 		tab_group_chart.add(sliderRate);
+		#end
 
 		tab_group_chart.add(new FlxText(metronomeStepper.x, metronomeStepper.y - 15, 0, 'BPM:'));
 		tab_group_chart.add(new FlxText(metronomeOffsetStepper.x, metronomeOffsetStepper.y - 15, 0, 'Offset (ms):'));
@@ -2359,6 +2361,7 @@ class ChartingState extends MusicBeatState
 		var pressedLB:Bool = FlxG.keys.justPressed.LBRACKET;
 		var pressedRB:Bool = FlxG.keys.justPressed.RBRACKET;
 
+		#if FLX_PITCH
 		if (!holdingShift && pressedLB || holdingShift && holdingLB) playbackSpeed -= 0.01;
 		if (!holdingShift && pressedRB || holdingShift && holdingRB) playbackSpeed += 0.01;
 	
@@ -2368,6 +2371,7 @@ class ChartingState extends MusicBeatState
 
 		FlxG.sound.music.pitch = playbackSpeed;
 		if (vocals != null) vocals.pitch = playbackSpeed;
+		#end
 
 		var playedSound:Array<Bool> = [false, false, false, false]; // Prevents ouchy GF sex sounds
 
@@ -2573,13 +2577,11 @@ class ChartingState extends MusicBeatState
 		if (FlxG.save.data.chart_waveformInst)
 		{
 			var sound:FlxSound = FlxG.sound.music;
-
-			if (sound != null && sound.buffer != null)
-			{
-				var bytes:Bytes = sound.buffer.data.toBytes();
-
+			@:privateAccess
+			if (sound != null && sound._sound.__buffer != null) {
+				var bytes:Bytes = sound._sound.__buffer.data.toBytes();
 				wavData = waveformData(
-					sound.buffer,
+					sound._sound.__buffer,
 					bytes,
 					st,
 					et,
@@ -2593,13 +2595,11 @@ class ChartingState extends MusicBeatState
 		if (FlxG.save.data.chart_waveformVoices)
 		{
 			var sound:FlxSound = vocals;
-
-			if (sound != null && sound.buffer != null)
-			{
-				var bytes:Bytes = sound.buffer.data.toBytes();
-
+			@:privateAccess
+			if (sound != null && sound._sound.__buffer != null) {
+				var bytes:Bytes = sound._sound.__buffer.data.toBytes();
 				wavData = waveformData(
-					sound.buffer,
+					sound._sound.__buffer,
 					bytes,
 					st,
 					et,

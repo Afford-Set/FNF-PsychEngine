@@ -34,15 +34,11 @@ import openfl.Lib;
 import flixel.FlxG;
 import flixel.FlxGame;
 import flixel.FlxState;
-import openfl.display.FPS;
+import debug.FPSCounter;
 import openfl.events.Event;
 import openfl.errors.Error;
 import openfl.display.Sprite;
 import openfl.display.StageScaleMode;
-
-#if MOBILE_CONTROLS
-import mobile.flixel.FlxVirtualPad;
-#end
 
 using StringTools;
 
@@ -65,10 +61,6 @@ private typedef GameVariables =
 
 class Main extends Sprite
 {
-	#if MOBILE_CONTROLS
-	public static var virtualPad(get, never):FlxVirtualPad;
-	#end
-
 	var variables:GameVariables = {
 		width: 1280, // WINDOW width
 		height: 720, // WINDOW height
@@ -79,7 +71,7 @@ class Main extends Sprite
 	};
 
 	public static var game:FlxGame = null;
-	public static var fpsCounter:FPS = null;
+	public static var fpsCounter:FPSCounter = null;
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
@@ -142,7 +134,7 @@ class Main extends Sprite
 		addChild(game);
 
 		#if !mobile
-		fpsCounter = new FPS(10, 3, 0xFFFFFF);
+		fpsCounter = new FPSCounter(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
 
 		FlxG.stage.align = 'tl';
@@ -314,21 +306,6 @@ class Main extends Sprite
 		#if (sys && desktop)
 		Sys.exit(1);
 		#end
-	}
-	#end
-
-	#if MOBILE_CONTROLS
-	static function get_virtualPad():FlxVirtualPad
-	{
-		if (MusicBeatSubState.instance.virtualPad != null) {
-			return MusicBeatSubState.instance.virtualPad;
-		}
-
-		if (MusicBeatState.instance.virtualPad != null) {
-			return MusicBeatState.instance.virtualPad;
-		}
-
-		return null;
 	}
 	#end
 }

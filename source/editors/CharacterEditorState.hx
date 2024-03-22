@@ -83,8 +83,7 @@ class CharacterEditorState extends MusicBeatState
 	{
 		if (ClientPrefs.cacheOnGPU) Paths.clearStoredMemory();
 
-		camEditor = new FlxCamera();
-		FlxG.cameras.reset(camEditor);
+		camEditor = initSwagCamera();
 
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
@@ -97,8 +96,6 @@ class CharacterEditorState extends MusicBeatState
 		camOther = new FlxCamera();
 		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
-
-		FlxG.cameras.setDefaultDrawTarget(camEditor, true);
 
 		CustomFadeTransition.nextCamera = camOther;
 
@@ -968,8 +965,18 @@ class CharacterEditorState extends MusicBeatState
 
 		var anims:Array<AnimArray> = char.animationsArray.copy();
 
-		if (Paths.fileExists('images/' + char.imageFile + '/Animation.json', TEXT)) {
-			char.frames = Paths.getAnimateAtlas(char.imageFile);
+		for (i in 0...10)
+		{
+			var st:String = '$i';
+			if (i == 0) st = '';
+
+			if (Paths.fileExists('images/' + char.imageFile + '/spritemap$st.json', TEXT)) {
+				char.frames = Paths.getAnimateAtlas(char.imageFile);
+			}
+		}
+
+		if (Paths.fileExists('images/' + char.imageFile + '.json', TEXT)) {
+			char.frames = Paths.getAsepriteAtlas(char.imageFile);
 		}
 		else if (Paths.fileExists('images/' + char.imageFile + '.txt', TEXT)) {
 			char.frames = Paths.getPackerAtlas(char.imageFile);

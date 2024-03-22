@@ -59,7 +59,9 @@ class DialogueBoxPsych extends FlxSpriteGroup // TO DO: Clean code? Maybe? idk
 		if (song != null && song != '' && song != 'none')
 		{
 			FlxG.sound.playMusic(Paths.getMusic(song), 0);
+			#if FLX_PITCH
 			FlxG.sound.music.pitch = PlayState.instance.playbackRate;
+			#end
 			FlxG.sound.music.fadeIn(2, 0, 1);
 		}
 		

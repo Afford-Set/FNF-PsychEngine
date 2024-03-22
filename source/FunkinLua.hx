@@ -83,6 +83,7 @@ class FunkinLua
 
 	public var camTarget:FlxCamera;
 	public var scriptName:String = '';
+	public var modFolder:String = null;
 	public var closed:Bool = false;
 
 	#if HSCRIPT_ALLOWED
@@ -100,6 +101,14 @@ class FunkinLua
 		this.scriptName = scriptName;
 
 		var game:PlayState = PlayState.instance;
+
+		#if MODS_ALLOWED
+		var myFolder:Array<String> = this.scriptName.split('/');
+
+		if (myFolder[0] + '/' == Paths.mods() && (Paths.currentModDirectory == myFolder[1] || Paths.globalMods.contains(myFolder[1]))) { // is inside mods folder
+			this.modFolder = myFolder[1];
+		}
+		#end
 
 		set('Function_StopLua', PlayState.Function_StopLua);
 
@@ -2360,6 +2369,7 @@ class FunkinLua
 			}
 		});
 
+		#if FLX_PITCH
 		set("getSoundPitch", function(tag:String):Float
 		{
 			if (tag != null && tag.length > 0 && game.modchartSounds.exists(tag)) {
@@ -2385,6 +2395,7 @@ class FunkinLua
 				}
 			}
 		});
+		#end
 
 		set("luaSoundExists", game.modchartSounds.exists);
 

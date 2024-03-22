@@ -44,9 +44,11 @@ class TypedAlphabet extends Alphabet
 				{
 					var sound:FlxSound = FlxG.sound.play(Paths.getSound(sound), volume);
 
+					#if FLX_PITCH
 					if (PlayState.instance != null) {
 						sound.pitch = PlayState.instance.playbackRate;
 					}
+					#end
 				}
 
 				playedSound = true;

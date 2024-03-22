@@ -28,7 +28,9 @@ class CutsceneHandler extends FlxBasic
 			if (music != null)
 			{
 				FlxG.sound.playMusic(Paths.getMusic(music), 0, false);
+				#if FLX_PITCH
 				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
+				#end
 				FlxG.sound.music.fadeIn();
 			}
 

@@ -41,13 +41,17 @@ class DialogueBox extends FlxSpriteGroup
 			case 'senpai':
 			{
 				FlxG.sound.playMusic(Paths.getMusic('Lunchbox'), 0);
+				#if FLX_PITCH
 				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
+				#end
 				FlxG.sound.music.fadeIn(1, 0, 0.8);
 			}
 			case 'thorns':
 			{
 				FlxG.sound.playMusic(Paths.getMusic('LunchboxScary'), 0);
+				#if FLX_PITCH
 				FlxG.sound.music.pitch = PlayState.instance.playbackRate;
+				#end
 				FlxG.sound.music.fadeIn(1, 0, 0.8);
 			}
 		}
@@ -156,9 +160,9 @@ class DialogueBox extends FlxSpriteGroup
 		swagDialogue = new FlxTypeText(240, 500, Std.int(FlxG.width * 0.6), "", 32);
 		swagDialogue.font = Paths.getFont('pixel.otf');
 		swagDialogue.color = 0xFF3F2021;
-		swagDialogue.callback = function():Void
+		swagDialogue.typingCallback = function():Void
 		{
-			FlxG.sound.play(Paths.getSound('pixelText'), 0.6).pitch = PlayState.instance.playbackRate;
+			FlxG.sound.play(Paths.getSound('pixelText'), 0.6) #if FLX_PITCH .pitch = PlayState.instance.playbackRate #end;
 
 			if (typeThing != null) {
 				typeThing();
@@ -216,7 +220,7 @@ class DialogueBox extends FlxSpriteGroup
 					if (!isEnding)
 					{
 						isEnding = true;
-						FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
+						FlxG.sound.play(Paths.getSound('clickText'), 0.8) #if FLX_PITCH .pitch = PlayState.instance.playbackRate #end;
 
 						switch (PlayState.SONG.songID)
 						{
@@ -247,7 +251,7 @@ class DialogueBox extends FlxSpriteGroup
 				}
 				else
 				{
-					FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
+					FlxG.sound.play(Paths.getSound('clickText'), 0.8) #if FLX_PITCH .pitch = PlayState.instance.playbackRate #end;
 
 					dialogueList.remove(dialogueList[0]);
 					startDialogue();
@@ -255,7 +259,7 @@ class DialogueBox extends FlxSpriteGroup
 			}
 			else if (dialogueStarted)
 			{
-				FlxG.sound.play(Paths.getSound('clickText'), 0.8).pitch = PlayState.instance.playbackRate;
+				FlxG.sound.play(Paths.getSound('clickText'), 0.8) #if FLX_PITCH .pitch = PlayState.instance.playbackRate #end;
 				swagDialogue.skip();
 
 				if (skipDialogueThing != null) {

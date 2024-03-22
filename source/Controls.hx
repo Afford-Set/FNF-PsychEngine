@@ -4,13 +4,6 @@ import flixel.FlxG;
 import flixel.input.keyboard.FlxKey;
 import flixel.input.gamepad.FlxGamepadInputID;
 
-#if MOBILE_CONTROLS
-import mobile.flixel.FlxButton;
-import mobile.flixel.FlxHitbox;
-import mobile.flixel.FlxVirtualPad;
-import mobile.flixel.FlxMobileControlsID;
-#end
-
 using StringTools;
 
 class Controls
@@ -20,18 +13,10 @@ class Controls
 	public var keyboardBinds:Map<String, Array<FlxKey>> = null;
 	public var gamepadBinds:Map<String, Array<FlxGamepadInputID>> = null;
 
-	#if MOBILE_CONTROLS
-	public var mobileBinds:Map<String, Array<FlxGamepadInputID>> = null;
-	#end
-
 	public function new():Void
 	{
 		keyboardBinds = ClientPrefs.keyBinds;
 		gamepadBinds = ClientPrefs.gamepadBinds;
-
-		#if MOBILE_CONTROLS
-		mobileBinds = ClientPrefs.mobileBinds;
-		#end
 	}
 
 	public var UI_LEFT_P(get, never):Bool;			inline function get_UI_LEFT_P():Bool return justPressed('ui_left');
@@ -84,7 +69,7 @@ class Controls
 
 	public function justPressed(key:String):Bool
 	{
-		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds.get(key)) == true) #if MOBILE_CONTROLS || (Main.virtualPad != null && Main.virtualPad.mobileControlsJustPressed(mobileBinds.get(key)) == true) #end;
+		var result:Bool = (FlxG.keys.anyJustPressed(keyboardBinds.get(key)) == true);
 		if (result) controllerMode = false;
 
 		return result || _myGamepadJustPressed(gamepadBinds.get(key)) == true;
@@ -92,7 +77,7 @@ class Controls
 
 	public function pressed(key:String):Bool
 	{
-		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds.get(key)) == true) #if MOBILE_CONTROLS || (Main.virtualPad != null && Main.virtualPad.mobileControlsPressed(mobileBinds.get(key)) == true) #end;
+		var result:Bool = (FlxG.keys.anyPressed(keyboardBinds.get(key)) == true);
 		if (result) controllerMode = false;
 
 		return result || _myGamepadPressed(gamepadBinds.get(key)) == true;
@@ -100,7 +85,7 @@ class Controls
 
 	public function justReleased(key:String):Bool
 	{
-		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds.get(key)) == true) #if MOBILE_CONTROLS || (Main.virtualPad != null && Main.virtualPad.mobileControlsJustPressed(mobileBinds.get(key)) == true) #end;
+		var result:Bool = (FlxG.keys.anyJustReleased(keyboardBinds.get(key)) == true);
 		if (result) controllerMode = false;
 
 		return result || _myGamepadJustReleased(gamepadBinds.get(key)) == true;

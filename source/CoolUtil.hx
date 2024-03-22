@@ -4,12 +4,38 @@ import haxe.io.Path;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.text.FlxText;
 import flixel.util.FlxSave;
 import flixel.util.FlxColor;
 import lime.system.Clipboard;
 
 using StringTools;
 
+#if windows
+@:buildXml('
+	<target id="haxe">
+		<lib name="dwmapi.lib" if="windows" />
+		<lib name="shell32.lib" if="windows" />
+		<lib name="gdi32.lib" if="windows" />
+		<lib name="ole32.lib" if="windows" />
+		<lib name="uxtheme.lib" if="windows" />
+	</target>
+')
+@:cppFileCode('
+#include "mmdeviceapi.h"
+#include "combaseapi.h"
+#include <iostream>
+#include <Windows.h>
+#include <cstdio>
+#include <tchar.h>
+#include <dwmapi.h>
+#include <winuser.h>
+#include <Shlobj.h>
+#include <wingdi.h>
+#include <shellapi.h>
+#include <uxtheme.h>
+')
+#end
 class CoolUtil
 {
 	public static var defaultDifficulties(default, never):Array<Dynamic> = // [Difficulty id, Difficulty custom name, Chart file suffix]
@@ -248,6 +274,27 @@ class CoolUtil
 		#end
 	}
 
+	public static function openFolder(folder:String, absolute:Bool = false):Void
+	{
+		#if sys
+		if (!absolute) folder =  Sys.getCwd() + '$folder';
+
+		folder = folder.replace('/', '\\');
+		if (folder.endsWith('/')) folder.substr(0, folder.length - 1);
+
+		#if linux
+		var command:String = '/usr/bin/xdg-open';
+		#else
+		var command:String = 'explorer.exe';
+		#end
+
+		Sys.command(command, [folder]);
+		Debug.logInfo('$command $folder');
+		#else
+		Debug.logError("Platform is not supported for CoolUtil.openFolder");
+		#end
+	}
+
 	public static function getSavePath(?folder:Null<String> = null):String
 	{
 		if (folder != null && folder.length > 0) {
@@ -258,19 +305,19 @@ class CoolUtil
 		return FlxG.stage.application.meta.get('company') + '/' + validate(FlxG.stage.application.meta.get('file'));
 	}
 
-	public static function precacheImage(image:String, ?library:String = null):Void
+	public static function setTextBorderFromString(text:FlxText, border:String):Void
 	{
-		Paths.getImage(image, library);
-	}
-
-	public static function precacheSound(sound:String, ?library:String = null):Void
-	{
-		Paths.getSound(sound, library);
-	}
-
-	public static function precacheMusic(sound:String, ?library:String = null):Void
-	{
-		Paths.getMusic(sound, library);
+		switch (border.toLowerCase().trim())
+		{
+			case 'shadow':
+				text.borderStyle = SHADOW;
+			case 'outline':
+				text.borderStyle = OUTLINE;
+			case 'outline_fast', 'outlinefast':
+				text.borderStyle = OUTLINE_FAST;
+			default:
+				text.borderStyle = NONE;
+		}
 	}
 
 	#if sys
@@ -278,5 +325,20 @@ class CoolUtil
 	{
 		return Path.normalize(Sys.getCwd() + path) #if windows .replace('/', '\\') #end;
 	}
+	#end
+
+	#if windows
+	@:functionCode('
+		int darkMode = enable ? 1 : 0;
+
+		HWND window = FindWindowA(NULL, title.c_str());
+		// Look for child windows if top level aint found
+		if (window == NULL) window = FindWindowExA(GetActiveWindow(), NULL, NULL, title.c_str());
+
+		if (window != NULL && S_OK != DwmSetWindowAttribute(window, 19, &darkMode, sizeof(darkMode))) {
+			DwmSetWindowAttribute(window, 20, &darkMode, sizeof(darkMode));
+		}
+	')
+	public static function setDarkMode(title:String, enable:Bool):Void {}
 	#end
 }

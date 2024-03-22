@@ -19,9 +19,8 @@ class GameOverSubState extends MusicBeatSubState
 {
 	public var boyfriend:Character;
 
-	var camFollow:FlxPoint;
-	var camFollowPos:FlxObject;
-	var updateCamera:Bool = false;
+	var camFollow:FlxObject;
+	var moveCamera:Bool = false;
 
 	public var camDeath:FlxCamera;
 
@@ -87,7 +86,7 @@ class GameOverSubState extends MusicBeatSubState
 
 	var randomGameover:Int = 1;
 
-	public function new(x:Float, y:Float):Void
+	public function new():Void
 	{
 		super();
 
@@ -101,7 +100,7 @@ class GameOverSubState extends MusicBeatSubState
 		camDeath.zoom = FlxG.camera.zoom;
 		FlxG.cameras.add(camDeath, false);
 
-		boyfriend = new Character(x, y, characterName, true);
+		boyfriend = new Character(PlayState.instance.boyfriend.getScreenPosition().x, PlayState.instance.boyfriend.getScreenPosition().y, characterName, true);
 		boyfriend.x += boyfriend.positionArray[0];
 		boyfriend.y += boyfriend.positionArray[1];
 		boyfriend.cameras = [camDeath];
@@ -124,11 +123,10 @@ class GameOverSubState extends MusicBeatSubState
 
 		boyfriend.playAnim('firstDeath');
 
-		camFollow = new FlxPoint(boyfriend.getGraphicMidpoint().x, boyfriend.getGraphicMidpoint().y);
-
-		camFollowPos = new FlxObject(0, 0, 1, 1);
-		camFollowPos.setPosition(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2));
-		add(camFollowPos);
+		camFollow = new FlxObject(0, 0, 1, 1);
+		camFollow.setPosition(boyfriend.getGraphicMidpoint().x + boyfriend.cameraPosition[0], boyfriend.getGraphicMidpoint().y + boyfriend.cameraPosition[1]);
+		camDeath.focusOn(new FlxPoint(FlxG.camera.scroll.x + (FlxG.camera.width / 2), FlxG.camera.scroll.y + (FlxG.camera.height / 2)));
+		add(camFollow);
 
 		if (micDownStart > -1)
 		{
@@ -168,12 +166,6 @@ class GameOverSubState extends MusicBeatSubState
 		super.update(elapsed);
 
 		PlayState.instance.callOnScripts('onUpdate', [elapsed]);
-
-		if (updateCamera)
-		{
-			var lerpVal:Float = CoolUtil.boundTo(elapsed * 0.6, 0, 1);
-			camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
-		}
 
 		var mousePoint:FlxPoint = FlxG.mouse.getScreenPosition(boyfriend.camera);
 		var objPoint:FlxPoint = boyfriend.getScreenPosition(null, boyfriend.camera);
@@ -225,10 +217,8 @@ class GameOverSubState extends MusicBeatSubState
 
 			if (boyfriend.animation.curAnim.curFrame >= 12 && !isFollowingAlready)
 			{
-				camDeath.follow(camFollowPos, null, 1);
-
-				updateCamera = true;
-				isFollowingAlready = true;
+				camDeath.follow(camFollow, LOCKON, 0.6);
+				moveCamera = true;
 			}
 
 			if (boyfriend.animation.curAnim.finished && !playingDeathSound) 

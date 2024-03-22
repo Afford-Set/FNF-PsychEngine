@@ -37,9 +37,6 @@
 	<define name="REPLAYS_ALLOWED" if="desktop" />
 	<define name="TITLE_SCREEN_EASTER_EGG" if="officialBuild"/> <!-- DELETE THE if="officialBuild" for enabling this on an unofficial build -->
 
-	<!--Mobile Controls Define-->
-	<define name="MOBILE_CONTROLS" if="mobile" /> <!--Can be added windows, mac or linux-->
-
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
@@ -75,8 +72,6 @@
 		<assets path="assets/secrets" rename="assets" exclude="*.ogg" if="MP3_ALLOWED"/>
 		<assets path="assets/secrets" rename="assets" exclude="*.mp3" unless="MP3_ALLOWED"/>
 	</section>
-
-	<assets path="assets/mobile" if="MOBILE_CONTROLS"/>
 
 	<section if="PRELOAD_ALL">
 		<library name="songs"         preload="true" />
@@ -132,8 +127,9 @@
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
 
-	<haxelib name="hscript" if="HSCRIPT_ALLOWED" />
+	<haxelib name="SScript" if="HSCRIPT_ALLOWED" />
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="web" />
+	<haxelib name="flxanimate"/>
 	<haxelib name="linc_luajit" if="LUA_ALLOWED" />
 	<haxelib name="discord_rpc" if="DISCORD_ALLOWED" />
 	<haxelib name="extension-androidtools" if="android" />
@@ -192,17 +188,8 @@
 	<haxedef name="HXCPP_STACK_TRACE" if="CRASH_HANDLER desktop" />
 	<haxedef name="HXCPP_CHECK_POINTER" if="CRASH_HANDLER desktop" />
 
-	<section if="android">
-		<config>
-			<!--Gradle-->
-			<!--<android gradle-version="7.4.2" gradle-plugin="7.3.1" />--> <!-- ENABLE THIS IF YOU HAVE ISSUES AT COMPILE -->
-			<android min-sdk-version="16" target-sdk-version="29" max-sdk-version="33" if="${lime &lt; 8.1.0}"/> <!--Target SDK-->
-		</config>
-	</section>
-
-	<section if="ios">
-		<dependency name="Metal.framework" if="${lime &lt; 8.0.0}" /> <!--Dependency-->
-	</section>
+	<!--Disable deprecated warnings-->
+	<haxedef name='no-deprecation-warnings' />
 
 	<!--Macro fixes-->
 	<haxeflag name="--macro" value="allowPackage('flash')" />

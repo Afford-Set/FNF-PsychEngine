@@ -44,10 +44,9 @@ class MainMenuState extends MusicBeatState
 	var menuItems:FlxTypedGroup<Sprite>;
 
 	var magenta:Sprite;
-	var camFollow:FlxPoint;
-	var camFollowPos:FlxObject;
+	var camFollow:FlxObject;
 
-	public static var psychEngineVersion:String = '0.7.2n';
+	public static var psychEngineVersion:String = '0.7.3';
 
 	override function create():Void
 	{
@@ -59,14 +58,11 @@ class MainMenuState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
-		camGame = new FlxCamera();
-		FlxG.cameras.reset(camGame);
+		camGame = initSwagCamera();
 
 		camAchievement = new FlxCamera();
 		camAchievement.bgColor.alpha = 0;
 		FlxG.cameras.add(camAchievement, false);
-
-		FlxG.cameras.setDefaultDrawTarget(camGame, true);
 
 		persistentUpdate = persistentDraw = true;
 
@@ -84,10 +80,8 @@ class MainMenuState extends MusicBeatState
 		bg.screenCenter();
 		add(bg);
 
-		camFollow = new FlxPoint();
-
-		camFollowPos = new FlxObject(0, 0, 1, 1);
-		add(camFollowPos);
+		camFollow = new FlxObject(0, 0, 1, 1);
+		add(camFollow);
 
 		magenta = new Sprite(-80);
 
@@ -128,7 +122,8 @@ class MainMenuState extends MusicBeatState
 			menuItem.updateHitbox();
 		}
 
-		FlxG.camera.follow(camFollowPos, null, 1);
+		FlxG.camera.follow(camFollow, null, 9);
+		FlxG.camera.focusOn(new FlxPoint(camFollow.x, camFollow.y));
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "v " + FlxG.stage.application.meta.get('version') #if PSYCH_WATERMARKS
 			+ (ClientPrefs.watermarks ? ' - FNF | v ' + psychEngineVersion + ' - Psych Engine (Null Edition)' : '') #end, 12);
@@ -137,8 +132,6 @@ class MainMenuState extends MusicBeatState
 		add(versionShit);
 
 		changeSelection();
-
-		camFollowPos.setPosition(camFollow.x, camFollow.y);
 
 		super.create();
 
@@ -179,11 +172,8 @@ class MainMenuState extends MusicBeatState
 			if (FreeplayMenuState.vocals != null) FreeplayMenuState.vocals.volume += 0.5 * elapsed;
 		}
 
-		var lerpVal:Float = CoolUtil.boundTo(elapsed * 9, 0, 1);
-		camFollowPos.setPosition(FlxMath.lerp(camFollowPos.x, camFollow.x, lerpVal), FlxMath.lerp(camFollowPos.y, camFollow.y, lerpVal));
-
 		if (!selectedSomethin)
-		{
+		{ 
 			if (optionShit.length > 1)
 			{
 				if (controls.UI_UP_P)
@@ -238,58 +228,49 @@ class MainMenuState extends MusicBeatState
 
 				if (optionShit[curSelected] == 'donate')
 				{
-					menuItems.forEach(function(spr:Sprite):Void
+					if (ClientPrefs.flashingLights)
 					{
-						if (curSelected == spr.ID)
-						{
-							if (ClientPrefs.flashingLights)
-							{
-								FlxFlicker.flicker(spr, 1, 0.06, true, false, function(flk:FlxFlicker):Void {
-									new FlxTimer().start(0.4, selectDonate);
-								});
-							}
-							else {
-								new FlxTimer().start(1.4, selectDonate);
-							}
-						}
-					});
+						FlxFlicker.flicker(menuItems.members[curSelected], 1, 0.06, true, false, function(flk:FlxFlicker):Void {
+							new FlxTimer().start(0.4, selectDonate);
+						});
+					}
+					else {
+						new FlxTimer().start(1.4, selectDonate);
+					}
 				}
 				else
 				{
-					menuItems.forEach(function(spr:Sprite):Void
+					if (ClientPrefs.flashingLights)
 					{
-						if (curSelected != spr.ID)
+						FlxFlicker.flicker(menuItems.members[curSelected], 1, 0.06, false, false, function(flk:FlxFlicker):Void
 						{
-							new FlxTimer().start(1, function(tmr:FlxTimer):Void
-							{
-								FlxTween.tween(spr, {alpha: 0}, 0.4,
-								{
-									ease: FlxEase.quadOut,
-									onComplete: function(twn:FlxTween) {
-										spr.kill();
-									}
-								});
+							new FlxTimer().start(0.4, function(tmr:FlxTimer):Void {
+								goToState(optionShit[curSelected]);
 							});
-						}
-						else
+						});
+					}
+					else
+					{
+						new FlxTimer().start(1.4, function(tmr:FlxTimer):Void {
+							goToState(optionShit[curSelected]);
+						});
+					}
+
+					for (i in 0...menuItems.members.length)
+					{
+						if (i == curSelected) continue;
+
+						new FlxTimer().start(1, function(tmr:FlxTimer):Void
 						{
-							if (ClientPrefs.flashingLights)
+							FlxTween.tween(menuItems.members[i], {alpha: 0}, 0.4,
 							{
-								FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flk:FlxFlicker):Void
-								{
-									new FlxTimer().start(0.4, function(tmr:FlxTimer):Void {
-										goToState(optionShit[curSelected]);
-									});
-								});
-							}
-							else
-							{
-								new FlxTimer().start(1.4, function(tmr:FlxTimer):Void {
-									goToState(optionShit[curSelected]);
-								});
-							}
-						}
-					});
+								ease: FlxEase.quadOut,
+								onComplete: function(twn:FlxTween):Void {
+									menuItems.members[i].kill();
+								}
+							});
+						});
+					}
 				}
 
 				FlxG.sound.play(Paths.getSound('confirmMenu'));
@@ -370,7 +351,7 @@ class MainMenuState extends MusicBeatState
 					add = optionShit.length * 8;
 				}
 
-				camFollow.set(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
+				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
 				spr.centerOffsets();
 			}
 		});

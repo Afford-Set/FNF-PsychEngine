@@ -199,15 +199,17 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		{
 			timerToStart -= elapsed * 1000;
 			Conductor.songPosition = startPos - timerToStart;
-			if(timerToStart < 0) startSong();
+
+			if (timerToStart < 0) startSong();
 		}
 		else Conductor.songPosition += elapsed * 1000 * playbackRate;
 
 		if (unspawnNotes[0] != null)
 		{
 			var time:Float = spawnTime * playbackRate;
-			if(songSpeed < 1) time /= songSpeed;
-			if(unspawnNotes[0].multSpeed < 1) time /= unspawnNotes[0].multSpeed;
+
+			if (songSpeed < 1) time /= songSpeed;
+			if (unspawnNotes[0].multSpeed < 1) time /= unspawnNotes[0].multSpeed;
 
 			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
 			{
@@ -246,12 +248,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 						noteMiss(daNote);
 					}
 
-					daNote.active = false;
-					daNote.visible = false;
-
-					daNote.kill();
-					notes.remove(daNote, true);
-					daNote.destroy();
+					daNote.active = daNote.visible = false;
+					invalidateNote(daNote);
 				}
 			});
 		}
@@ -326,7 +324,9 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
 		FlxG.sound.music.time = startPos;
+		#if FLX_PITCH
 		FlxG.sound.music.pitch = playbackRate;
+		#end
 		FlxG.sound.music.onComplete = finishSong;
 
 		vocals.volume = 1;
@@ -364,7 +364,9 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		}
 
 		vocals.volume = 0;
+		#if FLX_PITCH
 		vocals.pitch = playbackRate;
+		#end
 		FlxG.sound.list.add(vocals);
 
 		inst = new FlxSound();
@@ -612,59 +614,54 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		var eventKey:FlxKey = event.keyCode;
 		var key:Int = PlayState.getKeyFromEvent(keysArray, eventKey);
 
-		if (!controls.controllerMode && FlxG.keys.checkStatus(eventKey, JUST_PRESSED)) keyPressed(key);
+		if (!controls.controllerMode)
+		{
+			#if debug
+			@:privateAccess if (!FlxG.keys._keyListMap.exists(eventKey)) return; // Prevents crash specifically on debug without needing to try catch shit
+			#end
+
+			if (FlxG.keys.checkStatus(eventKey, JUST_PRESSED)) keyPressed(key);
+		}
 	}
 
 	private function keyPressed(key:Int):Void
 	{
-		if (key > -1 && notes.length > 0)
+		if (key < 0 || key >= playerStrums.length) return;
+
+		var lastTime:Float = Conductor.songPosition; // more accurate hit time for the ratings?
+		if (Conductor.songPosition >= 0) Conductor.songPosition = FlxG.sound.music.time;
+
+		var plrInputNotes:Array<Note> = notes.members.filter(function(n:Note):Bool // obtain notes that the player can hit
 		{
-			var lastTime:Float = Conductor.songPosition; //more accurate hit time for the ratings?
-			if (Conductor.songPosition >= 0) Conductor.songPosition = FlxG.sound.music.time;
+			var canHit:Bool = !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit;
+			return n != null && canHit && !n.isSustainNote && n.noteData == key;
+		});
 
-			var pressNotes:Array<Note> = []; // heavily based on my own code LOL if it aint broke dont fix it
-			var notesStopped:Bool = false;
-			var sortedNotesList:Array<Note> = [];
+		plrInputNotes.sort(PlayState.sortHitNotes);
 
-			notes.forEachAlive(function(daNote:Note):Void
+		if (plrInputNotes.length != 0) // slightly faster than doing `> 0` lol
+		{
+			var funnyNote:Note = plrInputNotes[0]; // front note
+
+			if (plrInputNotes.length > 1)
 			{
-				if (daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit && !daNote.isSustainNote && !daNote.blockHit)
+				var doubleNote:Note = plrInputNotes[1];
+
+				if (doubleNote.noteData == funnyNote.noteData)
 				{
-					if (daNote.noteData == key) {
-						sortedNotesList.push(daNote);
+					if (Math.abs(doubleNote.strumTime - funnyNote.strumTime) < 1.0) { // if the note has a 0ms distance (is on top of the current note), kill it
+						invalidateNote(doubleNote);
 					}
-				}
-			});
-
-			if (sortedNotesList.length > 0)
-			{
-				sortedNotesList.sort(PlayState.sortHitNotes);
-
-				for (epicNote in sortedNotesList)
-				{
-					for (doubleNote in pressNotes)
-					{
-						if (Math.abs(doubleNote.strumTime - epicNote.strumTime) < 1)
-						{
-							doubleNote.kill();
-							notes.remove(doubleNote, true);
-							doubleNote.destroy();
-						}
-						else {
-							notesStopped = true;
-						}
-					}
-
-					if (!notesStopped) // eee jack detection before was not super good
-					{
-						goodNoteHit(epicNote);
-						pressNotes.push(epicNote);
+					else if (doubleNote.strumTime < funnyNote.strumTime) {
+						funnyNote = doubleNote; // replace the note if its ahead of time (or at least ensure "doubleNote" is ahead)
 					}
 				}
 			}
 
-			Conductor.songPosition = lastTime;
+			goodNoteHit(funnyNote);
 		}
+
+		Conductor.songPosition = lastTime; // more accurate hit time for the ratings? part 2 (Now that the calculations are done, go back to the time it was before for not causing a note stutter)
 
 		var spr:StrumNote = playerStrums.members[key];
 
@@ -674,6 +671,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			spr.resetAnim = 0;
 		}
 	}
+
+	var strumsBlocked:Array<Bool> = [];
 
 	private function onKeyRelease(event:KeyboardEvent):Void
 	{
@@ -685,12 +684,15 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 	private function keyReleased(key:Int):Void
 	{
-		var spr:StrumNote = playerStrums.members[key];
-
-		if (spr != null)
+		if (key < playerStrums.length)
 		{
-			spr.playAnim('static');
-			spr.resetAnim = 0;
+			var spr:StrumNote = playerStrums.members[key];
+
+			if (spr != null)
+			{
+				spr.playAnim('static');
+				spr.resetAnim = 0;
+			}
 		}
 	}
 
@@ -702,36 +704,33 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 		if (controls.controllerMode && pressArray.contains(true)) // TO DO: Find a better way to handle controller inputs, this should work for now
 		{
-			for (i in 0...pressArray.length)
+			for (i in 0...pressArray.length) {
+				if (pressArray[i] && strumsBlocked[i] != true) keyPressed(i);
+			}
+		}
+
+		if (notes.length > 0)
+		{
+			for (n in notes) // I can't do a filter here, that's kinda awesome
 			{
-				if (pressArray[i]) {
-					keyPressed(i);
+				var canHit:Bool = (n != null && !strumsBlocked[n.noteData] && n.canBeHit && n.mustPress && !n.tooLate && !n.wasGoodHit && !n.blockHit);
+
+				if (canHit && n.isSustainNote)
+				{
+					var released:Bool = !holdArray[n.noteData];
+					if (!released) goodNoteHit(n);
 				}
 			}
 		}
 
-		if (notes.length > 0) // rewritten inputs???
+		if ((controls.controllerMode || strumsBlocked.contains(true)) && releaseArray.contains(true)) // TO DO: Find a better way to handle controller inputs, this should work for now
 		{
-			notes.forEachAlive(function(daNote:Note):Void
-			{
-				if (daNote.isSustainNote && holdArray[daNote.noteData] && daNote.canBeHit && daNote.mustPress && !daNote.tooLate && !daNote.wasGoodHit && !daNote.blockHit) { // hold note functions
-					goodNoteHit(daNote);
-				}
-			});
-		}
-
-		if (controls.controllerMode && releaseArray.contains(true)) // TO DO: Find a better way to handle controller inputs, this should work for now
-		{
-			for (i in 0...releaseArray.length)
-			{
-				if (releaseArray[i]) {
-					keyReleased(i);
-				}
+			for (i in 0...releaseArray.length) {
+				if (releaseArray[i] || strumsBlocked[i] == true) keyReleased(i);
 			}
 		}
 	}
 
-	
 	function opponentNoteHit(note:Note):Void
 	{
 		if (PlayState.SONG.needsVoices) {
@@ -752,12 +751,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 		note.hitByOpponent = true;
 
-		if (!note.isSustainNote)
-		{
-			note.kill();
-			notes.remove(note, true);
-			note.destroy();
-		}
+		if (!note.isSustainNote) invalidateNote(note);
 	}
 
 	function goodNoteHit(note:Note):Void
@@ -778,12 +772,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 					spawnNoteSplashOnNote(note);
 				}
 
-				if (!note.isSustainNote)
-				{
-					note.kill();
-					notes.remove(note, true);
-					note.destroy();
-				}
+				if (!note.isSustainNote) invalidateNote(note);
 
 				return;
 			}
@@ -805,11 +794,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 			vocals.volume = 1;
 
-			if (!note.isSustainNote)
-			{
-				note.kill();
-				notes.remove(note, true);
-				note.destroy();
+			if (!note.isSustainNote) {
+				invalidateNote(note);
 			}
 		}
 	}
@@ -818,11 +804,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		notes.forEachAlive(function(note:Note):Void //Dupe note remove
 		{
-			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1)
-			{
-				note.kill();
-				notes.remove(note, true);
-				note.destroy();
+			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1) {
+				invalidateNote(note);
 			}
 		});
 
@@ -833,6 +816,13 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 		vocals.volume = 0;
 		combo = 0;
+	}
+
+	function invalidateNote(note:Note):Void
+	{
+		note.kill();
+		notes.remove(note, true);
+		note.destroy();
 	}
 
 	function spawnNoteSplashOnNote(note:Note):Void
@@ -861,7 +851,9 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		vocals.pause();
 
 		FlxG.sound.music.play();
+		#if FLX_PITCH
 		FlxG.sound.music.pitch = playbackRate;
+		#end
 
 		Conductor.songPosition = FlxG.sound.music.time;
 
@@ -870,7 +862,9 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		if (Conductor.songPosition <= vocals.length)
 		{
 			vocals.time = Conductor.songPosition;
+			#if FLX_PITCH
 			vocals.pitch = playbackRate;
+			#end
 		}
 
 		vocals.play();

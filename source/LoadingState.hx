@@ -1,6 +1,7 @@
 package;
 
 import haxe.io.Path;
+import haxe.Exception;
 
 import flixel.FlxG;
 import flixel.FlxState;
@@ -10,6 +11,7 @@ import lime.app.Promise;
 import openfl.media.Sound;
 import flixel.math.FlxMath;
 import openfl.utils.Assets;
+import openfl.errors.Error;
 import flixel.util.FlxTimer;
 import lime.utils.AssetLibrary;
 import lime.utils.AssetManifest;
@@ -102,9 +104,9 @@ class LoadingState extends MusicBeatState
 				Debug.logInfo('loaded path: ' + cutPath);
 				callback();
 			})
-			.onError(function(error:Dynamic):Void
+			.onError(function(error:Error):Void
 			{
-				Debug.logError('error: ' + error);
+				Debug.logError('error: ' + error.toString());
 				callback();
 			});
 		}
@@ -124,7 +126,7 @@ class LoadingState extends MusicBeatState
 					Debug.logInfo('loaded library: ' + library);
 					callback();
 				})
-				.onError(function(error:Dynamic):Void
+				.onError(function(error:Error):Void
 				{
 					Debug.logError('error: ' + error);
 					callback();
@@ -221,7 +223,7 @@ class LoadingState extends MusicBeatState
 
 	static function isSoundLoaded(path:String):Bool
 	{
-		return Paths.currentTrackedSounds.exists(path);
+		return Paths.currentTrackedSounds.exists(path.substr(path.indexOf(':') + 1));
 	}
 
 	static function isLibraryLoaded(library:String):Bool
