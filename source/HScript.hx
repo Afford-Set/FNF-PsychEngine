@@ -28,9 +28,10 @@ class HScript extends SScript
 {
 	#if LUA_ALLOWED
 	public var parentLua(default, set):FunkinLua = null;
+	#end
+
 	#if MODS_ALLOWED
 	public var modFolder:String;
-	#end
 	#end
 
 	#if LUA_ALLOWED
