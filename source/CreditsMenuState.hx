@@ -31,7 +31,6 @@ class CreditsMenuState extends MusicBeatState
 		['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',							'https://twitter.com/riverennn',		'B42F71'],
 		[''],
 		['Former Engine Members'],
-		['shubs',				'shubs',			'Ex-Programmer of Psych Engine',								'https://twitter.com/yoshubs',			'5E99DF'],
 		['bb-panzu',			'bb',				'Ex-Programmer of Psych Engine',								'https://twitter.com/bbsub3',			'3E813A'],
 		[''],
 		['Engine Contributors'],
