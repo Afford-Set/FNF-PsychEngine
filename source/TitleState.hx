@@ -67,7 +67,7 @@ class TitleState extends MusicBeatState
 	var curWacky:Array<String> = [];
 
 	#if TITLE_SCREEN_EASTER_EGG
-	var easterEggKeys:Array<String> = ['SHADOW', 'RIVER', 'SHUBS', 'BBPANZU'];
+	var easterEggKeys:Array<String> = ['SHADOW', 'RIVER', 'BBPANZU'];
 	var allowedKeys:String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	var easterEggKeysBuffer:String = '';
 	#end
@@ -176,11 +176,6 @@ class TitleState extends MusicBeatState
 				titleJSON.gfx += 180;
 				titleJSON.gfy += 40;
 			}
-			case 'SHUBS':
-			{
-				titleJSON.gfx += 160;
-				titleJSON.gfy -= 10;
-			}
 			case 'BBPANZU':
 			{
 				titleJSON.gfx += 45;
@@ -261,12 +256,6 @@ class TitleState extends MusicBeatState
 				gfDance.frames = Paths.getSparrowAtlas('title/RiverBump');
 				gfDance.animation.addByIndices('danceLeft', 'River Title Bump', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
 				gfDance.animation.addByIndices('danceRight', 'River Title Bump', [29, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-			}
-			case 'SHUBS':
-			{
-				gfDance.frames = Paths.getSparrowAtlas('title/ShubBump');
-				gfDance.animation.addByPrefix('danceLeft', 'Shubs Title Bump', 24, false);
-				gfDance.animation.addByPrefix('danceRight', 'Shubs Title Bump', 24, false);
 			}
 			case 'BBPANZU':
 			{
@@ -668,7 +657,6 @@ class TitleState extends MusicBeatState
 				switch (easteregg)
 				{
 					case 'RIVER': sound = FlxG.sound.play(Paths.getSound('JingleRiver'));
-					case 'SHUBS': sound = FlxG.sound.play(Paths.getSound('JingleShubs'));
 					case 'SHADOW': FlxG.sound.play(Paths.getSound('JingleShadow'));
 					case 'BBPANZU': sound = FlxG.sound.play(Paths.getSound('JingleBB'));
 					default: // Go back to normal ugly ass boring GF

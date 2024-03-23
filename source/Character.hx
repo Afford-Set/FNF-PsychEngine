@@ -106,15 +106,8 @@ class Character extends Sprite
 				else if (Paths.fileExists('images/' + json.image + '.json', TEXT)) {
 					spriteType = 'aseprite';
 				}
-
-				for (i in 0...10)
-				{
-					var st:String = '$i';
-					if (i == 0) st = '';
-
-					if (Paths.fileExists('images/' + json.image + '/spritemap$st.json', TEXT)) {
-						spriteType = 'animate';
-					}
+				else if (Paths.fileExists('images/' + json.image + '/Animation.json', TEXT)) {
+					spriteType = 'animate';
 				}
 
 				switch (spriteType)

@@ -73,18 +73,11 @@
 			"url": "https://github.com/Afford-Set/hxcpp"
 		},
 		{
-			"name": "discord_rpc",
+			"name": "discord-rpc",
 			"type": "git",
 			"dir": null,
-			"ref": "master",
-			"url": "https://github.com/Afford-Set/linc_discord-rpc"
-		},
-		{
-			"name": "flxanimate",
-			"type": "git",
-			"dir": null,
-			"ref": "dev",
-			"url": "https://github.com/ShadowMario/flxanimate"
+			"ref": "main",
+			"url": "https://github.com/Afford-Set/hxdiscord_rpc"
 		},
 		{
 			"name": "linc_luajit",

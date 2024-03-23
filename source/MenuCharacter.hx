@@ -66,8 +66,11 @@ class MenuCharacter extends Sprite
 					if (Paths.fileExists('images/' + json.image + '.txt', TEXT)) {
 						spriteType = 'packer';
 					}
+					else if (Paths.fileExists('images/' + json.image + '.json', TEXT)) {
+						spriteType = 'aseprite';
+					}
 					else if (Paths.fileExists('images/' + json.image + '/Animation.json', TEXT)) {
-						spriteType = 'texture';
+						spriteType = 'animate';
 					}
 
 					var pos:Array<Float> = json.position;
@@ -85,7 +88,8 @@ class MenuCharacter extends Sprite
 					{
 						case 'packer': frames = Paths.getPackerAtlas(path);
 						case 'sparrow': frames = Paths.getSparrowAtlas(path);
-						case 'texture': frames = Paths.getAnimateAtlas(path);
+						case 'aseprite': frames = Paths.getAsepriteAtlas(json.image);
+						case 'animate': frames = Paths.getAnimateAtlas(path);
 					}
 
 					imageFile = json.image;

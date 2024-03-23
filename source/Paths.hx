@@ -8,6 +8,8 @@ import sys.io.File;
 import sys.FileSystem;
 #end
 
+import animateatlas.AtlasFrameMaker;
+
 import flixel.FlxG;
 import openfl.Assets;
 import flash.media.Sound;
@@ -20,9 +22,6 @@ import flixel.system.FlxAssets;
 import flash.display.BitmapData;
 import flixel.graphics.FlxGraphic;
 import lime.utils.Assets as LimeAssets;
-#if flxanimate
-import flxanimate.frames.FlxAnimateFrames;
-#end
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFramesCollection;
@@ -510,32 +509,33 @@ class Paths
 		return null;
 	}
 
-	public static function getAnimateAtlas(key:String, ?library:Null<String> = null, ?allowGPU:Null<Bool> = true, ?excludeArray:Array<String> = null, ?noAntialiasing:Bool = false, ?ignoreMods:Null<Bool> = false):FlxFramesCollection
+	public static function getAnimateAtlas(key:String, ?library:Null<String> = null, ?excludeArray:Array<String> = null, ?noAntialiasing:Bool = false, ?allowGPU:Null<Bool> = true, ?ignoreMods:Null<Bool> = false):FlxFramesCollection
 	{
-		for (i in 0...10)
+		var imagePath:String = getImage(key + '/spritemap', library, false, true, ignoreMods);
+		var animationPath:String = getJson('images/' + key + '/Animation', library, ignoreMods);
+		var atlasPath:String = getJson('images/' + key + '/spritemap', library, ignoreMods);
+
+		if (fileExists('images/' + key + '/spritemap1.json', TEXT))
 		{
-			var st:String = '$i';
-			if (i == 0) st = '';
+			Debug.logError("Only Spritemaps made with Adobe Animate 2018 are supported.");
+			return null;
+		}
 
-			var originalPath:String = key;
+		if (fileExists(imagePath, IMAGE, ignoreMods) && fileExists(animationPath, TEXT, ignoreMods) && fileExists(atlasPath, TEXT, ignoreMods))
+		{
+			var array:Array<String> = [imagePath, animationPath, atlasPath];
 
-			var imagePath:String = getImage(originalPath + '/spritemap' + st, library, false, true, ignoreMods);
-			var atlasPath:String = getJson('images/' + originalPath + '/spritemap' + st, library, ignoreMods);
-	
-			if (fileExists(imagePath, IMAGE, ignoreMods) && fileExists(atlasPath, TEXT, ignoreMods))
+			if (!currentTrackedFrames.exists(array))
 			{
-				var array:Array<String> = [imagePath, atlasPath];
-	
-				if (!currentTrackedFrames.exists(array))
-				{
-					var graphic:FlxGraphic = getImage(imagePath, null, allowGPU, false, ignoreMods);
-					var descAtlas:String = getTextFromFile(atlasPath, ignoreMods);
-	
-					currentTrackedFrames.set(array, FlxAnimateFrames.fromJson(Json.parse(descAtlas), graphic));
-				}
-	
-				return currentTrackedFrames.get(array);
+				var graphic:FlxGraphic = getImage(imagePath, null, allowGPU, false, ignoreMods);
+
+				var descAnim:String = getTextFromFile(animationPath, ignoreMods);
+				var descAtlas:String = getTextFromFile(atlasPath, ignoreMods);
+
+				currentTrackedFrames.set(array, AtlasFrameMaker.construct(graphic, descAnim, descAtlas, excludeArray, noAntialiasing));
 			}
+
+			return currentTrackedFrames.get(array);
 		}
 
 		Debug.logError('Could not find a animate asset with key "$key".');
