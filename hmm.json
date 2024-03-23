@@ -73,7 +73,7 @@
 			"url": "https://github.com/Afford-Set/hxcpp"
 		},
 		{
-			"name": "discord-rpc",
+			"name": "hxdiscord_rpc",
 			"type": "git",
 			"dir": null,
 			"ref": "main",

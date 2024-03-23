@@ -5,19 +5,19 @@
 				0,
 				0
 			],
-			"loop": true,
+			"indices": [],
 			"fps": 24,
 			"anim": "idle",
-			"indices": [],
+			"loop": true,
 			"name": "M Spooky Kids Idle"
 		}
 	],
 	"no_antialiasing": false,
 	"image": "Menu_Spooky_Kids",
 	"position": [
-		150,
-		110
+		0,
+		45
 	],
 	"flipX": false,
-	"scale": 1
+	"scale": 0.99
 }

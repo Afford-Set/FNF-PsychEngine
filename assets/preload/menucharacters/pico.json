@@ -5,19 +5,19 @@
 				0,
 				0
 			],
-			"loop": false,
+			"indices": [],
 			"fps": 24,
 			"anim": "idle",
-			"indices": [],
+			"loop": false,
 			"name": "M Pico Idle"
 		}
 	],
 	"no_antialiasing": false,
 	"image": "Menu_Pico",
 	"position": [
-		160,
-		150
+		-120,
+		-55
 	],
 	"flipX": false,
-	"scale": 1
+	"scale": 0.61
 }

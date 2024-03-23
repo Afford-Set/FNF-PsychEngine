@@ -24,7 +24,6 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 
 	public var isMenuItem:Bool = false;
 	public var targetY:Int = 0;
-	public var lerpMult:Float = 0.16;
 	public var changeX:Bool = true;
 	public var changeY:Bool = true;
 
@@ -173,7 +172,7 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 	{
 		if (isMenuItem)
 		{
-			var lerpVal:Float = CoolUtil.boundTo(elapsed * (lerpMult * 60), 0, 1);
+			var lerpVal:Float = CoolUtil.boundTo(elapsed * 9.6, 0, 1);
 
 			if (changeX) {
 				x = FlxMath.lerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpVal);

@@ -28,9 +28,15 @@ class MenuCharacter extends Sprite
 	public var originalFlipX:Bool = false;
 	public var confirmed:Bool = false;
 
-	public function new(character:String = 'bf'):Void
+	public var originalX:Float = 0;
+	public var originalY:Float = 0;
+
+	public function new(x:Float, y:Float, character:String = 'bf'):Void
 	{
-		super();
+		super(x, y);
+
+		originalX = x;
+		originalY = y;
 
 		changeCharacter(character);
 	}
@@ -74,7 +80,7 @@ class MenuCharacter extends Sprite
 					}
 
 					var pos:Array<Float> = json.position;
-					setPosition(pos[0], pos[1]);
+					setPosition(originalX + pos[0], originalY + pos[1]);
 
 					positionArray = pos.copy();
 
@@ -136,6 +142,8 @@ class MenuCharacter extends Sprite
 					}
 
 					hasConfirmAnimation = animation.getByName('confirm') != null;
+
+					playAnim('idle', true);
 				}
 				else
 				{

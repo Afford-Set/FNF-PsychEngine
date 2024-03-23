@@ -223,9 +223,9 @@ class Character extends Sprite
 
 				heyTimer -= elapsed * playbackRate;
 
-				if (heyTimer <= 0)
+				if (heyTimer <= 0 && animation.curAnim != null)
 				{
-					var anim:String = getAnimationName();
+					var anim:String = animation.curAnim.name;
 
 					if (specialAnim && anim == 'hey' || anim == 'cheer')
 					{
@@ -236,18 +236,18 @@ class Character extends Sprite
 					heyTimer = 0;
 				}
 			}
-			else if (specialAnim && isAnimationFinished())
+			else if (specialAnim && animation.curAnim.finished)
 			{
 				specialAnim = false;
 				dance();
 			}
-			else if (getAnimationName().endsWith('miss') && isAnimationFinished())
+			else if (animation.curAnim != null && animation.curAnim.name.endsWith('miss') && animation.curAnim.finished)
 			{
 				dance();
-				finishAnimation();
+				animation.curAnim.finish();
 			}
 
-			if (getAnimationName().startsWith('sing')) {
+			if (animation.curAnim != null && animation.curAnim.name.startsWith('sing')) {
 				holdTimer += elapsed;
 			}
 			else if (isPlayer) {
@@ -260,56 +260,17 @@ class Character extends Sprite
 				holdTimer = 0;
 			}
 
-			var name:String = getAnimationName();
+			if (animation.curAnim != null)
+			{
+				var name:String = animation.curAnim.name;
 
-			if (isAnimationFinished() && animOffsets.exists('$name-loop')) {
-				playAnim('$name-loop');
+				if (animation.curAnim.finished && animOffsets.exists('$name-loop')) {
+					playAnim('$name-loop');
+				}
 			}
 		}
 
 		super.update(elapsed);
-	}
-
-	inline public function isAnimationNull():Bool
-	{
-		return animation.curAnim == null;
-	}
-
-	inline public function getAnimationName():String
-	{
-		var name:String = '';
-
-		@:privateAccess
-		if (!isAnimationNull()) name = animation.curAnim.name;
-		return (name != null) ? name : '';
-	}
-
-	public function isAnimationFinished():Bool
-	{
-		if (isAnimationNull()) return false;
-		return animation.curAnim.finished;
-	}
-
-	public function finishAnimation():Void
-	{
-		if (isAnimationNull()) return;
-		animation.curAnim.finish();
-	}
-
-	public var animPaused(get, set):Bool;
-
-	private function get_animPaused():Bool
-	{
-		if (isAnimationNull()) return false;
-		return animation.curAnim.paused;
-	}
-
-	private function set_animPaused(value:Bool):Bool
-	{
-		if (isAnimationNull()) return value;
-		animation.curAnim.paused = value;
-
-		return value;
 	}
 
 	public var danced:Bool = false;

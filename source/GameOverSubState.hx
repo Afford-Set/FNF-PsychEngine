@@ -22,7 +22,7 @@ class GameOverSubState extends MusicBeatSubState
 	var camFollow:FlxObject;
 	var moveCamera:Bool = false;
 
-	public var camDeath:FlxCamera;
+	public var camDeath:SwagCamera;
 
 	var playingDeathSound:Bool = false;
 
@@ -95,14 +95,14 @@ class GameOverSubState extends MusicBeatSubState
 		Conductor.bpm = bpm;
 		Conductor.songPosition = 0;
 
-		camDeath = new FlxCamera();
+		camDeath = new SwagCamera();
 		camDeath.bgColor.alpha = 0;
 		camDeath.zoom = FlxG.camera.zoom;
 		FlxG.cameras.add(camDeath, false);
 
 		boyfriend = new Character(PlayState.instance.boyfriend.getScreenPosition().x, PlayState.instance.boyfriend.getScreenPosition().y, characterName, true);
-		boyfriend.x += boyfriend.positionArray[0];
-		boyfriend.y += boyfriend.positionArray[1];
+		boyfriend.x += boyfriend.positionArray[0] - PlayState.instance.boyfriend.positionArray[0];
+		boyfriend.y += boyfriend.positionArray[1] - PlayState.instance.boyfriend.positionArray[1];
 		boyfriend.cameras = [camDeath];
 		add(boyfriend);
 
@@ -159,8 +159,6 @@ class GameOverSubState extends MusicBeatSubState
 	public var startedDeath:Bool = false;
 	public var micIsDown:Bool = false;
 
-	var isFollowingAlready:Bool = false;
-
 	override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
@@ -215,7 +213,7 @@ class GameOverSubState extends MusicBeatSubState
 				boyfriend.playAnim('deathLoop');
 			}
 
-			if (boyfriend.animation.curAnim.curFrame >= 12 && !isFollowingAlready)
+			if (boyfriend.animation.curAnim.curFrame >= 12 && !moveCamera)
 			{
 				camDeath.follow(camFollow, LOCKON, 0.6);
 				moveCamera = true;

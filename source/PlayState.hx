@@ -2855,7 +2855,7 @@ class PlayState extends MusicBeatState
 		{
 			FlxG.camera.followLerp = 2.4 * cameraSpeed * playbackRate;
 
-			if (!startingSong && !endingSong && boyfriend.getAnimationName().startsWith('idle'))
+			if (!startingSong && !endingSong && boyfriend.animation.curAnim != null && boyfriend.animation.curAnim.name.startsWith('idle'))
 			{
 				boyfriendIdleTime += elapsed;
 
@@ -2991,7 +2991,7 @@ class PlayState extends MusicBeatState
 						}
 						case 'STOPPING':
 						{
-							bgLimo.x = FlxMath.lerp(bgLimo.x, -150, CoolUtil.boundTo(elapsed * 9 * playbackRate, 0, 1));
+							bgLimo.x = FlxMath.lerp(bgLimo.x, -150, Math.exp(-elapsed * 9 * playbackRate));
 
 							if (Math.round(bgLimo.x) == -150)
 							{
@@ -5336,25 +5336,28 @@ class PlayState extends MusicBeatState
 
 	public function characterBopper(beat:Int):Void
 	{
-		if (gf != null && beat % Math.round(gfSpeed * gf.danceEveryNumBeats) == 0 && !gf.getAnimationName().startsWith('sing') && !gf.stunned) {
+		if (gf != null && beat % Math.round(gfSpeed * gf.danceEveryNumBeats) == 0 && gf.animation.curAnim != null && !gf.animation.curAnim.name.startsWith('sing') && !gf.stunned) {
 			gf.dance();
 		}
 
-		if (boyfriend != null && beat % boyfriend.danceEveryNumBeats == 0 && !boyfriend.getAnimationName().startsWith('sing') && !boyfriend.stunned) {
+		if (boyfriend != null && beat % boyfriend.danceEveryNumBeats == 0 && boyfriend.animation.curAnim != null && !boyfriend.animation.curAnim.name.startsWith('sing') && !boyfriend.stunned) {
 			boyfriend.dance();
 		}
 
-		if (dad != null && beat % dad.danceEveryNumBeats == 0 && !dad.getAnimationName().startsWith('sing') && !dad.stunned) {
+		if (dad != null && beat % dad.danceEveryNumBeats == 0 && dad.animation.curAnim != null && !dad.animation.curAnim.name.startsWith('sing') && !dad.stunned) {
 			dad.dance();
 		}
 	}
 
 	public function playerDance():Void
 	{
-		var anim:String = boyfriend.getAnimationName();
+		if (boyfriend.animation.curAnim != null)
+		{
+			var anim:String = boyfriend.animation.curAnim.name;
 
-		if (boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * boyfriend.singDuration && anim.startsWith('sing') && !anim.endsWith('miss')) {
-			boyfriend.dance();
+			if (boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 #if FLX_PITCH / FlxG.sound.music.pitch #end) * boyfriend.singDuration && anim.startsWith('sing') && !anim.endsWith('miss')) {
+				boyfriend.dance();
+			}
 		}
 	}
 

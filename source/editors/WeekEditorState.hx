@@ -120,7 +120,7 @@ class WeekEditorState extends MusicBeatState
 
 		for (char in 0...3)
 		{
-			var weekCharacterThing:MenuCharacter = new MenuCharacter(charArray[char]);
+			var weekCharacterThing:MenuCharacter = new MenuCharacter((FlxG.width * 0.25) * (1 + char) - 150, 70, charArray[char]);
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 

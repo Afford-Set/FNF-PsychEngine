@@ -15,8 +15,8 @@
 	"no_antialiasing": false,
 	"image": "Menu_Senpai",
 	"position": [
-		80,
-		110
+		-75,
+		35
 	],
 	"flipX": false,
 	"scale": 1

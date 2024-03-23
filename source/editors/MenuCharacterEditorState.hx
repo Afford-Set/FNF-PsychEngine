@@ -78,7 +78,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		for (char in 0...3)
 		{
-			var weekCharacterThing:MenuCharacter = new MenuCharacter(defaultCharacters[char]);
+			var weekCharacterThing:MenuCharacter = new MenuCharacter((FlxG.width * 0.25) * (1 + char) - 150, 70, defaultCharacters[char]);
 			grpWeekCharacters.add(weekCharacterThing);
 		}
 
@@ -238,27 +238,25 @@ class MenuCharacterEditorState extends MusicBeatState
 		var tab_group:FlxUI = new FlxUI(null, UI_mainbox);
 		tab_group.name = "Animation";
 
-		animationDropDown = new FlxUIDropDownMenu(10, 25, FlxUIDropDownMenu.makeStrIdLabelArray(['']), function(name:String):Void
+		animationDropDown = new FlxUIDropDownMenu(10, 25, FlxUIDropDownMenu.makeStrIdLabelArray(['']), function(id:String):Void
 		{
-			if (name != 'NO ANIMATIONS')
+			var selectedAnimation:Int = Std.parseInt(id);
+			var anim:Character.AnimArray = char.animationsArray[selectedAnimation];
+
+			if (anim != null)
 			{
-				var anim:Character.AnimArray = findAnimationByName(name);
+				animationInputText.text = anim.anim;
+				animationNameInputText.text = anim.name;
+				animationLoopCheckBox.checked = anim.loop;
+				animationNameFramerate.value = anim.fps;
+	
+				var indicesStr:String = anim.indices.toString();
+				animationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
 
-				if (anim != null)
-				{
-					animationInputText.text = anim.anim;
-					animationNameInputText.text = anim.name;
-					animationLoopCheckBox.checked = anim.loop;
-					animationNameFramerate.value = anim.fps;
-		
-					var indicesStr:String = anim.indices.toString();
-					animationIndicesInputText.text = indicesStr.substr(1, indicesStr.length - 2);
+				curAnim = selectedAnimation;
+				char.playAnim(anim.anim, true);
 
-					curAnim = char.animationsArray.indexOf(anim);
-					char.playAnim(anim.anim, true);
-
-					updateAnimText();
-				}
+				updateAnimText();
 			}
 		});
 
@@ -484,9 +482,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		char.alpha = 1;
 
-		curAnim = 0;
-
-		char.playAnim(char.animationsArray[curAnim].anim, true);
+		char.playAnim(char.animationsArray[curAnim = 0].anim, true);
 		char.antialiasing = ClientPrefs.globalAntialiasing && !char.noAntialiasing;
 
 		if (char.jsonScale != 1) {
@@ -538,7 +534,7 @@ class MenuCharacterEditorState extends MusicBeatState
 
 		if (anims.length < 1) anims.push('NO ANIMATIONS'); // Prevents crash
 
-		animationDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(anims));
+		animationDropDown.setData(FlxUIDropDownMenu.makeStrIdLabelArray(anims, false));
 	}
 
 	function updatePresence():Void
@@ -723,9 +719,9 @@ class MenuCharacterEditorState extends MusicBeatState
 
 	function updateOffset():Void
 	{
-		char.setPosition(char.positionArray[0], char.positionArray[1]);
+		char.setPosition(char.originalX + char.positionArray[0], char.originalY + char.positionArray[1]);
 
-		positionText.text = '[' + char.x + ', ' + char.y + ']';
+		positionText.text = '[' + char.positionArray[0] + ', ' + char.positionArray[1] + ']';
 		positionText.text = positionText.text.toUpperCase();
 	}
 
@@ -832,7 +828,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			flipX: char.originalFlipX,
 			image: char.imageFile,
 			scale: char.jsonScale,
-			position: [char.x, char.y]
+			position: [char.positionArray[0], char.positionArray[1]]
 		};
 
 		var data:String = Json.stringify(json, "\t");
