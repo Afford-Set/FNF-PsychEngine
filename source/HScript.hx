@@ -42,7 +42,7 @@ class HScript extends SScript
 		{
 			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
 
-			parent.hscript = new HScript(varsToBring);
+			parent.hscript = new HScript(null, varsToBring);
 			parent.hscript.parentLua = parent;
 		}
 		#end
@@ -50,7 +50,7 @@ class HScript extends SScript
 
 	public static function initHaxeModuleCodeForLua(parent:FunkinLua, code:String, ?varsToBring:Any = null):Void
 	{
-		initHaxeModuleForLua(parent);
+		initHaxeModuleForLua(parent, varsToBring);
 
 		if (parent.hscript != null) {
 			parent.hscript.executeCode(code);

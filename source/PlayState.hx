@@ -5445,7 +5445,7 @@ class PlayState extends MusicBeatState
 	{
 		try
 		{
-			var newScript:HScript = new HScript(null, file);
+			var newScript:HScript = new HScript(file);
 
 			if (newScript.parsingException != null)
 			{
