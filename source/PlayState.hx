@@ -364,13 +364,10 @@ class PlayState extends MusicBeatState
 		generateSong(SONG);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
-
 		moveCameraToGF(true);
 
-		if (prevCamFollow != null)
-		{
+		if (prevCamFollow != null) {
 			camFollow = prevCamFollow;
-			prevCamFollow = null;
 		}
 
 		add(camFollow);
