@@ -32,10 +32,6 @@ import Achievements;
 import Replay;
 #end
 
-#if HSCRIPT_ALLOWED
-import tea.SScript;
-#end
-
 #if RUNTIME_SHADERS_ALLOWED
 import flixel.addons.display.FlxRuntimeShader;
 #end
@@ -5060,7 +5056,7 @@ class PlayState extends MusicBeatState
 		{
 			if (script != null)
 			{
-				script.call('onDestroy');
+				script.executeFunction('onDestroy');
 				script.destroy();
 			}
 
@@ -5441,61 +5437,58 @@ class PlayState extends MusicBeatState
 		return false;
 	}
 
-	public function initHScript(file:String):Void
+	public function initHScript(file:String):HScript
 	{
 		try
 		{
 			var newScript:HScript = new HScript(file);
-
-			if (newScript.parsingException != null)
-			{
-				addTextToDebug('ERROR ON LOADING: ${newScript.parsingException.message}', FlxColor.RED);
-				newScript.destroy();
-				return;
-			}
-
 			hscriptArray.push(newScript);
 
-			if (newScript.exists('onCreate'))
+			if (newScript.exception != null)
 			{
-				var callValue = newScript.call('onCreate');
+				debugTrace('ERROR ON LOADING - ${newScript.exception.message}', false, 'error', FlxColor.RED);
 
-				if (!callValue.succeeded)
+				newScript.destroy();
+				hscriptArray.remove(newScript);
+				newScript = null;
+
+				return null;
+			}
+
+			if (newScript.variables.exists('onCreate'))
+			{
+				newScript.executeFunction('onCreate');
+
+				if (newScript.exception != null)
 				{
-					for (e in callValue.exceptions)
-					{
-						if (e != null)
-						{
-							var len:Int = e.message.indexOf('\n') + 1;
-							if (len <= 0) len = e.message.length;
-
-							debugTrace('ERROR ($file: onCreate) - ${e.message.substr(0, len)}', false, 'error', FlxColor.RED);
-						}
-					}
+					debugTrace('ERROR (onCreate) - ${newScript.exception.message}', false, 'error', FlxColor.RED);
 
 					newScript.destroy();
 					hscriptArray.remove(newScript);
+					newScript = null;
 
-					Debug.logInfo('failed to initialize tea interp!!! ($file)');
+					return null;
 				}
-				else Debug.logInfo('initialized tea interp successfully: $file');
 			}
+
+			Debug.logInfo('initialized hscript interp successfully: $file');
+			return newScript;
 		}
 		catch (e:Error)
 		{
-			var len:Int = e.message.indexOf('\n') + 1;
-			if (len <= 0) len = e.message.length;
+			debugTrace('ERROR - $e', false, 'error', FlxColor.RED);
 
-			debugTrace('ERROR - ' + e.message.substr(0, len), false, 'error', FlxColor.RED);
-
-			var newScript:HScript = cast (SScript.global.get(file), HScript);
-
-			if (newScript != null)
+			if (hscriptArray.length > 0)
 			{
-				newScript.destroy();
-				hscriptArray.remove(newScript);
+				var script:HScript = hscriptArray[hscriptArray.length - 1];
+
+				script.destroy();
+				hscriptArray.remove(script);
+				script = null;
 			}
 		}
+
+		return null;
 	}
 	#end
 
@@ -5560,48 +5553,38 @@ class PlayState extends MusicBeatState
 		var returnVal:Dynamic = Function_Continue;
 
 		#if HSCRIPT_ALLOWED
-		if (exclusions == null) exclusions = [];
-		if (excludeValues == null) excludeValues = [];
+		if (exclusions == null) exclusions = new Array();
+		if (excludeValues == null) excludeValues = new Array();
 
 		excludeValues.push(Function_Continue);
 
 		var len:Int = hscriptArray.length;
-		if (len < 1) return returnVal;
+
+		if (len < 1) {
+			return returnVal;
+		}
 
 		for (i in 0...len)
 		{
 			var script:HScript = hscriptArray[i];
-			if (script == null || !script.exists(funcToCall) || exclusions.contains(script.origin)) continue;
+
+			if (script == null || !script.active || !script.variables.exists(funcToCall) || exclusions.contains(script.origin)) {
+				continue;
+			}
 
 			var myValue:Dynamic = null;
 
 			try
 			{
-				var callValue = script.call(funcToCall, args);
+				returnVal = script.executeFunction(funcToCall, args);
 
-				if (!callValue.succeeded)
+				if (script.exception != null)
 				{
-					var e:Exception = callValue.exceptions[0];
-
-					if (e != null)
-					{
-						var len:Int = e.message.indexOf('\n') + 1;
-						if (len <= 0) len = e.message.length;
-
-						debugTrace('ERROR (${callValue.calledFunction}) - ' + e.message.substr(0, len), false, 'error', FlxColor.RED);
-					}
+					script.active = false;
+					debugTrace('ERROR ($funcToCall) - ${script.exception}', true, 'error', FlxColor.RED);
 				}
-				else
-				{
-					myValue = callValue.returnValue;
-
-					if ((myValue == Function_StopHScript || myValue == Function_StopAll) && !excludeValues.contains(myValue) && !ignoreStops)
-					{
-						returnVal = myValue;
-						break;
-					}
-
-					if (myValue != null && !excludeValues.contains(myValue)) returnVal = myValue;
+				else {
+					if ((returnVal == Function_StopHScript || returnVal == Function_StopAll) && !excludeValues.contains(returnVal) && !ignoreStops) break;
 				}
 			}
 		}
@@ -5643,7 +5626,7 @@ class PlayState extends MusicBeatState
 			if (!instancesExclude.contains(variable))
 				instancesExclude.push(variable);
 
-			script.set(variable, arg);
+			script.setVar(variable, arg);
 		}
 		#end
 	}

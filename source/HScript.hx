@@ -13,19 +13,22 @@ import llua.Convert;
 import flixel.FlxG;
 import flixel.FlxBasic;
 import openfl.errors.Error;
-import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
 import flixel.input.gamepad.FlxGamepad;
 
 #if HSCRIPT_ALLOWED
-import tea.SScript;
+import hscript.Parser;
+import hscript.Interp;
 #end
 
 using StringTools;
 
 #if HSCRIPT_ALLOWED
-class HScript extends SScript
+class HScript extends Interp
 {
+	public var active:Bool = true;
+	public var parser:Parser;
+
 	#if LUA_ALLOWED
 	public var parentLua(default, set):FunkinLua = null;
 	#end
@@ -33,24 +36,26 @@ class HScript extends SScript
 	#if MODS_ALLOWED
 	public var modFolder:String;
 	#end
+	
+	public var exception:Error;
 
 	#if LUA_ALLOWED
-	public static function initHaxeModuleForLua(parent:FunkinLua, ?varsToBring:Any = null):Void
+	public static function initHaxeModuleForLua(parent:FunkinLua):Void
 	{
 		#if HSCRIPT_ALLOWED
 		if (parent.hscript == null)
 		{
 			Debug.logInfo('initializing haxe interp for: ${parent.scriptName}');
 
-			parent.hscript = new HScript(null, varsToBring);
+			parent.hscript = new HScript();
 			parent.hscript.parentLua = parent;
 		}
 		#end
 	}
 
-	public static function initHaxeModuleCodeForLua(parent:FunkinLua, code:String, ?varsToBring:Any = null):Void
+	public static function initHaxeModuleCodeForLua(parent:FunkinLua, code:String):Void
 	{
-		initHaxeModuleForLua(parent, varsToBring);
+		initHaxeModuleForLua(parent);
 
 		if (parent.hscript != null) {
 			parent.hscript.executeCode(code);
@@ -60,9 +65,9 @@ class HScript extends SScript
 
 	public var origin:String;
 
-	public function new(?file:String, ?varsToBring:Any = null):Void
+	public function new(?file:String):Void
 	{
-		if (file == null) file = '';
+		super();
 
 		var content:String = null;
 
@@ -70,79 +75,77 @@ class HScript extends SScript
 		{
 			content = Paths.getTextFromFile(file);
 
-			if (file != null && file.length > 0)
-			{
-				this.origin = file;
-	
-				#if MODS_ALLOWED
-				var myFolder:Array<String> = file.split('/');
-	
-				if (myFolder[0] + '/' == Paths.mods() && (Paths.currentModDirectory == myFolder[1] || Paths.globalMods.contains(myFolder[1]))) { // is inside mods folder
-					this.modFolder = myFolder[1];
-				}
-				#end
+			#if MODS_ALLOWED
+			var myFolder:Array<String> = file.split('/');
+
+			if (myFolder[0] + '/' == Paths.mods() && (Paths.currentModDirectory == myFolder[1] || Paths.globalMods.contains(myFolder[1]))) { // is inside mods folder
+				this.modFolder = myFolder[1];
 			}
+			#end
 		}
 
-		super(content, false, false);
+		if (content != null && content.trim().length > 0) {
+			origin = file;
+		}
 
 		preset();
-		execute();
+		executeCode(content);
 	}
 
-	var varsToBring:Any = null;
-
-	override function preset():Void
+	function preset():Void
 	{
-		super.preset();
+		parser = new Parser();
+		parser.allowJSON = parser.allowMetadata = parser.allowTypes = true;
 
-		set('Date', Date);
-		set('DateTools', DateTools);
-		set('Math', Math);
-		set('Reflect', Reflect);
-		set('Std', Std);
-		set('HScript', HScript);
-		set('StringTools', StringTools);
-		set('Type', Type);
+		scriptObject = PlayState.instance; // allow use vars from playstate without "game" thing
+
+		setVar('Date', Date);
+		setVar('DateTools', DateTools);
+		setVar('Math', Math);
+		setVar('Reflect', Reflect);
+		setVar('Std', Std);
+		setVar('HScript', HScript);
+		setVar('StringTools', StringTools);
+		setVar('Type', Type);
 
 		#if sys
-		set('File', sys.io.File);
-		set('FileSystem', sys.FileSystem);
-		set('Sys', Sys);
+		setVar('File', sys.io.File);
+		setVar('FileSystem', sys.FileSystem);
+		setVar('Sys', Sys);
 		#end
 
-		set('Assets', openfl.Assets);
+		setVar('Assets', openfl.Assets);
 
 		// Some very commonly used classes
-		set('FlxG', FlxG);
-		set('FlxSprite', flixel.FlxSprite);
-		set('FlxCamera', flixel.FlxCamera);
-		set('FlxTimer', flixel.util.FlxTimer);
-		set('FlxTween', flixel.tweens.FlxTween);
-		set('FlxEase', flixel.tweens.FlxEase);
-		set('FlxColor', CustomFlxColor);
-		set('PlayState', PlayState);
-		set('Sprite', Sprite);
-		set('Paths', Paths);
-		set('Conductor', Conductor);
-		set('ClientPrefs', ClientPrefs);
-		set('Character', Character);
-		set('Alphabet', Alphabet);
-		set('Note', Note);
-		set('CustomSubState', CustomSubState);
-		set('CustomSubstate', CustomSubState);
+		setVar('FlxG', flixel.FlxG);
+		setVar('FlxSprite', flixel.FlxSprite);
+		setVar('FlxCamera', flixel.FlxCamera);
+		setVar('FlxTimer', flixel.util.FlxTimer);
+		setVar('FlxTween', flixel.tweens.FlxTween);
+		setVar('FlxEase', flixel.tweens.FlxEase);
+		setVar('FlxColor', CustomFlxColor);
+		setVar('PlayState', PlayState);
+		setVar('Sprite', Sprite);
+		setVar('Paths', Paths);
+		setVar('Conductor', Conductor);
+		setVar('ClientPrefs', ClientPrefs);
+		setVar('Character', Character);
+		setVar('Alphabet', Alphabet);
+		setVar('Note', Note);
+		setVar('CustomSubState', CustomSubState);
+		setVar('CustomSubstate', CustomSubState);
 		#if RUNTIME_SHADERS_ALLOWED
-		set('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
+		setVar('FlxRuntimeShader', flixel.addons.display.FlxRuntimeShader);
 		#end
-		set('ShaderFilter', openfl.filters.ShaderFilter);
+		setVar('ShaderFilter', openfl.filters.ShaderFilter);
 
 		// Functions & Variables
-		set('setVar', function(name:String, value:Dynamic):Void
+		setVar('setVar', function(name:String, value:Dynamic):Void
 		{
 			return PlayState.instance.variables.set(name, value);
 		});
 
-		set('getVar', function(name:String):Dynamic
+		setVar('getVar', function(name:String):Dynamic
 		{
 			var result:Dynamic = null;
 			if (PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
@@ -150,26 +153,26 @@ class HScript extends SScript
 			return result;
 		});
 
-		set('removeVar', function(name:String):Bool
+		setVar('removeVar', function(name:String):Bool
 		{
 			return PlayState.instance.variables.remove(name);
 		});
 
-		set('debugPrint', function(text:String, ?color:FlxColor = null):Void
+		setVar('debugPrint', function(text:String, ?color:FlxColor = null):Void
 		{
 			if (color == null) color = FlxColor.WHITE;
 			PlayState.instance.addTextToDebug(text, color);
 		});
 
-		set('keyboardJustPressed', function(name:String):Bool return Reflect.getProperty(FlxG.keys.justPressed, name));
-		set('keyboardPressed', function(name:String):Bool return Reflect.getProperty(FlxG.keys.pressed, name));
-		set('keyboardReleased', function(name:String):Bool return Reflect.getProperty(FlxG.keys.justReleased, name));
+		setVar('keyboardJustPressed', function(name:String):Bool return Reflect.getProperty(FlxG.keys.justPressed, name));
+		setVar('keyboardPressed', function(name:String):Bool return Reflect.getProperty(FlxG.keys.pressed, name));
+		setVar('keyboardReleased', function(name:String):Bool return Reflect.getProperty(FlxG.keys.justReleased, name));
 
-		set('anyGamepadJustPressed', function(name:String):Bool return FlxG.gamepads.anyJustPressed(name));
-		set('anyGamepadPressed', function(name:String):Bool return FlxG.gamepads.anyPressed(name));
-		set('anyGamepadReleased', function(name:String):Bool return FlxG.gamepads.anyJustReleased(name));
+		setVar('anyGamepadJustPressed', function(name:String):Bool return FlxG.gamepads.anyJustPressed(name));
+		setVar('anyGamepadPressed', function(name:String):Bool return FlxG.gamepads.anyPressed(name));
+		setVar('anyGamepadReleased', function(name:String):Bool return FlxG.gamepads.anyJustReleased(name));
 
-		set('gamepadAnalogX', function(id:Int, ?leftStick:Bool = true):Float
+		setVar('gamepadAnalogX', function(id:Int, ?leftStick:Bool = true):Float
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 			if (controller == null) return 0.0;
@@ -177,7 +180,7 @@ class HScript extends SScript
 			return controller.getXAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 
-		set('gamepadAnalogY', function(id:Int, ?leftStick:Bool = true):Float
+		setVar('gamepadAnalogY', function(id:Int, ?leftStick:Bool = true):Float
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 			if (controller == null) return 0.0;
@@ -185,7 +188,7 @@ class HScript extends SScript
 			return controller.getYAxis(leftStick ? LEFT_ANALOG_STICK : RIGHT_ANALOG_STICK);
 		});
 
-		set('gamepadJustPressed', function(id:Int, name:String):Bool
+		setVar('gamepadJustPressed', function(id:Int, name:String):Bool
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 			if (controller == null) return false;
@@ -193,7 +196,7 @@ class HScript extends SScript
 			return Reflect.getProperty(controller.justPressed, name) == true;
 		});
 
-		set('gamepadPressed', function(id:Int, name:String):Bool
+		setVar('gamepadPressed', function(id:Int, name:String):Bool
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 			if (controller == null) return false;
@@ -201,7 +204,7 @@ class HScript extends SScript
 			return Reflect.getProperty(controller.pressed, name) == true;
 		});
 
-		set('gamepadReleased', function(id:Int, name:String):Bool
+		setVar('gamepadReleased', function(id:Int, name:String):Bool
 		{
 			var controller:FlxGamepad = FlxG.gamepads.getByID(id);
 			if (controller == null) return false;
@@ -209,7 +212,7 @@ class HScript extends SScript
 			return Reflect.getProperty(controller.justReleased, name) == true;
 		});
 
-		set('keyJustPressed', function(name:String = ''):Bool
+		setVar('keyJustPressed', function(name:String = ''):Bool
 		{
 			name = name.toLowerCase();
 
@@ -225,7 +228,7 @@ class HScript extends SScript
 			return false;
 		});
 
-		set('keyPressed', function(name:String = ''):Bool
+		setVar('keyPressed', function(name:String = ''):Bool
 		{
 			name = name.toLowerCase();
 
@@ -241,7 +244,7 @@ class HScript extends SScript
 			return false;
 		});
 
-		set('keyReleased', function(name:String = ''):Bool
+		setVar('keyReleased', function(name:String = ''):Bool
 		{
 			name = name.toLowerCase();
 
@@ -259,7 +262,7 @@ class HScript extends SScript
 
 		// For adding your own callbacks
 
-		set('createGlobalCallback', function(name:String, func:Dynamic):Void // not very tested but should work
+		setVar('createGlobalCallback', function(name:String, func:Dynamic):Void // not very tested but should work
 		{
 			#if LUA_ALLOWED
 			for (script in PlayState.instance.luaArray)
@@ -275,7 +278,7 @@ class HScript extends SScript
 
 		// tested
 		#if LUA_ALLOWED
-		set('createCallback', function(name:String, func:Dynamic, ?funk:FunkinLua = null):Void
+		setVar('createCallback', function(name:String, func:Dynamic, ?funk:FunkinLua = null):Void
 		{
 			if (funk == null) funk = parentLua;
 			
@@ -286,7 +289,7 @@ class HScript extends SScript
 		});
 		#end
 
-		set('addHaxeLibrary', function(libName:String, ?libPackage:String = ''):Void
+		setVar('addHaxeLibrary', function(libName:String, ?libPackage:String = ''):Void
 		{
 			try
 			{
@@ -296,7 +299,7 @@ class HScript extends SScript
 					str = libPackage + '.';
 				}
 
-				set(libName, Type.resolveClass(str + libName));
+				setVar(libName, Type.resolveClass(str + libName));
 			}
 			catch (e:Error)
 			{
@@ -314,93 +317,70 @@ class HScript extends SScript
 		});
 
 		#if LUA_ALLOWED
-		set('parentLua', parentLua);
+		setVar('parentLua', parentLua);
 		#end
 
-		set('this', this);
-		set('game', PlayState.instance);
-		set('buildTarget', CoolUtil.getBuildTarget());
-		set('customSubstate', CustomSubState.instance);
-		set('customSubstateName', CustomSubState.name);
+		setVar('this', this);
+		setVar('game', PlayState.instance);
+		setVar('buildTarget', CoolUtil.getBuildTarget());
+		setVar('customSubstate', CustomSubState.instance);
+		setVar('customSubstateName', CustomSubState.name);
 
-		set('Function_Stop', PlayState.Function_Stop);
-		set('Function_Continue', PlayState.Function_Continue);
+		setVar('Function_Stop', PlayState.Function_Stop);
+		setVar('Function_Continue', PlayState.Function_Continue);
 
 		#if LUA_ALLOWED
-		set('Function_StopLua', PlayState.Function_StopLua);
+		setVar('Function_StopLua', PlayState.Function_StopLua);
 		#end
 
-		set('Function_StopHScript', PlayState.Function_StopHScript);
-		set('Function_StopAll', PlayState.Function_StopAll);
+		setVar('Function_StopHScript', PlayState.Function_StopHScript);
+		setVar('Function_StopAll', PlayState.Function_StopAll);
 
-		set('add', FlxG.state.add);
-		set('insert', FlxG.state.insert);
-		set('remove', FlxG.state.remove);
+		setVar('add', FlxG.state.add);
+		setVar('insert', FlxG.state.insert);
+		setVar('remove', FlxG.state.remove);
 
 		if (PlayState.instance == FlxG.state)
 		{
-			set('addBehindGF', PlayState.instance.addBehindGF);
-			set('addBehindDad', PlayState.instance.addBehindDad);
-			set('addBehindBF', PlayState.instance.addBehindBF);
-
-			setSpecialObject(PlayState.instance, false, PlayState.instance.instancesExclude);
-		}
-
-		if (varsToBring != null)
-		{
-			for (key in Reflect.fields(varsToBring))
-			{
-				key = key.trim();
-
-				var value:Dynamic = Reflect.field(varsToBring, key);
-				set(key, Reflect.field(varsToBring, key));
-			}
-
-			varsToBring = null;
+			setVar('addBehindGF', PlayState.instance.addBehindGF);
+			setVar('addBehindDad', PlayState.instance.addBehindDad);
+			setVar('addBehindBF', PlayState.instance.addBehindBF);
 		}
 	}
 
-	public function executeCode(?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Tea
+	public function executeCode(?codeToRun:String):Dynamic
 	{
-		if (funcToRun == null) return null;
-
-		if (!exists(funcToRun))
+		if (codeToRun != null && active)
 		{
-			PlayState.debugTrace(origin + ' - No HScript function named: $funcToRun', false, 'error', FlxColor.RED);
-			return null;
+			try {
+				return execute(parser.parseString(codeToRun, origin));
+			}
+			catch (e:Error) {
+				exception = e;
+			}
 		}
 
-		final callValue = call(funcToRun, funcArgs);
+		return null;
+	}
 
-		if (!callValue.succeeded)
+	public function executeFunction(funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
+	{
+		if (funcToRun != null && active)
 		{
-			final e:Exception = callValue.exceptions[0];
-
-			if (e != null)
+			if (variables.exists(funcToRun))
 			{
-				var msg:String = e.toString();
+				if (funcArgs == null) funcArgs = [];
 
-				#if LUA_ALLOWED
-				if (parentLua != null)
-				{
-					PlayState.debugTrace('$origin: ${parentLua.lastCalledFunction} - $msg', false, 'error', FlxColor.RED);
-					return null;
+				try {
+					return Reflect.callMethod(null, variables.get(funcToRun), funcArgs);
 				}
-				#end
-
-				PlayState.debugTrace('$origin - $msg', false, 'error', FlxColor.RED);
+				catch (e:Error) {
+					exception = e;
+				}
 			}
-
-			return null;
 		}
 
-		return callValue;
-	}
-
-	public function executeFunction(funcToRun:String = null, funcArgs:Array<Dynamic>):Tea
-	{
-		if (funcToRun == null) return null;
-		return call(funcToRun, funcArgs);
+		return null;
 	}
 
 	#if LUA_ALLOWED
@@ -408,83 +388,117 @@ class HScript extends SScript
 	{
 		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic
 		{
-			initHaxeModuleCodeForLua(funk, codeToRun, varsToBring);
-			final retVal:Tea = funk.hscript.executeCode(funcToRun, funcArgs);
+			initHaxeModuleForLua(funk);
 
-			if (retVal != null)
+			if (funk.hscript.active)
 			{
-				if (retVal.succeeded) return (retVal.returnValue == null || PlayState.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
-
-				final e:Exception = retVal.exceptions[0];
-				final calledFunc:String = if(funk.hscript.origin == funk.lastCalledFunction) funcToRun else funk.lastCalledFunction;
-
-				if (e != null) {
-					PlayState.debugTrace(funk.hscript.origin + ":" + calledFunc + " - " + e, false, 'error', FlxColor.RED);
+				if (varsToBring != null)
+				{
+					for (key in Reflect.fields(varsToBring)) {
+						funk.hscript.setVar(key, Reflect.field(varsToBring, key));
+					}
 				}
 
-				return null;
-			}
-			else if (funk.hscript.returnValue != null) {
-				return funk.hscript.returnValue;
+				var retVal:Dynamic = funk.hscript.executeCode(codeToRun);
+
+				if (funcToRun != null)
+				{
+					var retFunc:Dynamic = funk.hscript.executeFunction(funcToRun, funcArgs);
+
+					if (retFunc != null) {
+						retVal = retFunc;
+					}
+				}
+
+				if (funk.hscript.exception != null)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - ${funk.hscript.exception}', false, 'error', FlxColor.RED);
+				}
+
+				return retVal;
 			}
 
 			return null;
 		});
 		
-		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null):Dynamic
+		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null):Null<Dynamic>
 		{
-			var callValue:Tea = funk.hscript.executeFunction(funcToRun, funcArgs);
-
-			if (!callValue.succeeded)
+			if (funk.hscript.active)
 			{
-				var e:Exception = callValue.exceptions[0];
+				var retVal:Dynamic = funk.hscript.executeFunction(funcToRun, funcArgs);
 
-				if (e != null) {
-					PlayState.debugTrace('ERROR (${funk.hscript.origin}: ${callValue.calledFunction}) - ' + e.message.substr(0, e.message.indexOf('\n')), false, 'error', FlxColor.RED);
+				if (funk.hscript.exception != null)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - ${funk.hscript.exception}', false, 'error', FlxColor.RED);
 				}
-
-				return null;
+	
+				return retVal;
 			}
 
-			return callValue.returnValue;
+			return null;
 		});
 
-		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = ''):Void
+		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = ''):Void // This function is unnecessary because import already exists in HScript as a native feature
 		{
-			var str:String = '';
+			initHaxeModuleForLua(funk);
 
-			if (libPackage.length > 0)
-				str = libPackage + '.';
-			else if (libName == null)
-				libName = '';
-
-			var c:Dynamic = Type.resolveClass(str + libName);
-
-			if (c == null)
-				c = Type.resolveEnum(str + libName);
-
-			if (c != null)
-				SScript.globalVariables[libName] = c;
-
-			if (funk.hscript != null)
+			if (funk.hscript.active)
 			{
-				try {
-					if (c != null) funk.hscript.set(libName, c);
+				var str:String = '';
+
+				if (libPackage.length > 0) {
+					str = libPackage + '.';
 				}
-				catch (e:Dynamic) {
-					PlayState.debugTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, 'error', FlxColor.RED);
+				else if (libName == null) {
+					libName = '';
+				}
+	
+				var c:Dynamic = funk.hscript.resolveClassOrEnum(str + libName);
+	
+				try {
+					funk.hscript.setVar(libName, c);
+				}
+				catch (e:Error)
+				{
+					funk.hscript.active = false;
+					PlayState.debugTrace('ERROR (${funk.lastCalledFunction}) - $e', false, 'error', FlxColor.RED);
 				}
 			}
 		});
 	}
 	#end
 
-	override public function destroy():Void
+	function resolveClassOrEnum(name:String):Dynamic
 	{
-		origin = null;
-		#if LUA_ALLOWED parentLua = null; #end
+		var c:Dynamic = Type.resolveClass(name);
 
-		super.destroy();
+		if (c == null) {
+			c = Type.resolveEnum(name);
+		}
+
+		return c;
+	}
+
+	public function destroy():Void
+	{
+		active = false;
+		parser = null;
+		origin = null;
+
+		#if LUA_ALLOWED
+		parentLua = null;
+		#end
+
+		__instanceFields = [];
+		binops.clear();
+		customClasses.clear();
+		declared = [];
+		importBlocklist = [];
+		locals.clear();
+
+		resetVariables();
 	}
 
 	#if LUA_ALLOWED
@@ -495,7 +509,9 @@ class HScript extends SScript
 			if (newLua != null)
 			{
 				origin = newLua.scriptName;
+				#if MODS_ALLOWED
 				modFolder = newLua.modFolder;
+				#end
 			}
 
 			parentLua = newLua;

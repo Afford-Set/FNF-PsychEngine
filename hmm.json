@@ -26,11 +26,6 @@
 			"version": null
 		},
 		{
-			"name": "SScript",
-			"type": "haxelib",
-			"version": null
-		},
-		{
 			"name": "actuate",
 			"type": "haxelib",
 			"version": null
@@ -73,11 +68,25 @@
 			"url": "https://github.com/Afford-Set/hxcpp"
 		},
 		{
+			"name": "hscript",
+			"type": "git",
+			"dir": null,
+			"ref": "master",
+			"url": "https://github.com/Afford-Set/hscript"
+		},
+		{
 			"name": "hxdiscord_rpc",
 			"type": "git",
 			"dir": null,
 			"ref": "main",
 			"url": "https://github.com/Afford-Set/hxdiscord_rpc"
+		},
+		{
+			"name": "hxCodec",
+			"type": "git",
+			"dir": null,
+			"ref": "main",
+			"url": "https://github.com/polybiusproxy/hxCodec"
 		},
 		{
 			"name": "linc_luajit",

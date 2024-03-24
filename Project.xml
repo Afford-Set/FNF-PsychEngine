@@ -127,7 +127,7 @@
 	<haxelib name="flixel-ui" />
 	<haxelib name="flixel-addons" />
 
-	<haxelib name="SScript" if="HSCRIPT_ALLOWED" />
+	<haxelib name="hscript" if="HSCRIPT_ALLOWED" />
 	<haxelib name="hxCodec" if="VIDEOS_ALLOWED" unless="web" />
 	<haxelib name="linc_luajit" if="LUA_ALLOWED" />
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
