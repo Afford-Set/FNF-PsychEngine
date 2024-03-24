@@ -318,6 +318,8 @@ class HScript extends Interp
 
 		#if LUA_ALLOWED
 		setVar('parentLua', parentLua);
+		#else
+		setVar('parentLua', null);
 		#end
 
 		setVar('this', this);
@@ -515,6 +517,7 @@ class HScript extends Interp
 			}
 
 			parentLua = newLua;
+			setVar('parentLua', parentLua);
 		}
 
 		return null;
