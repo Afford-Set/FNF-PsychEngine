@@ -611,6 +611,10 @@ class PlayState extends MusicBeatState
 			switch (type)
 			{
 				case 'image': Paths.getImage(key);
+				case 'sparrow': Paths.getSparrowAtlas(key);
+				case 'packer': Paths.getPackerAtlas(key);
+				case 'aseprite': Paths.getAsepriteAtlas(key);
+				case 'animate': Paths.getAnimateAtlas(key);
 				case 'sound': Paths.getSound(key);
 				case 'music': Paths.getMusic(key);
 			}
@@ -6494,5 +6498,23 @@ class PlayState extends MusicBeatState
 		}
 
 		return instance.camGame;
+	}
+
+	public static function getVar(name:String):Dynamic
+	{
+		var result:Dynamic = null;
+		if (instance.variables.exists(name)) result = instance.variables.get(name);
+
+		return result;
+	}
+
+	public static function setVar(name:String, value:Dynamic):Void
+	{
+		instance.variables.set(name, value);
+	}
+
+	public static function removeVar(name:String):Void
+	{
+		instance.variables.remove(name);
 	}
 }

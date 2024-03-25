@@ -140,23 +140,9 @@ class HScript extends Interp
 		setVar('ShaderFilter', openfl.filters.ShaderFilter);
 
 		// Functions & Variables
-		setVar('setVar', function(name:String, value:Dynamic):Void
-		{
-			return PlayState.instance.variables.set(name, value);
-		});
-
-		setVar('getVar', function(name:String):Dynamic
-		{
-			var result:Dynamic = null;
-			if (PlayState.instance.variables.exists(name)) result = PlayState.instance.variables.get(name);
-
-			return result;
-		});
-
-		setVar('removeVar', function(name:String):Bool
-		{
-			return PlayState.instance.variables.remove(name);
-		});
+		setVar('setVar', PlayState.setVar);
+		setVar('getVar', PlayState.getVar);
+		setVar('removeVar', PlayState.removeVar);
 
 		setVar('debugPrint', function(text:String, ?color:FlxColor = null):Void
 		{
