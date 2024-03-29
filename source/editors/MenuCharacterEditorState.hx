@@ -17,6 +17,7 @@ import flixel.FlxSprite;
 import flixel.ui.FlxButton;
 import flixel.text.FlxText;
 import openfl.events.Event;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import openfl.net.FileFilter;
@@ -458,25 +459,29 @@ class MenuCharacterEditorState extends MusicBeatState
 	{
 		char = grpWeekCharacters.members[curTypeSelected];
 
-		var spriteType:String = 'sparrow';
-
-		if (Paths.fileExists('images/' + char.imageFile + '.txt', TEXT)) {
-			spriteType = 'packer';
-		}
-		else if (Paths.fileExists('images/' + char.imageFile + '/Animation.json', TEXT)) {
-			spriteType = 'texture';
-		}
-
 		var path:String = 'storymenu/menucharacters/' + char.imageFile;
 
 		if (Paths.fileExists('images/menucharacters' + char.imageFile + '.png', IMAGE)) {
 			path = 'menucharacters/' + char.imageFile;
 		}
 
+		var spriteType:String = 'sparrow';
+
+		if (Paths.fileExists('images/' + path + '.txt', TEXT)) {
+			spriteType = 'packer';
+		}
+		else if (Paths.fileExists('images/' + path + '/Animation.json', TEXT)) {
+			spriteType = 'texture';
+		}
+		else if (Paths.fileExists('images/' + path + '.json', TEXT)) {
+			spriteType = 'aseprite';
+		}
+
 		switch (spriteType)
 		{
 			case 'packer': char.frames = Paths.getPackerAtlas(path);
 			case 'sparrow': char.frames = Paths.getSparrowAtlas(path);
+			case 'aseprite': char.frames = Paths.getAsepriteAtlas(path);
 			case 'texture': char.frames = Paths.getAnimateAtlas(path);
 		}
 
@@ -659,7 +664,7 @@ class MenuCharacterEditorState extends MusicBeatState
 					curAnim += 1;
 				}
 
-				curAnim = CoolUtil.boundSelection(curAnim, char.animationsArray.length);
+				curAnim = FlxMath.wrap(curAnim, 0, char.animationsArray.length - 1);
 
 				if (FlxG.keys.justPressed.H || FlxG.keys.justPressed.K || FlxG.keys.justPressed.SPACE)
 				{
@@ -839,7 +844,7 @@ class MenuCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[splittedImage.length - 1].toLowerCase().replace(' ', '');
 
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 

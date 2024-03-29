@@ -76,8 +76,8 @@ class FPSCounter extends TextField
 	{
 		text = '';
 
-		if (ClientPrefs.fpsCounter) text = 'FPS: ${currentFPS}';
-		if (ClientPrefs.memoryCounter) text += '\nMemory: ' + FlxStringUtil.formatBytes(memoryMegas);
+		if (ClientPrefs.fpsCounter) text = 'FPS: ${currentFPS}\n';
+		if (ClientPrefs.memoryCounter) text += 'Memory: ' + FlxStringUtil.formatBytes(memoryMegas);
 
 		textColor = 0xFFFFFFFF;
 

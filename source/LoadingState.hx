@@ -156,7 +156,7 @@ class LoadingState extends MusicBeatState
 		if (callbacks != null)
 		{
 			targetShit = FlxMath.remapToRange(callbacks.numRemaining / callbacks.length, 1, 0, 0, 1);
-			loadBar.scale.x = FlxMath.lerp(loadBar.scale.x, targetShit, CoolUtil.boundTo(elapsed * 30, 0, 1));
+			loadBar.scale.x = FlxMath.lerp(targetShit, loadBar.scale.x, Math.exp(-elapsed * 30));
 		}
 	}
 

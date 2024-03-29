@@ -17,6 +17,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.ui.FlxButton;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import openfl.events.Event;
 import flixel.util.FlxColor;
 import openfl.net.FileFilter;
@@ -462,7 +463,7 @@ class DialogueEditorState extends MusicBeatState
 			{
 				if (controlAnim[i] && character.jsonFile.animations.length > 0)
 				{
-					curAnim = CoolUtil.boundSelection(curAnim - negaMult[i], character.jsonFile.animations.length);
+					curAnim = FlxMath.wrap(curAnim - negaMult[i], 0, character.jsonFile.animations.length - 1);
 
 					var animToPlay:String = character.jsonFile.animations[curAnim].anim;
 
@@ -514,7 +515,7 @@ class DialogueEditorState extends MusicBeatState
 
 	function changeText(add:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + add, dialogueFile.dialogue.length);
+		curSelected = FlxMath.wrap(curSelected + add, 0, dialogueFile.dialogue.length - 1);
 
 		var curDialogue:DialogueLine = dialogueFile.dialogue[curSelected];
 
@@ -659,7 +660,7 @@ class DialogueEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 

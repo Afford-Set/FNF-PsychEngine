@@ -28,12 +28,13 @@ class CreditsMenuState extends MusicBeatState
 	[
 		['Psych Engine Team'],
 		['Shadow Mario',		'shadowmario',		'Main Programmer of Psych Engine',								'https://twitter.com/Shadow_Mario_',	'444444'],
-		['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',							'https://twitter.com/riverennn',		'B42F71'],
+		['Riveren',				'riveren',			'Main Artist/Animator of Psych Engine',							'https://twitter.com/riverennn',		'14967B'],
 		[''],
 		['Former Engine Members'],
 		['bb-panzu',			'bb',				'Ex-Programmer of Psych Engine',								'https://twitter.com/bbsub3',			'3E813A'],
 		[''],
 		['Engine Contributors'],
+		['CrowPlexus',			'crowplexus',		'Input System v3, Major Help and Other PRs',					 'https://twitter.com/crowplexus',		'A1A1A1'],
 		['iFlicky',				'flicky',			'Composer of Psync and Tea Time\nMade the Dialogue Sounds',		'https://twitter.com/flicky_i',			'9E29CF'],
 		['SqirraRNG',			'sqirra',			'Crash Handler and Base code for\nChart Editor\'s Waveform',	'https://twitter.com/gedehari',			'E1843A'],
 		['EliteMasterEric',		'mastereric',		'Runtime Shaders support',										'https://twitter.com/EliteMasterEric',	'FFBD40'],
@@ -229,17 +230,17 @@ class CreditsMenuState extends MusicBeatState
 		{
 			if (!item.bold)
 			{
-				var lerpVal:Float = CoolUtil.boundTo(elapsed * 12, 0, 1);
+				var lerpVal:Float = Math.exp(-elapsed * 12);
 
 				if (item.targetY == 0)
 				{
 					var lastX:Float = item.x;
 				
 					item.screenCenter(X);
-					item.x = FlxMath.lerp(lastX, item.x - (item.hasIcon ? 70 : 0), lerpVal);
+					item.x = FlxMath.lerp(item.x - 70, lastX, lerpVal);
 				}
 				else {
-					item.x = FlxMath.lerp(item.x, 200 + -40 * Math.abs(item.targetY), lerpVal);
+					item.x = FlxMath.lerp(200 + -40 * Math.abs(item.targetY), item.x, lerpVal);
 				}
 			}
 		});
@@ -293,7 +294,7 @@ class CreditsMenuState extends MusicBeatState
 	function changeSelection(change:Int = 0)
 	{
 		do {
-			curSelected = CoolUtil.boundSelection(curSelected + change, creditsStuff.length);
+			curSelected = FlxMath.wrap(curSelected + change, 0, creditsStuff.length - 1);
 		}
 		while (unselectableCheck(curSelected));
 

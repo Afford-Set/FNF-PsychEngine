@@ -6,6 +6,7 @@ import Discord.DiscordClient;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
 import flixel.group.FlxGroup;
 import flixel.effects.FlxFlicker;
 
@@ -233,7 +234,7 @@ class OptionsMenuState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, options.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, options.length - 1);
 
 		for (item in grpOptions.members)
 		{

@@ -333,7 +333,7 @@ class ModsMenuState extends MusicBeatState
 	
 	var nextAttempt:Float = 1;
 	var holdingMod:Bool = false;
-	var mouseOffsets:FlxPoint = new FlxPoint();
+	var mouseOffsets:FlxPoint = FlxPoint.get();
 	var holdingElapsed:Float = 0;
 	var gottaClickAgain:Bool = false;
 

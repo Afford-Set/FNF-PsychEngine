@@ -189,7 +189,7 @@ class NotesSubState extends MusicBeatSubState
 
 	function updateTip():Void
 	{
-		tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RELOAD to fully reset the selected Note.';
+		tipTxt.text = 'Hold ' + (!controls.controllerMode ? 'Shift' : 'Left Shoulder Button') + ' + Press RESET key to fully reset the selected Note.';
 	}
 
 	var _storedColor:FlxColor;
@@ -519,7 +519,7 @@ class NotesSubState extends MusicBeatSubState
 				}
 				else if (holdingOnObj == colorWheel)
 				{
-					var center:FlxPoint = new FlxPoint(colorWheel.x + colorWheel.width / 2, colorWheel.y + colorWheel.height / 2);
+					var center:FlxPoint = FlxPoint.get(colorWheel.x + colorWheel.width / 2, colorWheel.y + colorWheel.height / 2);
 					var mouse:FlxPoint = pointerFlxPoint();
 
 					var hue:Float = FlxMath.wrap(FlxMath.wrap(Std.int(mouse.degreesTo(center)), 0, 360) - 90, 0, 360);
@@ -607,7 +607,7 @@ class NotesSubState extends MusicBeatSubState
 
 	function changeSelectionMode(change:Int = 0):Void
 	{
-		curSelectedMode = CoolUtil.boundSelection(curSelectedMode + change, 3);
+		curSelectedMode = FlxMath.wrap(curSelectedMode + change, 0, 2);
 
 		modeBG.visible = true;
 		notesBG.visible = false;
@@ -619,7 +619,7 @@ class NotesSubState extends MusicBeatSubState
 
 	function changeSelectionNote(change:Int = 0):Void
 	{
-		curSelectedNote = CoolUtil.boundSelection(curSelectedNote + change, dataArray.length);
+		curSelectedNote = FlxMath.wrap(curSelectedNote + change, 0, dataArray.length - 1);
 		
 		modeBG.visible = false;
 		notesBG.visible = true;

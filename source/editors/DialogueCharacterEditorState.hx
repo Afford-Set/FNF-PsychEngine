@@ -18,6 +18,7 @@ import flixel.FlxSprite;
 import flixel.FlxCamera;
 import openfl.events.Event;
 import flixel.ui.FlxButton;
+import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import openfl.net.FileFilter;
@@ -794,7 +795,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 					updateTextBox();
 					daText.resetDialogue();
 					
-					curAnim = CoolUtil.boundSelection(curAnim, character.jsonFile.animations.length);
+					curAnim = FlxMath.wrap(curAnim, 0, character.jsonFile.animations.length - 1);
 					
 					character.playAnim(character.jsonFile.animations[curAnim].anim);
 					animText.text = 'Animation: ' + character.jsonFile.animations[curAnim].anim + ' (' + (curAnim + 1) +' / ' + character.jsonFile.animations.length + ') - Press W or S to scroll';
@@ -815,7 +816,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 					{
 						if (controlAnim[i] && character.jsonFile.animations.length > 0)
 						{
-							curAnim = CoolUtil.boundSelection(curAnim - negaMult[i], character.jsonFile.animations.length);
+							curAnim = FlxMath.wrap(curAnim - negaMult[i], 0, character.jsonFile.animations.length - 1);
 
 							var animToPlay:String = character.jsonFile.animations[curAnim].anim;
 
@@ -954,7 +955,7 @@ class DialogueCharacterEditorState extends MusicBeatState
 			var characterName:String = splittedImage[0].toLowerCase().replace(' ', '');
 
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 

@@ -254,14 +254,14 @@ class TitleState extends MusicBeatState
 			case 'RIVER':
 			{
 				gfDance.frames = Paths.getSparrowAtlas('title/RiverBump');
-				gfDance.animation.addByIndices('danceLeft', 'River Title Bump', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
-				gfDance.animation.addByIndices('danceRight', 'River Title Bump', [29, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
+				gfDance.animation.addByIndices('danceLeft', 'River Title Bump', CoolUtil.numberArray(30, 15), '', 24, false);
+				gfDance.animation.addByIndices('danceRight', 'River Title Bump', [29].concat(CoolUtil.numberArray(15, 0)), '', 24, false);
 			}
 			case 'BBPANZU':
 			{
 				gfDance.frames = Paths.getSparrowAtlas('title/BBBump');
-				gfDance.animation.addByIndices('danceLeft', 'BB Title Bump', [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27], "", 24, false);
-				gfDance.animation.addByIndices('danceRight', 'BB Title Bump', [27, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "", 24, false);
+				gfDance.animation.addByIndices('danceLeft', 'BB Title Bump', CoolUtil.numberArray(28, 14), '', 24, false);
+				gfDance.animation.addByIndices('danceRight', 'BB Title Bump', [27].concat(CoolUtil.numberArray(14, 0)), '', 24, false);
 			}
 			#end
 			default: // EDIT THIS ONE IF YOU'RE MAKING A SOURCE CODE MOD!!!!
@@ -273,8 +273,8 @@ class TitleState extends MusicBeatState
 					gfDance.frames = Paths.getSparrowAtlas('title/gfDanceTitle');
 				}
 
-				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], "", 24, false);
-				gfDance.animation.addByIndices('danceRight', 'gfDance', [15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29], "", 24, false);
+				gfDance.animation.addByIndices('danceLeft', 'gfDance', [30].concat(CoolUtil.numberArray(15, 0)), '', 24, false);
+				gfDance.animation.addByIndices('danceRight', 'gfDance', CoolUtil.numberArray(30, 15), '', 24, false);
 			}
 		}
 

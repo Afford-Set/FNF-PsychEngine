@@ -12,6 +12,7 @@ import sys.FileSystem;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.util.FlxColor;
 import flixel.sound.FlxSound;
@@ -223,7 +224,7 @@ class ReplaysMenuState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, songs.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, songs.length - 1);
 
 		var bullShit:Int = 0;
 

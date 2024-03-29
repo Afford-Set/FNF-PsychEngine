@@ -144,11 +144,20 @@ function onGhostTap(key:Int)
 	// key can be: 0 - left, 1 - down, 2 - up, 3 - right
 }
 
-
 // Note miss/hit
-function goodNoteHit(note:Note)
+function goodNoteHitPre(note:Note)
 {
-	// Function called when you hit a note (after note hit calculations)
+	// Function called when you hit a note (***before*** note hit calculations)
+}
+
+function opponentNoteHitPre(note:Note)
+{
+	// Works the same as goodNoteHitPre, but for Opponent's notes being hit
+}
+
+function onHitCausesMissNotePre(note:Note)
+{
+	// Works the same as goodNoteHitPre, but for causes miss notes
 }
 
 function onHitCausesMissNote(note:Note)
@@ -156,15 +165,14 @@ function onHitCausesMissNote(note:Note)
 	// Works the same as goodNoteHit, but for causes miss notes
 }
 
+function goodNoteHit(note:Note)
+{
+	// Function called when you hit a note (***after*** note hit calculations)
+}
+
 function opponentNoteHit(note:Note)
 {
 	// Works the same as goodNoteHit, but for Opponent's notes being hit
-}
-
-function noteMissPress(direction:Int)
-{
-	// Called after the note press miss calculations
-	// Player pressed a button, but there was no note to hit (ghost miss)
 }
 
 function noteMiss(note:Note)

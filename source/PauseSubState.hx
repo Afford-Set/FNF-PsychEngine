@@ -7,6 +7,7 @@ import Discord.DiscordClient;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.sound.FlxSound;
@@ -40,6 +41,8 @@ class PauseSubState extends MusicBeatSubState
 	var curTime:Float = Math.max(0, Conductor.songPosition);
 
 	var pauseMusic:FlxSound;
+
+	public static var songName:String = null;
 
 	public function new():Void
 	{
@@ -76,9 +79,12 @@ class PauseSubState extends MusicBeatSubState
 
 		pauseMusic = new FlxSound();
 
-		if (ClientPrefs.pauseMusic != 'None') {
-			pauseMusic.loadEmbedded(Paths.getMusic(Paths.formatToSongPath(ClientPrefs.pauseMusic)), true, true);
+		try
+		{
+			var pauseSong:String = getPauseSong();
+			if (pauseSong != null) pauseMusic.loadEmbedded(Paths.getMusic(pauseSong), true, true);
 		}
+		catch (e:Dynamic) {}
 
 		pauseMusic.volume = 0;
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
@@ -180,6 +186,15 @@ class PauseSubState extends MusicBeatSubState
 		regenMenu();
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+	}
+
+	function getPauseSong():String
+	{
+		var formattedSongName:String = (songName != null ? Paths.formatToSongPath(songName) : '');
+		var formattedPauseMusic:String = Paths.formatToSongPath(ClientPrefs.pauseMusic);
+		if (formattedSongName == 'none' || (formattedSongName != 'none' && formattedPauseMusic == 'none')) return null;
+
+		return (formattedSongName != '') ? formattedSongName : formattedPauseMusic;
 	}
 
 	private function regenMenu():Void
@@ -373,12 +388,7 @@ class PauseSubState extends MusicBeatSubState
 					PlayState.instance.practiceMode = !PlayState.instance.practiceMode;
 					PlayState.usedPractice = true;
 
-					if (PlayState.instance.practiceMode) {
-						FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut});
-					}
-					else {
-						FlxTween.tween(practiceText, {alpha: 0, y: practiceText.y - 5}, 0.4, {ease: FlxEase.quartInOut});
-					}
+					practiceText.visible = PlayState.instance.practiceMode;
 				}
 				case 'Leave Charting Mode':
 				{
@@ -507,7 +517,7 @@ class PauseSubState extends MusicBeatSubState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, menuItems.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, menuItems.length - 1);
 
 		var bullShit:Int = 0;
 

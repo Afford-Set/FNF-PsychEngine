@@ -1,5 +1,11 @@
 package;
 
+import haxe.io.Path;
+
+#if android
+import android.content.Context;
+#end
+
 #if DISCORD_ALLOWED
 import Discord.DiscordClient;
 #end
@@ -19,7 +25,6 @@ import sys.FileSystem;
 import js.Browser;
 import js.Lib as JSLib;
 #end
-import haxe.io.Path;
 import haxe.CallStack;
 import haxe.EnumFlags;
 import haxe.Exception;
@@ -84,6 +89,12 @@ class Main extends Sprite
 	public function new():Void
 	{
 		super();
+
+		#if android
+		Sys.setCwd(Path.addTrailingSlash(Context.getExternalFilesDir()));
+		#elseif ios
+		Sys.setCwd(lime.system.System.applicationStorageDirectory);
+		#end
 
 		if (stage != null) {
 			init();

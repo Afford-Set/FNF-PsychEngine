@@ -278,7 +278,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 		if (updatedFrame)
 		{
-			forceFrame = CoolUtil.boundSelection(forceFrame, maxFrame);
+			forceFrame = FlxMath.wrap(forceFrame, 0, maxFrame - 1);
 			
 			curFrameText.text = 'Force Frame: ${forceFrame+1} / $maxFrame\n(Press Q/E to change)';
 
@@ -462,7 +462,7 @@ class NoteSplashDebugState extends MusicBeatState
 	function changeSelection(change:Int = 0):Void
 	{
 		var max:Int = Note.colArray.length;
-		curSelected = CoolUtil.boundSelection(curSelected + change, max);
+		curSelected = FlxMath.wrap(curSelected + change, 0, max - 1);
 
 		selection.x = curSelected * 220 + 220;
 		updateOffsetText();

@@ -6,6 +6,7 @@ import shaderslmfao.RGBPalette;
 import flixel.FlxSprite;
 import flixel.math.FlxRect;
 import flixel.util.FlxColor;
+import flixel.util.FlxDestroyUtil;
 import flixel.graphics.FlxGraphic;
 
 using StringTools;
@@ -512,9 +513,10 @@ class Note extends FlxSprite
 
 	override function destroy():Void
 	{
-		super.destroy();
-
+		clipRect = FlxDestroyUtil.put(clipRect);
 		_lastValidChecked = '';
+
+		super.destroy();
 	}
 
 	public function followStrumNote(myStrum:StrumNote, fakeCrochet:Float, songSpeed:Float = 1):Void
@@ -561,12 +563,11 @@ class Note extends FlxSprite
 
 	public function clipToStrumNote(myStrum:StrumNote):Void
 	{
-		var center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
+		final center:Float = myStrum.y + offsetY + Note.swagWidth / 2;
 
 		if (isSustainNote && (mustPress || !ignoreNote) && (!mustPress || (wasGoodHit || (prevNote.wasGoodHit && !canBeHit))))
 		{
-			var swagRect:FlxRect = clipRect;
-			if (swagRect == null) swagRect = new FlxRect(0, 0, width / scale.x, height / scale.y);
+			final swagRect:FlxRect = (clipRect == null ? FlxRect.get(0, 0, width / scale.x, height / scale.y) : clipRect);
 
 			if (myStrum.downScroll)
 			{

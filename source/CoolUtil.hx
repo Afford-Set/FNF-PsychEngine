@@ -3,6 +3,7 @@ package;
 import haxe.io.Path;
 
 import flixel.FlxG;
+import flixel.FlxBasic;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.util.FlxSave;
@@ -105,19 +106,6 @@ class CoolUtil
 		return min != null ? Math.max(min, maxBound) : maxBound;
 	}
 
-	public static function boundSelection(selection:Int, max:Int):Int
-	{
-		if (selection < 0) {
-			return max - 1;
-		}
-
-		if (selection >= max) {
-			return 0;
-		}
-
-		return selection;
-	}
-
 	public static function floorDecimal(value:Float, decimals:Int):Float
 	{
 		if (decimals < 1) return Math.floor(value);
@@ -162,7 +150,7 @@ class CoolUtil
 
 	public static function dominantColor(sprite:FlxSprite):FlxColor
 	{
-		var countByColor:Map<Int, Int> = [];
+		final countByColor:Map<Int, Int> = [];
 
 		for (x in 0...sprite.frameWidth)
 		{
@@ -234,6 +222,11 @@ class CoolUtil
 	public static function numberArray(max:Int, ?min:Int = 0):Array<Int>
 	{
 		return [for (i in min...max) i];
+	}
+
+	public static function sortByID(i:Int, basic1:FlxBasic, basic2:FlxBasic):Int
+	{
+		return basic1.ID > basic2.ID ? -i : basic2.ID > basic1.ID ? i : 0;
 	}
 
 	public static function browserLoad(site:String):Void

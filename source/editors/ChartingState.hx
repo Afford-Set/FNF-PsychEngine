@@ -196,6 +196,8 @@ class ChartingState extends MusicBeatState
 		192
 	];
 
+	var text:String = '';
+
 	public var mouseQuant:Bool = false;
 	public static var vortex:Bool = false;
 
@@ -358,6 +360,35 @@ class ChartingState extends MusicBeatState
 		UI_box.resize(300, 400);
 		UI_box.setPosition(640 + GRID_SIZE / 2, 25);
 		UI_box.scrollFactor.set();
+
+		text = "W/S or Mouse Wheel - Change Conductor's strum time
+		\nA/D - Go to the previous/next section
+		\nLeft/Right - Change Snap
+		\nUp/Down - Change Conductor's Strum Time with Snapping" +
+		#if FLX_PITCH
+		"\nLeft Bracket / Right Bracket - Change Song Playback Rate (SHIFT to go Faster)
+		\nALT + Left Bracket / Right Bracket - Reset Song Playback Rate" +
+		#end
+		"\nHold Shift to move 4x faster
+		\nHold Control and click on an arrow to select it
+		\nZ/X - Zoom in/out
+		\n
+		\nEsc - Test your chart inside Chart Editor
+		\nEnter - Play your chart
+		\nQ/E - Decrease/Increase Note Sustain Length
+		\nSpace - Stop/Resume song";
+
+		var tipTextArray:Array<String> = text.split('\n');
+
+		for (i in 0...tipTextArray.length)
+		{
+			var tipText:FlxText = new FlxText(UI_box.x, UI_box.y + UI_box.height + 8, 0, tipTextArray[i], 16);
+			tipText.y += i * 12;
+			tipText.setFormat(Paths.getFont('vcr.ttf'), 14, FlxColor.WHITE, LEFT);
+			tipText.scrollFactor.set();
+			add(tipText);
+		}
+
 		add(UI_box);
 
 		addAssets();
@@ -787,7 +818,7 @@ class ChartingState extends MusicBeatState
 		tab_group_song.add(shiftNoteButton);
 
 		UI_box.addGroup(tab_group_song);
-		FlxG.camera.follow(camPos);
+		initSwagCamera().follow(camPos, LOCKON, 999);
 	}
 
 	var stepperBeats:FlxUINumericStepper;
@@ -1411,7 +1442,9 @@ class ChartingState extends MusicBeatState
 	var instVolume:FlxUINumericStepper;
 	var voicesVolume:FlxUINumericStepper;
 
+	#if FLX_PITCH
 	var sliderRate:FlxUISlider;
+	#end
 
 	function addChartingUI():Void
 	{
@@ -1801,7 +1834,7 @@ class ChartingState extends MusicBeatState
 		else if (id == FlxUISlider.CHANGE_EVENT && (sender is FlxUISlider))
 		{
 			switch (sender) {
-				case 'playbackSpeed': playbackSpeed = Std.int(sliderRate.value);
+				case 'playbackSpeed': playbackSpeed = #if FLX_PITCH Std.int(sliderRate.value) #else 1.0 #end;
 			}
 		}
 	}
@@ -3303,7 +3336,7 @@ class ChartingState extends MusicBeatState
 		{
 			curRenderedNotes.forEachAlive(function(note:Note):Void
 			{
-				if (note.overlapsPoint(new FlxPoint(strumLineNotes.members[d].x + 1, strumLine.y + 1)) && note.noteData == d % Note.pointers.length)
+				if (note.overlapsPoint(FlxPoint.get(strumLineNotes.members[d].x + 1, strumLine.y + 1)) && note.noteData == d % Note.pointers.length)
 				{
 					if (!delnote) deleteNote(note);
 					delnote = true;
@@ -3450,7 +3483,7 @@ class ChartingState extends MusicBeatState
 		if (data != null && data.length > 0)
 		{
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 
@@ -3533,7 +3566,7 @@ class ChartingState extends MusicBeatState
 		if ((data != null) && (data.length > 0))
 		{
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 

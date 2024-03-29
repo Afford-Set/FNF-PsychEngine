@@ -15,6 +15,8 @@ typedef MenuCharacterFile =
 
 class MenuCharacter extends Sprite
 {
+	static inline final DEFAULT_CHARACTER:String = 'bf';
+
 	public var character:String;
 	public var hasConfirmAnimation:Bool = false;
 
@@ -31,7 +33,7 @@ class MenuCharacter extends Sprite
 	public var originalX:Float = 0;
 	public var originalY:Float = 0;
 
-	public function new(x:Float, y:Float, character:String = 'bf'):Void
+	public function new(x:Float, y:Float, character:String = DEFAULT_CHARACTER):Void
 	{
 		super(x, y);
 
@@ -41,7 +43,7 @@ class MenuCharacter extends Sprite
 		changeCharacter(character);
 	}
 
-	public function changeCharacter(?character:String = 'bf', ?json:MenuCharacterFile):Void
+	public function changeCharacter(?character:String = DEFAULT_CHARACTER, ?json:MenuCharacterFile):Void
 	{
 		if (character == null) character = '';
 		if (character == this.character) return;

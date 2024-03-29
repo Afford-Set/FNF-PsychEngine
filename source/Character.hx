@@ -52,7 +52,7 @@ class Character extends Sprite
 	public var specialAnim:Bool = false;
 	public var stunned:Bool = false;
 	public var singDuration:Float = 4; // Multiplier of how long a character holds the sing pose
-	public var idleSuffix:String = '';
+	public var idleSuffix(default, set):String = '';
 	public var danceIdle:Bool = false; // Character use "danceLeft" and "danceRight" instead of "idle"
 	public var skipDance:Bool = false;
 
@@ -75,9 +75,9 @@ class Character extends Sprite
 	public var originalFlipX:Bool = false;
 	public var healthColorArray:Array<Int> = [255, 0, 0];
 
-	public static var DEFAULT_CHARACTER:String = 'bf'; // In case a character is missing, it will use BF on its place
+	public static inline final DEFAULT_CHARACTER:String = 'bf'; // In case a character is missing, it will use BF on its place
 
-	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false):Void
+	public function new(x:Float, y:Float, ?character:String = DEFAULT_CHARACTER, ?isPlayer:Bool = false):Void
 	{
 		super(x, y);
 
@@ -199,7 +199,14 @@ class Character extends Sprite
 
 		originalFlipX = flipX;
 
-		hasMissAnimations = animOffsets.exists('singLEFTmiss') || animOffsets.exists('singDOWNmiss') || animOffsets.exists('singUPmiss') || animOffsets.exists('singRIGHTmiss');
+		for (name => offset in animOffsets)
+		{
+			if (name.startsWith('sing') && name.contains('miss')) // includes alt miss animations now
+			{
+				hasMissAnimations = true;
+				break;
+			}
+		}
 
 		recalculateDanceIdle();
 		dance();
@@ -215,19 +222,12 @@ class Character extends Sprite
 		{
 			if (heyTimer > 0)
 			{
-				var playbackRate:Float = 1;
+				var rate:Float = (PlayState.instance != null ? PlayState.instance.playbackRate : 1.0);
+				heyTimer -= elapsed * rate;
 
-				if (PlayState.instance != null) {
-					playbackRate = PlayState.instance.playbackRate;
-				}
-
-				heyTimer -= elapsed * playbackRate;
-
-				if (heyTimer <= 0 && animation.curAnim != null)
+				if (heyTimer <= 0)
 				{
-					var anim:String = animation.curAnim.name;
-
-					if (specialAnim && anim == 'hey' || anim == 'cheer')
+					if (specialAnim && animation.curAnim.name == 'hey' || animation.curAnim.name == 'cheer')
 					{
 						specialAnim = false;
 						dance();
@@ -241,13 +241,13 @@ class Character extends Sprite
 				specialAnim = false;
 				dance();
 			}
-			else if (animation.curAnim != null && animation.curAnim.name.endsWith('miss') && animation.curAnim.finished)
+			else if (animation.curAnim.name.endsWith('miss') && animation.curAnim.finished)
 			{
 				dance();
-				animation.curAnim.finish();
+				animation.finish();
 			}
 
-			if (animation.curAnim != null && animation.curAnim.name.startsWith('sing')) {
+			if (animation.curAnim.name.startsWith('sing')) {
 				holdTimer += elapsed;
 			}
 			else if (isPlayer) {
@@ -264,7 +264,7 @@ class Character extends Sprite
 			{
 				var name:String = animation.curAnim.name;
 
-				if (animation.curAnim.finished && animOffsets.exists('$name-loop')) {
+				if (animation.curAnim.finished && animation.getByName('$name-loop') != null && animOffsets.exists('$name-loop')) {
 					playAnim('$name-loop');
 				}
 			}
@@ -275,22 +275,19 @@ class Character extends Sprite
 
 	public var danced:Bool = false;
 
-	public function dance():Void
+	public function dance(force:Bool = false):Void
 	{
 		if (!debugMode && !skipDance && !specialAnim)
 		{
+			var danceAnim:String = 'idle$idleSuffix';
+
 			if (danceIdle)
 			{
 				danced = !danced;
-
-				if (danced)
-					playAnim('danceRight' + idleSuffix);
-				else
-					playAnim('danceLeft' + idleSuffix);
+				danceAnim = 'dance' + (danced ? 'Right' : 'Left') + '$idleSuffix';
 			}
-			else if (animation.getByName('idle' + idleSuffix) != null) {
-				playAnim('idle' + idleSuffix);
-			}
+	
+			playAnim(danceAnim, force);
 		}
 	}
 
@@ -299,29 +296,24 @@ class Character extends Sprite
 		specialAnim = false;
 		super.playAnim(name, forced, reverse, frame);
 
-		if (curCharacter.startsWith('gf'))
+		if (curCharacter.startsWith('gf') || danceIdle) // idk
 		{
-			if (name == 'singLEFT') {
-				danced = true;
-			}
-			else if (name == 'singRIGHT') {
-				danced = false;
-			}
-
-			if (name == 'singUP' || name == 'singDOWN') {
-				danced = !danced;
+			switch (name)
+			{
+				case 'singLEFT': danced = true;
+				case 'singRIGHT': danced = false;
+				case 'singUP' | 'singDOWN': danced = !danced;
 			}
 		}
 	}
 
 	public var danceEveryNumBeats:Int = ClientPrefs.danceOffset;
-
 	private var settingCharacterUp:Bool = true;
 
 	public function recalculateDanceIdle():Void
 	{
-		var lastDanceIdle:Bool = danceIdle;
-		danceIdle = animation.getByName('danceLeft' + idleSuffix) != null && animation.getByName('danceRight' + idleSuffix) != null;
+		final lastDanceIdle:Bool = danceIdle;
+		danceIdle = (animation.exists('danceLeft' + idleSuffix) && animation.exists('danceRight' + idleSuffix));
 
 		if (settingCharacterUp) {
 			danceEveryNumBeats = (danceIdle ? 1 : ClientPrefs.danceOffset);
@@ -341,6 +333,16 @@ class Character extends Sprite
 		}
 
 		settingCharacterUp = false;
+	}
+
+	function set_idleSuffix(newSuffix:String):String
+	{
+		if (idleSuffix == newSuffix) return newSuffix;
+
+		idleSuffix = newSuffix;
+		recalculateDanceIdle();
+
+		return idleSuffix;
 	}
 
 	public function quickAnimAdd(name:String, anim:String):Void

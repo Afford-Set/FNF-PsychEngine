@@ -115,22 +115,37 @@ function onGhostTap(key)
 end
 
 
--- Note miss/hit
-function goodNoteHit(id, direction, noteType, isSustainNote)
-	-- Function called when you hit a note (after note hit calculations)
+function goodNoteHitPre(id, direction, noteType, isSustainNote)
+	-- Function called when you hit a note (***before*** note hit calculations)
 	-- id: The note member id, you can get whatever variable you want from this note, example: "getPropertyFromGroup('notes', id, 'strumTime')"
 	-- noteData: 0 = Left, 1 = Down, 2 = Up, 3 = Right
 	-- noteType: The note type string/tag
 	-- isSustainNote: If it's a hold note, can be either true or false
 end
+function opponentNoteHit(id, direction, noteType, isSustainNote)
+	-- Works the same as goodNoteHit, but for Opponent's notes being hit
+	-- Values work the same as goodNoteHitPre
+end
+
+function onHitCausesMissNotePre(id, direction, noteType, isSustainNote)
+	-- Works the same as goodNoteHitPre, but for causes miss notes
+	-- Values work the same as goodNoteHitPre
+end
 
 function onHitCausesMissNote(id, direction, noteType, isSustainNote)
 	-- Works the same as goodNoteHit, but for causes miss notes
+	-- Values work the same as goodNoteHitPre
 end
 
-function opponentNoteHit(id, direction, noteType, isSustainNote)
-	-- Works the same as goodNoteHit, but for Opponent's notes being hit
+function goodNoteHit(id, direction, noteType, isSustainNote)
+	-- Function called when you hit a note (***after*** note hit calculations)
+	-- Values work the same as goodNoteHitPre
 end
+function opponentNoteHit(id, direction, noteType, isSustainNote)
+	-- Works the same as goodNoteHitPost, but for Opponent's notes being hit
+	-- Values work the same as goodNoteHitPre
+end
+
 
 function noteMissPress(direction)
 	-- Called after the note press miss calculations

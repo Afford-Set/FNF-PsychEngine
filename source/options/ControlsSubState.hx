@@ -6,6 +6,7 @@ import Discord.DiscordClient;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.group.FlxGroup;
@@ -597,7 +598,7 @@ class ControlsSubState extends MusicBeatSubState
 	function updateText(?move:Int = 0):Void
 	{
 		if (move != 0) {
-			curSelected = CoolUtil.boundSelection(curSelected + move, curOptions.length);
+			curSelected = FlxMath.wrap(curSelected + move, 0, curOptions.length - 1);
 		}
 
 		var num:Int = curOptionsValid[curSelected];
@@ -630,7 +631,7 @@ class ControlsSubState extends MusicBeatSubState
 	function swapMode():Void
 	{
 		var modsArrayShit:Array<String> = ['key', 'gamepad'];
-		mode = modsArrayShit[CoolUtil.boundSelection(modsArrayShit.indexOf(mode) + 1, modsArrayShit.length)];
+		mode = modsArrayShit[FlxMath.wrap(modsArrayShit.indexOf(mode) + 1, 0, modsArrayShit.length - 1)];
 
 		curSelected = 0;
 		curAlt = false;

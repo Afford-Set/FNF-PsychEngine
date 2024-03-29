@@ -49,8 +49,6 @@ class TankmenBG extends Sprite
 	{
 		super.update(elapsed);
 
-		alpha = (x > -0.5 * FlxG.width && x < 1.2 * FlxG.width) ? 1 : FlxMath.EPSILON;
-
 		if (animation.curAnim.name == 'run')
 		{
 			var speed:Float = (Conductor.songPosition - strumTime) * tankSpeed;

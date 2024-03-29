@@ -12,6 +12,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxSubState;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.tweens.FlxTween;
@@ -221,7 +222,7 @@ class AchievementsMenuState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, achievements.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, achievements.length - 1);
 
 		var bullShit:Int = 0;
 

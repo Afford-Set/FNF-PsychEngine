@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
+import flixel.util.FlxDestroyUtil;
 import flixel.group.FlxSpriteGroup;
 
 using StringTools;
@@ -32,8 +33,8 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 	public var scaleY(default, set):Float = 1;
 	public var rows:Int = 0;
 
-	public var distancePerItem:FlxPoint = new FlxPoint(20, 120);
-	public var startPosition:FlxPoint = new FlxPoint(0, 0); // for the calculations
+	public var distancePerItem:FlxPoint = FlxPoint.get(20, 120);
+	public var startPosition:FlxPoint = FlxPoint.get(0, 0); // for the calculations
 
 	public function new(x:Float, y:Float, text:String = '', ?bold:Bool = true):Void
 	{
@@ -172,18 +173,26 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 	{
 		if (isMenuItem)
 		{
-			var lerpVal:Float = CoolUtil.boundTo(elapsed * 9.6, 0, 1);
+			var lerpVal:Float = Math.exp(-elapsed * 9.6);
 
 			if (changeX) {
-				x = FlxMath.lerp(x, (targetY * distancePerItem.x) + startPosition.x, lerpVal);
+				x = FlxMath.lerp((targetY * distancePerItem.x) + startPosition.x, x, lerpVal);
 			}
 
 			if (changeY) {
-				y = FlxMath.lerp(y, (targetY * 1.3 * distancePerItem.y) + startPosition.y, lerpVal);
+				y = FlxMath.lerp((targetY * 1.3 * distancePerItem.y) + startPosition.y, y, lerpVal);
 			}
 		}
 
 		super.update(elapsed);
+	}
+
+	override function destroy():Void
+	{
+		distancePerItem = FlxDestroyUtil.put(distancePerItem);
+		startPosition = FlxDestroyUtil.put(startPosition);
+
+		super.destroy();
 	}
 
 	public function snapToPosition():Void
@@ -223,6 +232,7 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 					if (consecutiveSpaces > 0)
 					{
 						xPos += 28 * consecutiveSpaces * scaleX;
+						rowData[rows] = xPos;
 
 						if (!bold && xPos >= FlxG.width * 0.65)
 						{
@@ -237,6 +247,7 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 
 					letter.scale.x = scaleX;
 					letter.scale.y = scaleY;
+					letter.rowWidth = 0;
 
 					letter.setupAlphaCharacter(xPos, rows * Y_PER_ROW * scale.y, character, bold);
 					letter.parent = this;
@@ -260,7 +271,7 @@ class Alphabet extends FlxTypedSpriteGroup<AlphaCharacter>
 		}
 
 		for (letter in letters) {
-			letter.rowWidth = rowData[letter.row];
+			letter.rowWidth = rowData[letter.row] / scale.x;
 		}
 
 		if (letters.length > 0) rows++;

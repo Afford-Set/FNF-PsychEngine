@@ -57,7 +57,7 @@ class MenuItem extends Sprite
 
 	override function update(elapsed:Float):Void
 	{
-		y = FlxMath.lerp(y, (targetY * 120) + 465, CoolUtil.boundTo(elapsed * 10.2, 0, 1));
+		y = FlxMath.lerp((targetY * 120) + 465, y, Math.exp(-elapsed * 10.2));
 
 		if (!inEditor)
 		{

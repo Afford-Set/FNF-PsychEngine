@@ -17,10 +17,12 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.FlxObject;
+import flixel.math.FlxMath;
 import openfl.events.Event;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
+import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
 import lime.system.Clipboard;
 import flixel.addons.ui.FlxUI;
@@ -285,7 +287,7 @@ class CharacterEditorState extends MusicBeatState
 			var bg:BGSprite = new BGSprite('stageback', -600 + OFFSET_X - playerXDifference, -300, 0.9, 0.9);
 			bgLayer.add(bg);
 
-			var stageFront:BGSprite = new BGSprite('stagefront', -650 + OFFSET_X - playerXDifference, 500, 0.9, 0.9);
+			final stageFront:BGSprite = new BGSprite('stagefront', -650 + OFFSET_X - playerXDifference, 500, 0.9, 0.9);
 			stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
 			stageFront.updateHitbox();
 			bgLayer.add(stageFront);
@@ -1113,15 +1115,13 @@ class CharacterEditorState extends MusicBeatState
 
 	function updatePointerPos():Void
 	{
-		var x:Float = char.getMidpoint().x;
-		var y:Float = char.getMidpoint().y;
+		final mid:FlxPoint = char.getMidpoint();
 
-		if (!char.isPlayer) {
-			x += 150 + char.cameraPosition[0];
-		}
-		else {
-			x -= 100 + char.cameraPosition[0];
-		}
+		var x:Float = mid.x;
+		var y:Float = mid.y;
+
+		if (char.isPlayer) x -= 100 + char.cameraPosition[0];
+		else x += 150 + char.cameraPosition[0];
 
 		y -= 100 - char.cameraPosition[1];
 
@@ -1129,6 +1129,7 @@ class CharacterEditorState extends MusicBeatState
 		y -= cameraFollowPointer.height / 2;
 
 		cameraFollowPointer.setPosition(x, y);
+		mid.put();
 	}
 
 	function findAnimationByName(name:String):AnimArray
@@ -1406,7 +1407,7 @@ class CharacterEditorState extends MusicBeatState
 					if (FlxG.keys.justPressed.W) curAnim -= 1;
 					if (FlxG.keys.justPressed.S) curAnim += 1;
 
-					curAnim = CoolUtil.boundSelection(curAnim, char.animationsArray.length);
+					curAnim = FlxMath.wrap(curAnim, 0, char.animationsArray.length - 1);
 
 					if (FlxG.keys.justPressed.S || FlxG.keys.justPressed.W || FlxG.keys.justPressed.SPACE)
 					{
@@ -1536,7 +1537,7 @@ class CharacterEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 

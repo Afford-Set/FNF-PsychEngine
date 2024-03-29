@@ -690,7 +690,7 @@ class PreferencesSubState extends MusicBeatSubState
 									{
 										holdValue = CoolUtil.boundTo(curOption.value + add, curOption.minValue, curOption.maxValue);
 
-										switch(curOption.type)
+										switch (curOption.type)
 										{
 											case 'int':
 											{
@@ -706,7 +706,7 @@ class PreferencesSubState extends MusicBeatSubState
 									}
 									case 'string':
 									{
-										curOption.curOption = CoolUtil.boundSelection(curOption.curOption + (controls.UI_LEFT_P ? -1 : 1), curOption.options.length);
+										curOption.curOption = FlxMath.wrap(curOption.curOption + (controls.UI_LEFT_P ? -1 : 1), 0, curOption.options.length - 1);
 										curOption.value = curOption.options[curOption.curOption]; // lol
 									}
 								}
@@ -767,8 +767,7 @@ class PreferencesSubState extends MusicBeatSubState
 						}
 						else if (curOption.type == 'string')
 						{
-							var num:Int = curOption.options.indexOf(curOption.value); // lol
-							num = CoolUtil.boundSelection(num + (-1 * FlxG.mouse.wheel), curOption.options.length);
+							var num:Int = FlxMath.wrap(curOption.options.indexOf(curOption.value) + (-1 * FlxG.mouse.wheel), 0, curOption.options.length - 1);
 
 							curOption.curOption = num;
 							curOption.value = curOption.options[num]; // lol
@@ -834,7 +833,7 @@ class PreferencesSubState extends MusicBeatSubState
 	function changeSelection(change:Int = 0):Void
 	{
 		do {
-			curSelected = CoolUtil.boundSelection(curSelected + change, optionsArray.length);
+			curSelected = FlxMath.wrap(curSelected + change, 0, optionsArray.length - 1);
 		}
 		while (unselectableCheck(curSelected));
 

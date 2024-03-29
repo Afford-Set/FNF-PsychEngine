@@ -194,53 +194,53 @@ class WeekData
 		return json;
 	}
 
+	public static final DEFAULT_WEEK:WeekFile = {
+		itemColor: [MenuItem.DEFAULT_COLOR.red, MenuItem.DEFAULT_COLOR.green, MenuItem.DEFAULT_COLOR.blue],
+		freeplayColor: [146, 113, 253],
+		songs: [
+			{
+				songID: 'bopeebo',
+				songName: 'Bopeebo',
+				icon: 'dad',
+				color: [146, 113, 253],
+				difficulties: [],
+				defaultDifficulty: null
+			},
+			{
+				songID: 'fresh',
+				songName: 'Fresh',
+				icon: 'dad',
+				color: [146, 113, 253],
+				difficulties: [],
+				defaultDifficulty: null
+			},
+			{
+				songID: 'dad-battle',
+				songName: 'Dad Battle',
+				icon: 'dad',
+				color: [146, 113, 253],
+				difficulties: [],
+				defaultDifficulty: null
+			}
+		],
+		weekCharacters: ['dad', 'bf', 'gf'],
+		weekBackground: 'stage',
+		weekBefore: 'tutorial',
+		itemFile: 'week1',
+		storyName: 'Your New Week',
+		weekName: 'Custom Week',
+		weekID: 'custom-week',
+		startUnlocked: true,
+		hiddenUntilUnlocked: false,
+		hideStoryMode: false,
+		hideFreeplay: false,
+		difficulties: [],
+		defaultDifficulty: null
+	};
+
 	public static function createWeekFile():WeekFile
 	{
-		var col:FlxColor = MenuItem.DEFAULT_COLOR;
-
-		return {
-			itemColor: [col.red, col.green, col.blue],
-			freeplayColor: [146, 113, 253],
-			songs: [
-				{
-					songID: 'bopeebo',
-					songName: 'Bopeebo',
-					icon: 'dad',
-					color: [146, 113, 253],
-					difficulties: [],
-					defaultDifficulty: null
-				},
-				{
-					songID: 'fresh',
-					songName: 'Fresh',
-					icon: 'dad',
-					color: [146, 113, 253],
-					difficulties: [],
-					defaultDifficulty: null
-				},
-				{
-					songID: 'dad-battle',
-					songName: 'Dad Battle',
-					icon: 'dad',
-					color: [146, 113, 253],
-					difficulties: [],
-					defaultDifficulty: null
-				}
-			],
-			weekCharacters: ['dad', 'bf', 'gf'],
-			weekBackground: 'stage',
-			weekBefore: 'tutorial',
-			itemFile: 'week1',
-			storyName: 'Your New Week',
-			weekName: 'Custom Week',
-			weekID: 'custom-week',
-			startUnlocked: true,
-			hiddenUntilUnlocked: false,
-			hideStoryMode: false,
-			hideFreeplay: false,
-			difficulties: [],
-			defaultDifficulty: null
-		};
+		return DEFAULT_WEEK;
 	}
 
 	public static function reloadWeekFiles(isStoryMode:Null<Bool> = false):Void

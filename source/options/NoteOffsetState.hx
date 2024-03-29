@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxCamera;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup;
@@ -58,52 +59,28 @@ class NoteOffsetState extends MusicBeatState
 		persistentUpdate = true;
 		FlxG.sound.pause();
 
-		var pathShit:String = 'stage/stageback';
-
-		if (Paths.fileExists('images/stageback.png', IMAGE)) {
-			pathShit = 'stageback';
-		}
-
-		var bg:BGSprite = new BGSprite(pathShit, -600, -200, 0.9, 0.9);
+		var bg:BGSprite = new BGSprite('stageback', -600, -200, 0.9, 0.9);
 		add(bg);
 
-		var pathShit:String = 'stage/stagefront';
-
-		if (Paths.fileExists('images/stagefront.png', IMAGE)) {
-			pathShit = 'stagefront';
-		}
-
-		var stageFront:BGSprite = new BGSprite(pathShit, -650, 600, 0.9, 0.9);
+		final stageFront:BGSprite = new BGSprite('stagefront', -650, 600, 0.9, 0.9);
 		stageFront.setGraphicSize(Std.int(stageFront.width * 1.1));
 		stageFront.updateHitbox();
 		add(stageFront);
 
 		if (!ClientPrefs.lowQuality)
 		{
-			var pathShit:String = 'stage/stage_light';
-
-			if (Paths.fileExists('images/stage_light.png', IMAGE)) {
-				pathShit = 'stage_light';
-			}
-
-			var stageLight:BGSprite = new BGSprite(pathShit, -125, -100, 0.9, 0.9);
+			final stageLight:BGSprite = new BGSprite('stage_light', -125, -100, 0.9, 0.9);
 			stageLight.setGraphicSize(Std.int(stageLight.width * 1.1));
 			stageLight.updateHitbox();
 			add(stageLight);
 
-			var stageLight:BGSprite = new BGSprite(pathShit, 1225, -100, 0.9, 0.9);
+			final stageLight:BGSprite = new BGSprite('stage_light', 1225, -100, 0.9, 0.9);
 			stageLight.setGraphicSize(Std.int(stageLight.width * 1.1));
 			stageLight.updateHitbox();
 			stageLight.flipX = true;
 			add(stageLight);
 
-			var pathShit:String = 'stage/stagecurtains';
-
-			if (Paths.fileExists('images/stagecurtains.png', IMAGE)) {
-				pathShit = 'stagecurtains';
-			}
-
-			var stageCurtains:BGSprite = new BGSprite(pathShit, -500, -300, 1.3, 1.3);
+			final stageCurtains:BGSprite = new BGSprite('stagecurtains', -500, -300, 1.3, 1.3);
 			stageCurtains.setGraphicSize(Std.int(stageCurtains.width * 0.9));
 			stageCurtains.updateHitbox();
 			add(stageCurtains);
@@ -112,7 +89,6 @@ class NoteOffsetState extends MusicBeatState
 		gf = new Character(400, 130, 'gf'); // Characters
 		gf.x += gf.positionArray[0];
 		gf.y += gf.positionArray[1];
-		gf.scrollFactor.set(0.95, 0.95);
 		add(gf);
 
 		boyfriend = new Character(770, 100, 'bf', true);
@@ -138,31 +114,23 @@ class NoteOffsetState extends MusicBeatState
 		comboNums.cameras = [camHUD];
 		add(comboNums);
 
-		var seperatedScore:Array<Int> = [];
+		final seperatedScore:Array<Int> = [for (i in 0...3) FlxG.random.int(0, 9)];
 
-		for (i in 0...3) {
-			seperatedScore.push(FlxG.random.int(0, 9));
-		}
-
-		var daLoop:Int = 0;
-
-		for (i in seperatedScore)
+		for (i in 0...seperatedScore.length)
 		{
-			var numScore:Sprite = new Sprite(43 * daLoop);
+			var num:Int = seperatedScore[i];
+			var numScore:Sprite = new Sprite(43 * (i + 1));
 
-			if (Paths.fileExists('images/num' + i + '.png', IMAGE)) {
-				numScore.loadGraphic(Paths.getImage('num'));
+			if (Paths.fileExists('images/num' + num + '.png', IMAGE)) {
+				numScore.loadGraphic(Paths.getImage('num' + num));
 			}
 			else {
-				numScore.loadGraphic(Paths.getImage('ui/num' + i));
+				numScore.loadGraphic(Paths.getImage('ui/num' + num));
 			}
 
-			numScore.cameras = [camHUD];
 			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
 			numScore.updateHitbox();
 			comboNums.add(numScore);
-
-			daLoop++;
 		}
 
 		dumbTexts = new FlxTypedGroup<FlxText>();
@@ -239,8 +207,8 @@ class NoteOffsetState extends MusicBeatState
 
 	var holdingObjectType:Null<Bool> = null;
 
-	var startMousePos:FlxPoint = new FlxPoint();
-	var startComboOffset:FlxPoint = new FlxPoint();
+	var startMousePos:FlxPoint = FlxPoint.get();
+	var startComboOffset:FlxPoint = FlxPoint.get();
 
 	override function update(elapsed:Float):Void
 	{
@@ -487,7 +455,7 @@ class NoteOffsetState extends MusicBeatState
 		if ((!controls.controllerMode && controls.ACCEPT_P) || (controls.controllerMode && FlxG.gamepads.anyJustPressed(START)))
 		{
 			var menusArrayShit:Array<String> = ['combo', 'offset', 'dance'];
-			menu = menusArrayShit[CoolUtil.boundSelection(menusArrayShit.indexOf(menu) + 1, menusArrayShit.length)];
+			menu = menusArrayShit[FlxMath.wrap(menusArrayShit.indexOf(menu) + 1, 0, menusArrayShit.length - 1)];
 
 			updateMode();
 			updateNoteDelay();

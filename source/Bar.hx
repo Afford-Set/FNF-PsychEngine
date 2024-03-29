@@ -5,7 +5,9 @@ import flixel.math.FlxRect;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.util.FlxColor;
+import flixel.util.FlxDestroyUtil;
 import flixel.group.FlxSpriteGroup;
+import flixel.util.helpers.FlxBounds;
 
 using StringTools;
 
@@ -19,7 +21,7 @@ class Bar extends FlxSpriteGroup
 	public var valueFunction:Void->Float = function():Float return 0;
 
 	public var percent(default, set):Float = 0;
-	public var bounds:Dynamic = {min: 0, max: 1};
+	public var bounds:FlxBounds<Float> = new FlxBounds<Float>(0, 1);
 
 	public var leftToRight(default, set):Bool = true;
 	public var barCenter(default, null):Float = 0;
@@ -27,9 +29,9 @@ class Bar extends FlxSpriteGroup
 	// you might need to change this if you want to use a custom bar
 	public var barWidth(default, set):Int = 1;
 	public var barHeight(default, set):Int = 1;
-	public var barOffset:FlxPoint = new FlxPoint(3, 3);
+	public var barOffset:FlxPoint = FlxPoint.get(3, 3);
 
-	public function new(x:Float, y:Float, image:String = 'ui/healthBar', valueFunction:Void->Float = null, minBound:Float = 0, maxBound:Float = 1):Void
+	public function new(x:Float, y:Float, image:String = 'ui/healthBar', ?valueFunction:Void->Float, minBound:Float = 0, maxBound:Float = 1):Void
 	{
 		super(x, y);
 
@@ -75,14 +77,24 @@ class Bar extends FlxSpriteGroup
 
 		super.update(elapsed);
 	}
-	
-	public function setBounds(min:Float, max:Float):Void
+
+	override public function destroy():Void
 	{
-		bounds.min = min;
-		bounds.max = max;
+		bounds = null;
+		barOffset = FlxDestroyUtil.put(barOffset);
+
+		if (leftBar.clipRect != null) leftBar.clipRect = FlxDestroyUtil.put(leftBar.clipRect);
+		if (rightBar.clipRect != null) rightBar.clipRect = FlxDestroyUtil.put(rightBar.clipRect);
+
+		super.destroy();
 	}
 
-	public function setColors(left:FlxColor, right:FlxColor):Void
+	public function setBounds(min:Float, max:Float):FlxBounds<Float>
+	{
+		return bounds.set(min, max);
+	}
+
+	public function setColors(?left:FlxColor, ?right:FlxColor):Void
 	{
 		leftBar.color = left;
 		rightBar.color = right;
@@ -95,14 +107,7 @@ class Bar extends FlxSpriteGroup
 		leftBar.setPosition(bg.x, bg.y);
 		rightBar.setPosition(bg.x, bg.y);
 
-		var leftSize:Float = 0;
-
-		if (leftToRight) {
-			leftSize = FlxMath.lerp(0, barWidth, percent / 100);
-		}
-		else {
-			leftSize = FlxMath.lerp(0, barWidth, 1 - percent / 100);
-		}
+		final leftSize:Float = FlxMath.lerp(0, barWidth, (leftToRight ? percent / 100 : 1 - percent / 100));
 
 		leftBar.clipRect.width = leftSize;
 		leftBar.clipRect.height = barHeight;
@@ -122,18 +127,31 @@ class Bar extends FlxSpriteGroup
 
 	public function regenerateClips():Void
 	{
+		if (leftBar == null && rightBar == null) return;
+
+		final width:Float = Std.int(bg.width);
+		final height:Float = Std.int(bg.height);
+
 		if (leftBar != null)
 		{
-			leftBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
+			leftBar.setGraphicSize(width, height);
 			leftBar.updateHitbox();
-			leftBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+
+			if (leftBar.clipRect == null)
+				leftBar.clipRect = FlxRect.get(0, 0, width, height);
+			else
+				leftBar.clipRect.set(0, 0, width, height);
 		}
 
 		if (rightBar != null)
 		{
-			rightBar.setGraphicSize(Std.int(bg.width), Std.int(bg.height));
+			rightBar.setGraphicSize(width, height);
 			rightBar.updateHitbox();
-			rightBar.clipRect = new FlxRect(0, 0, Std.int(bg.width), Std.int(bg.height));
+
+			if (rightBar.clipRect == null)
+				rightBar.clipRect = FlxRect.get(0, 0, width, height);
+			else
+				rightBar.clipRect.set(0, 0, width, height);
 		}
 
 		updateBar();
@@ -141,8 +159,7 @@ class Bar extends FlxSpriteGroup
 
 	private function set_percent(value:Float):Float
 	{
-		var doUpdate:Bool = false;
-		if (value != percent) doUpdate = true;
+		final doUpdate:Bool = (value != percent);
 		percent = value;
 
 		if (doUpdate) updateBar();
@@ -171,5 +188,20 @@ class Bar extends FlxSpriteGroup
 		regenerateClips();
 
 		return value;
+	}
+
+	override function set_x(value:Float):Float
+	{
+		final prevX:Float = x;
+		super.set_x(value);
+
+		barCenter += value - prevX;
+		return value;
+	}
+
+	override function set_antialiasing(value:Bool):Bool
+	{
+		for (member in members) member.antialiasing = value;
+		return antialiasing = value;
 	}
 }

@@ -145,6 +145,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		add(notes);
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
+		grpNoteSplashes.ID = 0;
 		add(grpNoteSplashes);
 
 		var splash:NoteSplash = new NoteSplash(100, 100);
@@ -266,8 +267,10 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		if (FlxG.sound.music.time >= -ClientPrefs.noteOffset)
 		{
-			if (Math.abs(FlxG.sound.music.time - Conductor.songPosition) > (20 * playbackRate)
-				|| (PlayState.SONG.needsVoices && Math.abs(vocals.time - Conductor.songPosition) > (20 * playbackRate))) {
+			final timeWithOffset:Float = Conductor.songPosition - Conductor.offset;
+			final maxDelay:Float = 20;
+
+			if (Math.abs(FlxG.sound.music.time - timeWithOffset) > maxDelay || (PlayState.SONG.needsVoices && Math.abs(vocals.time - timeWithOffset) > maxDelay)) {
 				resyncVocals();
 			}
 		}
@@ -503,7 +506,7 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	{
 		if (daNote != null && !daNote.isSustainNote)
 		{
-			var noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
+			final noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
 			var daRating:Rating = Conductor.judgeNote(ratingsData, noteDiff);
 
 			if (daRating != null)
@@ -544,20 +547,23 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 	var showCombo:Bool = true;
 	var showComboNum:Bool = true;
 
+	var lastComboTen:Int = 3;
+	var _lastComboTenDiffs:Int = 0;
+
 	private function displayCombo():Void
 	{
-		var seperatedScore:Array<Int> = [];
-		var tempCombo:Int = combo;
+		var stringCombo:String = Std.string(combo);
 
-		var stringCombo:String = '' + tempCombo;
+		if (stringCombo.length > lastComboTen)
+		{
+			var prevCombo:Int = lastComboTen;
 
-		for (i in 0...stringCombo.length) {
-			seperatedScore.push(Std.parseInt(stringCombo.charAt(i)));
+			lastComboTen += (stringCombo.length - prevCombo);
+			_lastComboTenDiffs += (lastComboTen - prevCombo);
 		}
 
-		while (seperatedScore.length < 3) {
-			seperatedScore.insert(0, 0);
-		}
+		final seperatedScore:Array<Int> = [for (i in 0...lastComboTen) Math.floor(combo / Math.pow(10, i)) % 10];
+		seperatedScore.reverse();
 
 		if (lastScore != null)
 		{
@@ -576,7 +582,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 		for (i in 0...seperatedScore.length)
 		{
-			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * i) - 175, seperatedScore[i], null, i);
+			var int:Int = i - _lastComboTenDiffs;
+			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, seperatedScore[i], null, i);
 
 			if (showComboNum) {
 				grpComboNumbers.add(numScore);
@@ -837,11 +844,13 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		}
 	}
 
-	function spawnNoteSplash(x:Float, y:Float, data:Int, ?note:Note = null):Void
+	public function spawnNoteSplash(x:Float, y:Float, data:Int, ?note:Note = null):Void
 	{
-		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
+		final splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.setupNoteSplash(x, y, data, note);
+		splash.ID = grpNoteSplashes.ID++;
 		grpNoteSplashes.add(splash);
+		grpNoteSplashes.sort(CoolUtil.sortByID);
 	}
 	
 	function resyncVocals():Void

@@ -100,11 +100,12 @@ class MainMenuState extends MusicBeatState
 		menuItems = new FlxTypedGroup<Sprite>();
 		add(menuItems);
 
+		final offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
+		final scroll:Float = (optionShit.length - 4) * 0.135;
+
 		for (i in 0...optionShit.length)
 		{
 			if (curSelected < 0) curSelected = i;
-
-			var offset:Float = 108 - (Math.max(optionShit.length, 4) - 4) * 80;
 
 			var menuItem:Sprite = new Sprite(0, (i * 140) + offset);
 			menuItem.frames = Paths.getSparrowAtlas('mainmenu/menu_' + optionShit[i]);
@@ -115,15 +116,12 @@ class MainMenuState extends MusicBeatState
 			menuItem.screenCenter(X);
 			menuItems.add(menuItem);
 
-			var scr:Float = (optionShit.length - 4) * 0.135;
-			if (optionShit.length < 6) scr = 0;
-			menuItem.scrollFactor.set(0, scr);
-
+			menuItem.scrollFactor.set(0, (optionShit.length < 6 ? 0 : scroll));
 			menuItem.updateHitbox();
 		}
 
 		FlxG.camera.follow(camFollow, null, 9);
-		FlxG.camera.focusOn(new FlxPoint(camFollow.x, camFollow.y));
+		FlxG.camera.focusOn(FlxPoint.get(camFollow.x, camFollow.y));
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "v " + FlxG.stage.application.meta.get('version') #if PSYCH_WATERMARKS
 			+ (ClientPrefs.watermarks ? ' - FNF | v ' + psychEngineVersion + ' - Psych Engine (Null Edition)' : '') #end, 12);
@@ -138,7 +136,7 @@ class MainMenuState extends MusicBeatState
 		#if ACHIEVEMENTS_ALLOWED
 		Achievements.loadAchievements();
 
-		var leDate:Date = Date.now();
+		final leDate:Date = Date.now();
 
 		if (leDate.getDay() == 5 && leDate.getHours() >= 18)
 		{
@@ -266,7 +264,7 @@ class MainMenuState extends MusicBeatState
 							{
 								ease: FlxEase.quadOut,
 								onComplete: function(twn:FlxTween):Void {
-									menuItems.members[i].kill();
+									menuItems.members[i].destroy();
 								}
 							});
 						});
@@ -286,10 +284,6 @@ class MainMenuState extends MusicBeatState
 		}
 
 		super.update(elapsed);
-
-		menuItems.forEach(function(spr:Sprite):Void {
-			spr.screenCenter(X);
-		});
 	}
 
 	function selectDonate(tmr:FlxTimer):Void
@@ -334,25 +328,23 @@ class MainMenuState extends MusicBeatState
 
 	function changeSelection(huh:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + huh, optionShit.length);
+		curSelected = FlxMath.wrap(curSelected + huh, 0, optionShit.length - 1);
 
 		menuItems.forEach(function(spr:Sprite):Void
 		{
-			spr.playAnim('idle');
-			spr.updateHitbox();
-
 			if (spr.ID == curSelected)
 			{
 				spr.playAnim('selected');
 
-				var add:Float = 0;
-
-				if (optionShit.length > 4) {
-					add = optionShit.length * 8;
-				}
+				final add:Float = (menuItems.length > 4 ? menuItems.length * 8 : 0);
 
 				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
 				spr.centerOffsets();
+			}
+			else
+			{
+				spr.animation.play('idle');
+				spr.updateHitbox();
 			}
 		});
 	}

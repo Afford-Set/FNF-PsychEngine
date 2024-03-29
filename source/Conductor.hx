@@ -17,6 +17,7 @@ class Conductor
 	public static var crochet:Float = calculateCrochet(bpm); // beats in milliseconds
 	public static var stepCrochet:Float = crochet / 4; // steps in milliseconds
 	public static var songPosition:Float = 0;
+	public static var offset:Float = 0;
 
 	public static var safeFrames:Float = -1;
 	public static var safeZoneOffset:Float = 0; // is calculated in create(), is safeFrames in milliseconds

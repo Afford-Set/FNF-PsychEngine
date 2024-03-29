@@ -3,13 +3,6 @@ package;
 import haxe.Json;
 import haxe.Exception;
 
-#if LUA_ALLOWED
-import llua.Lua;
-import llua.LuaL;
-import llua.State;
-import llua.Convert;
-#end
-
 import flixel.FlxG;
 import flixel.FlxBasic;
 import openfl.errors.Error;
@@ -118,6 +111,8 @@ class HScript extends Interp
 
 		// Some very commonly used classes
 		setVar('FlxG', flixel.FlxG);
+		setVar('SwagCamera', SwagCamera);
+		setVar('PsychCamera', SwagCamera);
 		setVar('FlxSprite', flixel.FlxSprite);
 		setVar('FlxCamera', flixel.FlxCamera);
 		setVar('FlxTimer', flixel.util.FlxTimer);

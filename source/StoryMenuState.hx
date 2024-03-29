@@ -224,7 +224,7 @@ class StoryMenuState extends MusicBeatState
 			Conductor.songPosition = FlxG.sound.music.time;
 		}
 
-		lerpScore = FlxMath.lerp(lerpScore, intendedScore, CoolUtil.boundTo(elapsed * 30, 0, 1));
+		lerpScore = FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 30));
 		if (Math.abs(intendedScore - lerpScore) < 10) lerpScore = intendedScore;
 
 		scoreText.text = "WEEK SCORE:" + Math.round(lerpScore);
@@ -415,7 +415,7 @@ class StoryMenuState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, weeksArray.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, weeksArray.length - 1);
 		curWeek = weeksArray[curSelected];
 
 		WeekData.setDirectoryFromWeek(curWeek);
@@ -424,14 +424,8 @@ class StoryMenuState extends MusicBeatState
 
 		for (item in grpWeekText.members)
 		{
-			item.targetY = bullShit - curSelected;
-			bullShit++;
-
-			item.alpha = 0.6;
-
-			if (item.targetY == 0 && !WeekData.weekIsLocked(curWeek.fileName)) {
-				item.alpha = 1;
-			}
+			item.targetY = bullShit++ - curSelected;
+			item.alpha = (item.targetY == 0 && !WeekData.weekIsLocked(curWeek.fileName) ? 1 : 0.6);
 		}
 
 		PlayState.storyWeek = curSelected;
@@ -510,7 +504,7 @@ class StoryMenuState extends MusicBeatState
 
 	function changeDifficulty(change:Int = 0):Void
 	{
-		curDifficulty = CoolUtil.boundSelection(curDifficulty + change, CoolUtil.difficultyStuff.length);
+		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, CoolUtil.difficultyStuff.length - 1);
 
 		var diff:String = CoolUtil.difficultyStuff[curDifficulty][0];
 

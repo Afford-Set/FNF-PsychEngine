@@ -15,6 +15,7 @@ import WeekData;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.ui.FlxButton;
+import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import openfl.events.Event;
 import flixel.util.FlxColor;
@@ -880,7 +881,7 @@ class WeekEditorState extends MusicBeatState
 		if (data.length > 0)
 		{
 			_file = new FileReference();
-			_file.addEventListener(Event.COMPLETE, onSaveComplete);
+			_file.addEventListener(#if desktop Event.SELECT #else Event.COMPLETE #end, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
 
@@ -1416,7 +1417,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, weekFile.songs.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, weekFile.songs.length - 1);
 		curSong = weekFile.songs[curSelected];
 
 		var bullShit:Int = 0;

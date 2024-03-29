@@ -7,6 +7,7 @@ import Discord.DiscordClient;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
+import flixel.math.FlxMath;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 
@@ -218,7 +219,7 @@ class MasterEditorMenu extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, editorsArray.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, editorsArray.length - 1);
 
 		var bullShit:Int = 0;
 
@@ -240,7 +241,7 @@ class MasterEditorMenu extends MusicBeatState
 	#if MODS_ALLOWED
 	function changeDirectory(change:Int = 0):Void
 	{
-		curDirectory = CoolUtil.boundSelection(curDirectory + change, directories.length);
+		curDirectory = FlxMath.wrap(curDirectory + change, 0, directories.length - 1);
 	
 		WeekData.setDirectoryFromWeek();
 

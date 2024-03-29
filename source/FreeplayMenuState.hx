@@ -246,8 +246,8 @@ class FreeplayMenuState extends MusicBeatState
 			FlxG.sound.music.volume += 0.5 * elapsed;
 		}
 
-		lerpScore = FlxMath.lerp(lerpScore, intendedScore, CoolUtil.boundTo(elapsed * 24, 0, 1));
-		lerpAccuracy = FlxMath.lerp(lerpAccuracy, intendedAccuracy, CoolUtil.boundTo(elapsed * 12, 0, 1));
+		lerpScore = FlxMath.lerp(intendedScore, lerpScore, Math.exp(-elapsed * 24));
+		lerpAccuracy = FlxMath.lerp(intendedAccuracy, lerpAccuracy, Math.exp(-elapsed * 12));
 
 		if (Math.abs(lerpScore - intendedScore) <= 10) {
 			lerpScore = intendedScore;
@@ -467,7 +467,7 @@ class FreeplayMenuState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		curSelected = CoolUtil.boundSelection(curSelected + change, songsArray.length);
+		curSelected = FlxMath.wrap(curSelected + change, 0, songsArray.length - 1);
 		curSong = songsArray[curSelected];
 
 		var bullShit:Int = 0;
@@ -554,7 +554,7 @@ class FreeplayMenuState extends MusicBeatState
 
 	function changeDifficulty(change:Int = 0):Void
 	{
-		curDifficulty = CoolUtil.boundSelection(curDifficulty + change, CoolUtil.difficultyStuff.length);
+		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, CoolUtil.difficultyStuff.length - 1);
 		lastDifficultyName = CoolUtil.difficultyStuff[curDifficulty][0];
 
 		#if !switch
