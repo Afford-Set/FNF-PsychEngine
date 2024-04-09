@@ -68,8 +68,8 @@ using StringTools;
 
 class PlayState extends MusicBeatState
 {
-	public static var STRUM_X:Float = 42;
-	public static var STRUM_X_MIDDLESCROLL:Float = -278;
+	public static var STRUM_X:Float = 49;
+	public static var STRUM_X_MIDDLESCROLL:Float = -274;
 
 	public static var ratingStuff:Array<Dynamic> =
 	[
@@ -285,8 +285,6 @@ class PlayState extends MusicBeatState
 		camOther = new FlxCamera();
 		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
-
-		CustomFadeTransition.nextCamera = camOther;
 
 		persistentUpdate = true;
 		persistentDraw = true;
@@ -668,7 +666,6 @@ class PlayState extends MusicBeatState
 		super.create();
 
 		Paths.clearUnusedMemory();
-		CustomFadeTransition.nextCamera = camOther;
 	}
 
 	public function moveCameraToGF(snap:Bool = false):Void
@@ -2399,7 +2396,7 @@ class PlayState extends MusicBeatState
 		#if FLX_PITCH
 		FlxG.sound.music.pitch = playbackRate;
 		#end
-		FlxG.sound.music.onComplete = () -> finishSong();
+		FlxG.sound.music.onComplete = finishSong.bind();
 
 		vocals.play();
 
@@ -2735,6 +2732,8 @@ class PlayState extends MusicBeatState
 				FlxG.sound.music.pause();
 				vocals.pause();
 			}
+
+			makeOperationsActive(false);
 		}
 
 		super.openSubState(subState);
@@ -2742,31 +2741,15 @@ class PlayState extends MusicBeatState
 
 	override public function closeSubState():Void
 	{
+		super.closeSubState();
+
 		if (paused)
 		{
 			if (FlxG.sound.music != null && !startingSong) {
 				resyncVocals();
 			}
 
-			if (startTimer != null && !startTimer.finished) startTimer.active = true;
-			if (finishTimer != null && !finishTimer.finished) finishTimer.active = true;
-			if (songSpeedTween != null) songSpeedTween.active = true;
-
-			FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
-			{
-				if (!tmr.finished) tmr.active = true;
-			});
-
-			FlxG.sound.list.forEachAlive(function(sud:FlxSound):Void
-			{
-				@:privateAccess
-				if (sud._paused) sud.resume();
-			});
-
-			FlxTween.globalManager.forEach(function(twn:FlxTween):Void
-			{
-				if (!twn.finished) twn.active = true;
-			});
+			makeOperationsActive();
 
 			paused = false;
 			callOnScripts('onResume');
@@ -2775,8 +2758,6 @@ class PlayState extends MusicBeatState
 			if (autoUpdateRPC) resetRPC(startTimer != null && startTimer.finished);
 			#end
 		}
-
-		super.closeSubState();
 	}
 
 	override public function onFocus():Void
@@ -3237,22 +3218,32 @@ class PlayState extends MusicBeatState
 		return health;
 	}
 
-	private function unactiveShit():Void
+	private function makeOperationsActive(value:Bool = false):Void
 	{
 		FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
 		{
-			if (!tmr.finished) tmr.active = false;
+			if (!tmr.finished) tmr.active = value;
 		});
 
 		FlxG.sound.list.forEachAlive(function(sud:FlxSound):Void
 		{
-			@:privateAccess
-			if (!sud._paused) sud.pause();
+			if (sud != vocals)
+			{
+				@:privateAccess
+				{
+					if (value) {
+						if (sud._paused) sud.resume();
+					}
+					else {
+						if (!sud._paused) sud.pause();
+					}
+				}	
+			}
 		});
 
 		FlxTween.globalManager.forEach(function(twn:FlxTween):Void
 		{
-			if (!twn.finished) twn.active = false;
+			if (!twn.finished) twn.active = value;
 		});
 	}
 
@@ -3269,8 +3260,6 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.pause();
 			vocals.pause();
 		}
-
-		unactiveShit();
 
 		if (!cpuControlled)
 		{
@@ -3302,9 +3291,8 @@ class PlayState extends MusicBeatState
 			FlxG.sound.music.stop();
 		}
 
-		unactiveShit();
-
 		cancelMusicFadeTween();
+
 		chartingMode = true;
 
 		#if DISCORD_ALLOWED
@@ -3325,8 +3313,6 @@ class PlayState extends MusicBeatState
 		if (FlxG.sound.music != null) {
 			FlxG.sound.music.stop();
 		}
-
-		unactiveShit();
 
 		cancelMusicFadeTween();
 
@@ -3365,13 +3351,8 @@ class PlayState extends MusicBeatState
 				FlxTween.globalManager.clear();
 
 				#if LUA_ALLOWED
-				for (tween in modchartTweens) {
-					tween.active = true;
-				}
-
-				for (timer in modchartTimers) {
-					timer.active = true;
-				}
+				modchartTimers.clear();
+				modchartTweens.clear();
 				#end
 
 				openSubState(new GameOverSubState());
@@ -4146,8 +4127,8 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		timeBar.visible = false;
-		timeTxt.visible = false;
+		timeBar.alpha = 0;
+		timeTxt.alpha = 0;
 
 		canPause = false;
 		endingSong = true;
@@ -4224,10 +4205,6 @@ class PlayState extends MusicBeatState
 
 						cancelMusicFadeTween();
 
-						if (FlxTransitionableState.skipNextTransIn) {
-							CustomFadeTransition.nextCamera = null;
-						}
-
 						if (!usedPractice)
 						{
 							var filename:String = WeekData.getWeekFileName();
@@ -4280,10 +4257,6 @@ class PlayState extends MusicBeatState
 
 					cancelMusicFadeTween();
 
-					if (FlxTransitionableState.skipNextTransIn) {
-						CustomFadeTransition.nextCamera = null;
-					}
-
 					usedPractice = false;
 					changedDifficulty = false;
 
@@ -4299,10 +4272,6 @@ class PlayState extends MusicBeatState
 
 					cancelMusicFadeTween();
 
-					if (FlxTransitionableState.skipNextTransIn) {
-						CustomFadeTransition.nextCamera = null;
-					}
-
 					firstSong = null;
 
 					FlxG.switchState(new options.ReplaysMenuState());
@@ -4314,10 +4283,6 @@ class PlayState extends MusicBeatState
 					#end
 
 					cancelMusicFadeTween();
-
-					if (FlxTransitionableState.skipNextTransIn) {
-						CustomFadeTransition.nextCamera = null;
-					}
 
 					firstSong = null;
 
@@ -4816,19 +4781,17 @@ class PlayState extends MusicBeatState
 
 		var lastCombo:Int = combo;
 
-		if (!endingSong && (note == null || !note.isSustainNote))
+		if (!endingSong)
 		{
-			if (note != null) {
-				health -= note.missHealth * healthLoss;
-			}
+			var subtract:Float = (note != null ? note.missHealth : 0.05);
+			health -= subtract * healthLoss;
 
-			if (!practiceMode && !cpuControlled)
+			if (!practiceMode && !cpuControlled && (note == null || !note.isSustainNote))
 			{
 				songMisses++;
 				totalPlayed++;
+				combo = 0;
 			}
-
-			combo = 0;
 		}
 
 		RecalculateRating(true);
@@ -5539,22 +5502,21 @@ class PlayState extends MusicBeatState
 		var returnVal:Dynamic = Function_Continue;
 
 		#if LUA_ALLOWED
-		if (args == null) args = new Array();
-		if (exclusions == null) exclusions = new Array();
+		if (args == null) args = [];
+		if (exclusions == null) exclusions = [];
 		if (excludeValues == null) excludeValues = [Function_Continue];
 
-		var len:Int = luaArray.length;
-		var i:Int = 0;
+		var arr:Array<FunkinLua> = [];
 
-		while (i < len)
+		for (script in luaArray)
 		{
-			var script:FunkinLua = luaArray[i];
-
-			if (exclusions.contains(script.scriptName))
+			if (script.closed)
 			{
-				i++;
+				arr.push(script);
 				continue;
 			}
+
+			if (exclusions.contains(script.scriptName)) continue;
 
 			var myValue:Dynamic = script.call(funcToCall, args);
 
@@ -5563,15 +5525,16 @@ class PlayState extends MusicBeatState
 				returnVal = myValue;
 				break;
 			}
-			
+
 			if (myValue != null && !excludeValues.contains(myValue)) {
 				returnVal = myValue;
 			}
 
-			if (!script.closed) {
-				i++;
-			}
-			else len--;
+			if (script.closed) arr.push(script);
+		}
+
+		if (arr.length > 0) {
+			for (script in arr) luaArray.remove(script);
 		}
 		#end
 

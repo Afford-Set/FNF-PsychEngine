@@ -44,10 +44,8 @@ class PauseSubState extends MusicBeatSubState
 
 	public static var songName:String = null;
 
-	public function new():Void
+	override function create():Void
 	{
-		super();
-
 		if (CoolUtil.difficultyStuff.length < 2 || PlayState.gameMode == 'replay') pauseOG.remove('Change Difficulty'); // No need to change difficulty if there is only one!
 
 		if (PlayState.chartingMode)
@@ -112,23 +110,15 @@ class PauseSubState extends MusicBeatSubState
 		levelDifficulty.x = FlxG.width - (levelDifficulty.width + 20);
 		add(levelDifficulty);
 
-		var pos:Int = 64;
-		var blueballedTxt:FlxText = null;
-		
-		if (ClientPrefs.naughtyness)
-		{
-			blueballedTxt = new FlxText(20, 15 + 64, 0, '', 32);
-			blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
-			blueballedTxt.scrollFactor.set();
-			blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
-			blueballedTxt.updateHitbox();
-			blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
-			add(blueballedTxt);
+		var blueballedTxt:FlxText = new FlxText(20, 15 + 64, 0, '', 32);
+		blueballedTxt.text = 'Blue balled: ' + PlayState.deathCounter;
+		blueballedTxt.scrollFactor.set();
+		blueballedTxt.setFormat(Paths.getFont('vcr.ttf'), 32);
+		blueballedTxt.updateHitbox();
+		blueballedTxt.x = FlxG.width - (blueballedTxt.width + 20);
+		add(blueballedTxt);
 
-			pos = 96;
-		}
-
-		var chartingText:FlxText = new FlxText(20, 15 + pos, 0, "CHARTING MODE", 32);
+		var chartingText:FlxText = new FlxText(20, 15 + 96, 0, "CHARTING MODE", 32);
 		chartingText.scrollFactor.set();
 		chartingText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		chartingText.x = FlxG.width - (chartingText.width + 20);
@@ -136,7 +126,7 @@ class PauseSubState extends MusicBeatSubState
 		chartingText.alpha = 0;
 		add(chartingText);
 
-		practiceText = new FlxText(20, 15 + (pos + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
+		practiceText = new FlxText(20, 15 + (96 + (PlayState.chartingMode ? 32 : 0)), 0, 'PRACTICE MODE', 32);
 		practiceText.scrollFactor.set();
 		practiceText.setFormat(Paths.getFont('vcr.ttf'), 32);
 		practiceText.x = FlxG.width - (practiceText.width + 20);
@@ -146,38 +136,26 @@ class PauseSubState extends MusicBeatSubState
 
 		levelInfo.alpha = 0;
 		levelDifficulty.alpha = 0;
-		if (blueballedTxt != null) blueballedTxt.alpha = 0;
+		blueballedTxt.alpha = 0;
 
 		FlxTween.tween(bg, {alpha: 0.6}, 0.4, {ease: FlxEase.quartInOut});
 
 		FlxTween.tween(levelInfo, {alpha: 1, y: 20}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.3});
 		FlxTween.tween(levelDifficulty, {alpha: 1, y: levelDifficulty.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.5});
-		if (blueballedTxt != null) FlxTween.tween(blueballedTxt, {alpha: 1, y: blueballedTxt.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7});
+		FlxTween.tween(blueballedTxt, {alpha: 1, y: blueballedTxt.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7});
 
 		if (PlayState.instance.practiceMode)
 		{
-			if (PlayState.chartingMode)
-			{
-				if (ClientPrefs.naughtyness)
-					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 1.1});
-				else
-					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.9});
+			if (PlayState.chartingMode) {
+				FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 1.1});
 			}
-			else
-			{
-				if (ClientPrefs.naughtyness)
-					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.9});
-				else
-					FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7});
+			else {
+				FlxTween.tween(practiceText, {alpha: 1, y: practiceText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.9});
 			}
 		}
 
-		if (PlayState.chartingMode)
-		{
-			if (ClientPrefs.naughtyness)
-				FlxTween.tween(chartingText, {alpha: 1, y: chartingText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.9});
-			else
-				FlxTween.tween(chartingText, {alpha: 1, y: chartingText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.7});
+		if (PlayState.chartingMode) {
+			FlxTween.tween(chartingText, {alpha: 1, y: chartingText.y + 5}, 0.4, {ease: FlxEase.quartInOut, startDelay: 0.9});
 		}
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
@@ -186,6 +164,8 @@ class PauseSubState extends MusicBeatSubState
 		regenMenu();
 
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+
+		super.create();
 	}
 
 	function getPauseSong():String
@@ -474,6 +454,9 @@ class PauseSubState extends MusicBeatSubState
 						default:
 							FlxG.switchState(new MainMenuState());
 					}
+
+					FlxG.camera.followLerp = 0;
+					FlxG.sound.music.volume = 0;
 				}
 			}
 		}

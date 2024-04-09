@@ -186,7 +186,7 @@ class FunkinLua
 		// Gameplay settings
 		set('healthGainMult', game.healthGain);
 		set('healthLossMult', game.healthLoss);
-		set('playbackRate', game.playbackRate);
+		#if FLX_PITCH set('playbackRate', game.playbackRate); #end
 		set('instakillOnMiss', game.instakillOnMiss);
 		set('botPlay', game.cpuControlled);
 		set('practice', game.practiceMode);
@@ -449,6 +449,36 @@ class FunkinLua
 			else {
 				PlayState.debugTrace('removeLuaScript: Script $luaFile isn\'t running!', false, 'error', FlxColor.RED);
 			}
+
+			return false;
+		});
+
+		Lua_helper.add_callback(lua, "removeHScript", function(luaFile:String, ?ignoreAlreadyRunning:Bool = false):Bool
+		{
+			#if HSCRIPT_ALLOWED
+			var foundScript:String = findScript(luaFile, '.hx');
+
+			if (foundScript != null)
+			{
+				if (!ignoreAlreadyRunning)
+				{
+					for (script in game.hscriptArray)
+					{
+						if (script.origin == foundScript)
+						{
+							Debug.logInfo('Closing script ' + (script.origin != null ? script.origin : luaFile));
+							script.destroy();
+							return true;
+						}
+					}
+				}
+			}
+			else {
+				PlayState.debugTrace('removeHScript: Script $luaFile isn\'t running!', false, 'error', FlxColor.RED);
+			}
+			#else
+			PlayState.debugTrace("removeHScript: HScript is not supported on this platform!", false, 'error', FlxColor.RED);
+			#end
 
 			return false;
 		});
@@ -731,6 +761,8 @@ class FunkinLua
 				game.vocals.pause();
 				game.vocals.volume = 0;
 			}
+
+			FlxG.camera.followLerp = 0;
 		});
 
 		set("loadGraphic", function(variable:String, image:String, ?gridX:Int = 0, ?gridY:Int = 0):Void
@@ -1336,6 +1368,7 @@ class FunkinLua
 		set("restartSong", function(?skipTransition:Bool = false):Bool
 		{
 			game.persistentUpdate = false;
+			FlxG.camera.followLerp = 0;
 
 			PauseSubState.restartSong(skipTransition);
 			return true;
@@ -1351,12 +1384,6 @@ class FunkinLua
 
 			PlayState.cancelMusicFadeTween();
 
-			CustomFadeTransition.nextCamera = game.camOther;
-
-			if (FlxTransitionableState.skipNextTransIn) {
-				CustomFadeTransition.nextCamera = null;
-			}
-
 			#if DISCORD_ALLOWED
 			DiscordClient.resetClientID();
 			#end
@@ -1369,6 +1396,8 @@ class FunkinLua
 			PlayState.firstSong = null;
 
 			game.transitioning = true;
+
+			FlxG.camera.followLerp = 0;
 
 			Paths.loadTopMod();
 
@@ -2452,13 +2481,13 @@ class FunkinLua
 			return false;
 		});
 
-		set("initSaveData", function(name:String, ?folder:String = 'nullenginemods'):Void
+		set("initSaveData", function(name:String, ?folder:String = 'psychenginemods'):Void
 		{
 			if (!PlayState.instance.modchartSaves.exists(name))
 			{
 				var save:FlxSave = new FlxSave();
-				save.bind(name, CoolUtil.getSavePath(folder));
-	
+				save.bind(name, CoolUtil.getSavePath() + '/' + folder);
+
 				PlayState.instance.modchartSaves.set(name, save);
 				return;
 			}
@@ -2877,6 +2906,8 @@ class FunkinLua
 				lua = null;
 				return;
 			}
+
+			if (isString) scriptName = 'unknown';
 		}
 		catch (e:Error)
 		{

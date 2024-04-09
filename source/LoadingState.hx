@@ -42,8 +42,6 @@ class LoadingState extends MusicBeatState
 
 	override function create():Void
 	{
-		CustomFadeTransition.nextCamera = null;
-
 		var bg:Sprite = new Sprite();
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFFcaff4d);
 		add(bg);

@@ -83,15 +83,18 @@ class PreferencesSubState extends MusicBeatSubState
 			'bool');
 		addOption(option);
 
-		#if !html5 //Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
+		#if (!html5 && !switch) //Apparently other framerates isn't correctly supported on Browser? Probably it has some V-Sync shit enabled by default, idk
 		var option:Option = new Option('Framerate',
 			"Pretty self explanatory, isn't it?",
 			'framerate',
 			'int');
 		addOption(option);
 
+		final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+
 		option.minValue = 60;
 		option.maxValue = 240;
+		option.defaultValue = Std.int(CoolUtil.boundTo(refreshRate, option.minValue, option.maxValue));
 		option.displayFormat = '%v FPS';
 		option.onChange = function():Void
 		{
@@ -299,12 +302,6 @@ class PreferencesSubState extends MusicBeatSubState
 		var option:Option = new Option('Score Text',
 			"If unchecked, the score text is not displayed.",
 			'scoreText',
-			'bool');
-		addOption(option);
-
-		var option:Option = new Option('Naughtyness',
-			"If unchecked, your mom won't be angry at you.",
-			'naughtyness',
 			'bool');
 		addOption(option);
 

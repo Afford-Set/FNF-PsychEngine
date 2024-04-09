@@ -121,7 +121,6 @@ class MainMenuState extends MusicBeatState
 		}
 
 		FlxG.camera.follow(camFollow, null, 9);
-		FlxG.camera.focusOn(FlxPoint.get(camFollow.x, camFollow.y));
 
 		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "v " + FlxG.stage.application.meta.get('version') #if PSYCH_WATERMARKS
 			+ (ClientPrefs.watermarks ? ' - FNF | v ' + psychEngineVersion + ' - Psych Engine (Null Edition)' : '') #end, 12);
@@ -149,6 +148,8 @@ class MainMenuState extends MusicBeatState
 			}
 		}
 		#end
+
+		FlxG.camera.focusOn(FlxPoint.get(camFollow.x, camFollow.y));
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -328,24 +329,16 @@ class MainMenuState extends MusicBeatState
 
 	function changeSelection(huh:Int = 0):Void
 	{
+		menuItems.members[curSelected].animation.play('idle');
+		menuItems.members[curSelected].updateHitbox();
+		menuItems.members[curSelected].screenCenter(X);
+
 		curSelected = FlxMath.wrap(curSelected + huh, 0, optionShit.length - 1);
 
-		menuItems.forEach(function(spr:Sprite):Void
-		{
-			if (spr.ID == curSelected)
-			{
-				spr.playAnim('selected');
+		menuItems.members[curSelected].animation.play('selected');
+		menuItems.members[curSelected].centerOffsets();
+		menuItems.members[curSelected].screenCenter(X);
 
-				final add:Float = (menuItems.length > 4 ? menuItems.length * 8 : 0);
-
-				camFollow.setPosition(spr.getGraphicMidpoint().x, spr.getGraphicMidpoint().y - add);
-				spr.centerOffsets();
-			}
-			else
-			{
-				spr.animation.play('idle');
-				spr.updateHitbox();
-			}
-		});
+		camFollow.setPosition(menuItems.members[curSelected].getGraphicMidpoint().x, menuItems.members[curSelected].getGraphicMidpoint().y - (menuItems.length > 4 ? menuItems.length * 8 : 0));
 	}
 }

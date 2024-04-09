@@ -19,11 +19,6 @@ class Section
 	public var gfSection:Bool = false;
 	public var mustHitSection:Bool = true;
 
-	/**
-	 *	Copies the first section into the second section!
-	 */
-	public static var COPYCAT:Int = 0;
-
 	public function new(sectionBeats:Null<Float> = 4):Void
 	{
 		this.sectionBeats = sectionBeats;

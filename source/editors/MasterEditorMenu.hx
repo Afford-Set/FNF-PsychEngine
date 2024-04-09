@@ -38,8 +38,6 @@ class MasterEditorMenu extends MusicBeatState
 
 	override function create():Void
 	{
-		CustomFadeTransition.nextCamera = null;
-
 		FlxG.mouse.visible = !controls.controllerMode;
 		FlxG.camera.bgColor = FlxColor.BLACK;
 

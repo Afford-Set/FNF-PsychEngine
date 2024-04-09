@@ -76,19 +76,12 @@ class GameOverSubState extends MusicBeatSubState
 
 	public static var instance:GameOverSubState;
 
+	var randomGameover:Int = 1;
+
 	override function create():Void
 	{
 		instance = this;
 		PlayState.instance.callOnScripts('onGameOverStart', []);
-
-		super.create();
-	}
-
-	var randomGameover:Int = 1;
-
-	public function new():Void
-	{
-		super();
 
 		PlayState.instance.setOnScripts('inGameOver', true);
 
@@ -152,13 +145,9 @@ class GameOverSubState extends MusicBeatSubState
 			});
 		}
 
-		var randomCensor:Array<Int> = [];
+		randomGameover = FlxG.random.int(1, 25);
 
-		if (ClientPrefs.naughtyness) {
-			randomCensor = [1, 3, 8, 13, 17, 21];
-		}
-
-		randomGameover = FlxG.random.int(1, 25, randomCensor);
+		super.create();
 	}
 
 	public var startedDeath:Bool = false;

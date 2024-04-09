@@ -32,6 +32,8 @@ class NoteSplash extends FlxSprite
 	{
 		super(x, y);
 
+		animation = new SwagAnimationController(this);
+
 		var skin:String = null;
 
 		if (PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.trim().length > 0) {
@@ -301,12 +303,8 @@ class PixelSplashShader extends FlxShader
 		vec4 flixel_texture2DCustom(sampler2D bitmap, vec2 coord) {
 			vec2 blocks = openfl_TextureSize / uBlocksize;
 			vec4 color = flixel_texture2D(bitmap, floor(coord * blocks) / blocks);
-			if (!hasTransform) {
+			if (!hasTransform || color.a == 0.0 || mult == 0.0) {
 				return color;
-			}
-
-			if(color.a == 0.0 || mult == 0.0) {
-				return color * openfl_Alphav;
 			}
 
 			vec4 newColor = color;

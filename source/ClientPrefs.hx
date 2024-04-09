@@ -51,7 +51,6 @@ class ClientPrefs
 	public static var splashAlpha:Float = 0.6;
 	public static var timeBarType:String = 'Time Elapsed/Left';
 	public static var scoreText:Bool = true;
-	public static var naughtyness:Bool = true;
 	public static var flashingLights:Bool = true;
 	public static var camZooms:Bool = true;
 	public static var healthBarAlpha:Float = 1;
@@ -104,6 +103,14 @@ class ClientPrefs
 					case 'fullScreen': FlxG.fullscreen = fullScreen;
 					case 'framerate':
 					{
+						#if (!html5 && !switch)
+						if (FlxG.save.data.framerate == null)
+						{
+							final refreshRate:Int = FlxG.stage.application.window.displayMode.refreshRate;
+							framerate = Std.int(CoolUtil.boundTo(refreshRate, 60, 240));
+						}
+						#end
+
 						if (framerate > FlxG.drawFramerate)
 						{
 							FlxG.updateFramerate = framerate;

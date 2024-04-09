@@ -385,7 +385,7 @@ class Paths
 					var bitmap:BitmapData = BitmapData.fromFile(modKey);
 
 					if (allowGPU && ClientPrefs.cacheOnGPU) {
-						bitmap = loadBitmapFromGPU(bitmap.clone());
+						loadBitmapFromGPU(bitmap);
 					}
 
 					var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, modKey);
@@ -412,7 +412,7 @@ class Paths
 				var bitmap:BitmapData = OpenFlAssets.getBitmapData(path);
 
 				if (allowGPU && ClientPrefs.cacheOnGPU) {
-					bitmap = loadBitmapFromGPU(bitmap.clone());
+					loadBitmapFromGPU(bitmap);
 				}
 
 				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, path);
@@ -432,16 +432,24 @@ class Paths
 		return null;
 	}
 
-	private static function loadBitmapFromGPU(bitmap:BitmapData):BitmapData
+	private static function loadBitmapFromGPU(bitmap:BitmapData):Void
 	{
-		var texture:RectangleTexture = FlxG.stage.context3D.createRectangleTexture(bitmap.width, bitmap.height, BGRA, true);
-		texture.uploadFromBitmapData(bitmap);
+		@:privateAccess
+		{
+			bitmap.lock();
 
-		bitmap.image.data = null;
-		bitmap.dispose();
-		bitmap.disposeImage();
-
-		return BitmapData.fromTexture(texture);
+			if (bitmap.__texture == null)
+			{
+				bitmap.image.premultiplied = true;
+				bitmap.getTexture(FlxG.stage.context3D);
+			}
+	
+			bitmap.getSurface();
+			bitmap.disposeImage();
+			bitmap.image.data = null;
+			bitmap.image = null;
+			bitmap.readable = true;
+		}
 	}
 
 	public static function getFont(key:String, ?library:Null<String> = null, ?ignoreMods:Null<Bool> = false):String

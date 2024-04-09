@@ -99,8 +99,6 @@ class CharacterEditorState extends MusicBeatState
 		camOther.bgColor.alpha = 0;
 		FlxG.cameras.add(camOther, false);
 
-		CustomFadeTransition.nextCamera = camOther;
-
 		bgLayer = new FlxTypedGroup<FlxSprite>();
 		add(bgLayer);
 
@@ -1360,8 +1358,6 @@ class CharacterEditorState extends MusicBeatState
 			{
 				if (FlxG.keys.justPressed.ESCAPE)
 				{
-					CustomFadeTransition.nextCamera = camOther;
-
 					if (goToPlayState) {
 						FlxG.switchState(new PlayState());
 					}

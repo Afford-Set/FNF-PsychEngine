@@ -37,6 +37,8 @@ class StrumNote extends FlxSprite
 
 	public function new(x:Float, y:Float, leData:Int, player:Int):Void
 	{
+		animation = new SwagAnimationController(this);
+
 		rgbShader = new RGBShaderReference(this, Note.initializeGlobalRGBShader(leData));
 		rgbShader.enabled = false;
 

@@ -79,8 +79,6 @@ class OptionsMenuState extends MusicBeatState
 
 	override function create():Void
 	{
-		CustomFadeTransition.nextCamera = null;
-
 		if (FlxG.sound.music != null)
 		{
 			if (!FlxG.sound.music.playing || FlxG.sound.music.volume == 0)

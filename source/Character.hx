@@ -81,6 +81,8 @@ class Character extends Sprite
 	{
 		super(x, y);
 
+		animation = new SwagAnimationController(this);
+
 		curCharacter = character;
 		this.isPlayer = isPlayer;
 

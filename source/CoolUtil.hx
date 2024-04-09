@@ -288,14 +288,11 @@ class CoolUtil
 		#end
 	}
 
-	public static function getSavePath(?folder:Null<String> = null):String
+	@:access(flixel.util.FlxSave.validate)
+	public static function getSavePath():String
 	{
-		if (folder != null && folder.length > 0) {
-			return folder;
-		}
-
-		var validate:String->String = @:privateAccess FlxSave.validate;
-		return FlxG.stage.application.meta.get('company') + '/' + validate(FlxG.stage.application.meta.get('file'));
+		final company:String = FlxG.stage.application.meta.get('company');
+		return '${company}/${flixel.util.FlxSave.validate(FlxG.stage.application.meta.get('file'))}';
 	}
 
 	public static function setTextBorderFromString(text:FlxText, border:String):Void

@@ -53,9 +53,6 @@ class RatingSprite extends Sprite
 
 		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
 		setPosition(x + offset[0], y - offset[1]);
-
-		var iCanSayShit:Bool = (rating == 'shit' && !ClientPrefs.naughtyness);
-		visible = ClientPrefs.showRatings && !iCanSayShit;
 	}
 
 	public var disappearTween:FlxTween = null;
