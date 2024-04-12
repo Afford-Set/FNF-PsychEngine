@@ -173,10 +173,9 @@ class GameOverSubState extends MusicBeatSubState
 			#if DISCORD_ALLOWED
 			DiscordClient.resetClientID(); #end
 
-			FlxG.sound.music.stop();
+			PlayState.instance.stopMusic();
 
 			PlayState.deathCounter = 0;
-
 			PlayState.seenCutscene = false;
 			PlayState.usedPractice = false;
 			PlayState.changedDifficulty = false;
@@ -244,7 +243,7 @@ class GameOverSubState extends MusicBeatSubState
 
 	function coolStartDeath(?vol:Float = 1):Void
 	{
-		if (!isEnding) {
+		if (!isEnding && !isEnding) {
 			FlxG.sound.playMusic(Paths.getMusic(loopSoundName), vol);
 		}
 	}
@@ -253,7 +252,7 @@ class GameOverSubState extends MusicBeatSubState
 	{
 		super.beatHit();
 
-		if (curBeat % danceDelay == 0 && startedDeath) {
+		if (startedDeath) {
 			boyfriend.playAnim('deathLoop');
 		}
 	}
@@ -275,8 +274,8 @@ class GameOverSubState extends MusicBeatSubState
 			boyfriend.playAnim('deathConfirm', true);
 
 			var lastVolume:Float = FlxG.sound.music.volume;
+			PlayState.instance.stopMusic();
 
-			FlxG.sound.music.stop();
 			FlxG.sound.play(Paths.getMusic(endSoundName), lastVolume);
 
 			new FlxTimer().start(startConfirmFadeOut, function(tmr:FlxTimer):Void

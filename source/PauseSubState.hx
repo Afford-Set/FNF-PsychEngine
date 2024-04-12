@@ -432,8 +432,9 @@ class PauseSubState extends MusicBeatSubState
 					#if DISCORD_ALLOWED
 					DiscordClient.resetClientID(); #end
 
-					PlayState.deathCounter = 0;
+					PlayState.instance.stopMusic();
 
+					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
 					PlayState.usedPractice = false;
 					PlayState.changedDifficulty = false;
@@ -456,7 +457,6 @@ class PauseSubState extends MusicBeatSubState
 					}
 
 					FlxG.camera.followLerp = 0;
-					FlxG.sound.music.volume = 0;
 				}
 			}
 		}

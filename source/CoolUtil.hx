@@ -203,16 +203,18 @@ class CoolUtil
 
 	public static function coolTextFile(path:String, ?ignoreMods:Bool = false):Array<String>
 	{
-		if (Paths.fileExists(path, TEXT, ignoreMods)) {
-			return listFromString(Paths.getTextFromFile(path, ignoreMods));
+		if (Paths.fileExists(path, TEXT, ignoreMods))
+		{
+			var text:String = Paths.getTextFromFile(path, ignoreMods);
+			return listFromString(text);
 		}
-
+	
 		return [];
 	}
 
 	public static function listFromString(string:String):Array<String>
 	{
-		if (string != null && string.length > 0) {
+		if (string != null && string.trim().length > 0) {
 			return [for (i in string.trim().split('\n')) i.trim()];
 		}
 

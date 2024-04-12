@@ -1383,11 +1383,13 @@ class FunkinLua
 			}
 
 			PlayState.cancelMusicFadeTween();
+			PlayState.instance.stopMusic();
 
 			#if DISCORD_ALLOWED
 			DiscordClient.resetClientID();
 			#end
 
+			PlayState.deathCounter = 0;
 			PlayState.seenCutscene = false;
 			PlayState.usedPractice = false;
 			PlayState.changedDifficulty = false;

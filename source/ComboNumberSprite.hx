@@ -11,9 +11,9 @@ class ComboNumberSprite extends Sprite
 	public var group:FlxTypedGroup<ComboNumberSprite>;
 	public var number:Int = 0;
 
-	public function new(x:Float = 705, number:Int, suffix:String = null, i:Int = 0):Void
+	public function new(x:Float = 0, y:Float = 0, number:Int, ?suffix:String):Void
 	{
-		super(x);
+		super(x, y);
 
 		this.number = number;
 
@@ -45,17 +45,19 @@ class ComboNumberSprite extends Sprite
 		}
 
 		loadGraphic(Paths.getImage(ourPath));
-		setPosition(x + (43 * i) - 175, ((FlxG.height - height) / 2) + 80);
 
 		antialiasing = ClientPrefs.globalAntialiasing && !PlayState.isPixelStage;
 
 		setGraphicSize(Std.int(width * (PlayState.isPixelStage ? PlayState.daPixelZoom : 0.5)));
 		updateHitbox();
 
-		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
-		setPosition(x + offset[2], y + offset[3]);
-
 		visible = ClientPrefs.showCombo;
+	}
+
+	public function reoffset():Void
+	{
+		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
+		setPosition(x + offset[2], y - offset[3]);
 	}
 
 	public var disappearTween:FlxTween = null;

@@ -11,9 +11,9 @@ class RatingSprite extends Sprite
 	public var group:FlxTypedGroup<RatingSprite>;
 	public var rating:String = 'sick';
 
-	public function new(x:Float = 580, rating:String, suffix:String = null):Void
+	public function new(x:Float = 0, y:Float = 0, rating:String, ?suffix:String):Void
 	{
-		super(x);
+		super(x, y);
 
 		this.rating = rating;
 
@@ -44,13 +44,15 @@ class RatingSprite extends Sprite
 		}
 
 		loadGraphic(Paths.getImage(ourPath));
-		y = ((FlxG.height - height) / 2) - 60;
 
 		antialiasing = ClientPrefs.globalAntialiasing && !PlayState.isPixelStage;
 
 		setGraphicSize(Std.int(width * (PlayState.isPixelStage ? PlayState.daPixelZoom * 0.85 : 0.7)));
 		updateHitbox();
+	}
 
+	public function reoffset():Void
+	{
 		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
 		setPosition(x + offset[0], y - offset[1]);
 	}

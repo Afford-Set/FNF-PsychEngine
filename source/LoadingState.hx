@@ -174,12 +174,14 @@ class LoadingState extends MusicBeatState
 
 	static function getSongPath():String
 	{
-		return Paths.getInst(PlayState.SONG.songID, CoolUtil.difficultyStuff[PlayState.lastDifficulty][2], true);
+		var diff:String = CoolUtil.difficultyStuff[PlayState.lastDifficulty] != null && CoolUtil.difficultyStuff[PlayState.lastDifficulty].length == 2 ? CoolUtil.difficultyStuff[PlayState.lastDifficulty][2] : null;
+		return Paths.getInst(PlayState.SONG.songID, diff, true);
 	}
 
 	static function getVocalPath():String
 	{
-		return Paths.getVoices(PlayState.SONG.songID, CoolUtil.difficultyStuff[PlayState.lastDifficulty][2], true);
+		var diff:String = CoolUtil.difficultyStuff[PlayState.lastDifficulty] != null && CoolUtil.difficultyStuff[PlayState.lastDifficulty].length == 2 ? CoolUtil.difficultyStuff[PlayState.lastDifficulty][2] : null;
+		return Paths.getVoices(PlayState.SONG.songID, diff, true);
 	}
 
 	public static function loadAndSwitchState(target:FlxState, stopMusic:Bool = false):Void

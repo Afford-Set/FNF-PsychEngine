@@ -247,8 +247,6 @@ class PlayState extends MusicBeatState
 
 	private var keysArray:Array<String>;
 
-	public var precacheList:Map<String, String> = new Map<String, String>();
-
 	var doof:DialogueBox = null;
 
 	override public function create():Void
@@ -505,6 +503,23 @@ class PlayState extends MusicBeatState
 		{
 			switch (SONG.songID)
 			{
+				case 'tutorial':
+				{
+					camHUD.visible = false;
+					FlxG.camera.zoom = 2.1;
+
+					FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5,
+					{
+						ease: FlxEase.quadInOut,
+						onComplete: function(twn:FlxTween):Void
+						{
+							cameraMovementSection();
+
+							camHUD.visible = true;
+							startCountdown();
+						}
+					});
+				}
 				case 'monster':
 				{
 					inCutscene = true;
@@ -602,19 +617,19 @@ class PlayState extends MusicBeatState
 
 		RecalculateRating();
 
-		precacheList.set('hitsound', 'sound');
+		Paths.getSound('hitsound');
 
 		for (i in 1...4) {
-			precacheList.set('missnote' + i, 'sound');
+			Paths.getSound('missnote' + i);
 		}
 
 		if (ClientPrefs.pauseMusic != 'None') {
-			precacheList.set(Paths.formatToSongPath(ClientPrefs.pauseMusic), 'music');
+			Paths.getMusic(Paths.formatToSongPath(ClientPrefs.pauseMusic));
 		}
 
-		precacheList.set(GameOverSubState.deathSoundName, 'sound');
-		precacheList.set(GameOverSubState.loopSoundName, 'music');
-		precacheList.set(GameOverSubState.endSoundName, 'music');
+		Paths.getSound(GameOverSubState.deathSoundName);
+		Paths.getMusic(GameOverSubState.loopSoundName);
+		Paths.getMusic(GameOverSubState.endSoundName);
 
 		var characterJsonPath:String = 'characters/' + GameOverSubState.characterName + '.json';
 
@@ -623,7 +638,7 @@ class PlayState extends MusicBeatState
 			try
 			{
 				var gameOverCharacter:CharacterFile = Character.getCharacterFile(characterJsonPath);
-				precacheList.set(gameOverCharacter.image, 'image');
+				Paths.getSparrowAtlas(gameOverCharacter.image);
 			}
 			catch (e:Error) {
 				Debug.logError('Cannot precache game over character image file: ' + e);
@@ -631,37 +646,21 @@ class PlayState extends MusicBeatState
 		}
 
 		if (Paths.fileExists('images/alphabet.png', IMAGE)) {
-			precacheList.set('alphabet', 'image');
+			Paths.getSparrowAtlas('alphabet');
 		}
 		else {
-			precacheList.set('ui/alphabet', 'image');
+			Paths.getSparrowAtlas('ui/alphabet');
 		}
-
-		#if DISCORD_ALLOWED
-		resetRPC();
-		#end
 
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPress);
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyRelease);
+
+		resetRPC();
 
 		callOnScripts('onCreatePost');
 
 		cacheCountdown();
 		cachePopUpScore();
-
-		for (key => type in precacheList)
-		{
-			switch (type)
-			{
-				case 'image': Paths.getImage(key);
-				case 'sparrow': Paths.getSparrowAtlas(key);
-				case 'packer': Paths.getPackerAtlas(key);
-				case 'aseprite': Paths.getAsepriteAtlas(key);
-				case 'animate': Paths.getAnimateAtlas(key);
-				case 'sound': Paths.getSound(key);
-				case 'music': Paths.getMusic(key);
-			}
-		}
 
 		super.create();
 
@@ -839,7 +838,7 @@ class PlayState extends MusicBeatState
 				add(halloweenWhite);
 
 				for (i in 1...3) {
-					precacheList.set('thunder_' + i, 'sound');
+					Paths.getSound('thunder_' + i);
 				}
 			}
 			case 'philly': // Week 3
@@ -916,7 +915,7 @@ class PlayState extends MusicBeatState
 					particle.alpha = FlxMath.EPSILON;
 					grpLimoParticles.add(particle);
 
-					precacheList.set('dancerdeath', 'sound');
+					Paths.getSound('dancerdeath');
 
 					resetLimoKill();
 				}
@@ -966,7 +965,7 @@ class PlayState extends MusicBeatState
 
 				addChars([GF_X, GF_Y], [DAD_X, DAD_Y], [BF_X, BF_Y]);
 
-				precacheList.set('Lights_Shut_off', 'sound');
+				Paths.getSound('Lights_Shut_off');
 			}
 			case 'mallEvil': // Week 5 - Winter Horrorland
 			{
@@ -1065,7 +1064,7 @@ class PlayState extends MusicBeatState
 			case 'tank': // Week 7 - Ugh, Guns, Stress
 			{
 				for (i in 1...26) {
-					precacheList.set('jeffGameover/jeffGameover-' + i, 'sound');
+					Paths.getSound('jeffGameover/jeffGameover-' + i);
 				}
 
 				var sky:BGSprite = new BGSprite('tankSky', -400, -400, 0, 0);
@@ -1165,7 +1164,6 @@ class PlayState extends MusicBeatState
 		add(boyfriendGroup);
 	}
 
-	public var comboGroup:FlxGroup; // Stores Ratings and Combo Sprites in a group
 	public var uiGroup:FlxSpriteGroup; // Stores HUD Objects in a Group
 	public var noteGroup:FlxGroup; // Stores Note Objects in a Group
 
@@ -1195,11 +1193,6 @@ class PlayState extends MusicBeatState
 
 	private function createHud():Void
 	{
-		comboGroup = new FlxGroup();
-		comboGroup.ID = 0;
-		comboGroup.cameras = [camHUD];
-		add(comboGroup);
-
 		noteGroup = new FlxGroup();
 		noteGroup.cameras = [camHUD];
 		add(noteGroup);
@@ -1215,7 +1208,7 @@ class PlayState extends MusicBeatState
 		grpRatings.memberRemoved.add(function(spr:RatingSprite):Void {
 			spr.destroy();
 		});
-		comboGroup.add(grpRatings);
+		add(grpRatings);
 
 		grpCombo = new FlxTypedGroup<ComboSprite>();
 		grpCombo.memberAdded.add(function(spr:ComboSprite):Void {
@@ -1224,7 +1217,7 @@ class PlayState extends MusicBeatState
 		grpCombo.memberRemoved.add(function(spr:ComboSprite):Void {
 			spr.destroy();
 		});
-		comboGroup.add(grpCombo);
+		add(grpCombo);
 
 		grpComboNumbers = new FlxTypedGroup<ComboNumberSprite>();
 		grpComboNumbers.memberAdded.add(function(spr:ComboNumberSprite):Void {
@@ -1233,7 +1226,7 @@ class PlayState extends MusicBeatState
 		grpComboNumbers.memberRemoved.add(function(spr:ComboNumberSprite):Void {
 			spr.destroy();
 		});
-		comboGroup.add(grpComboNumbers);
+		add(grpComboNumbers);
 
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		noteGroup.add(strumLineNotes);
@@ -1242,7 +1235,6 @@ class PlayState extends MusicBeatState
 		playerStrums = new FlxTypedGroup<StrumNote>();
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
-		grpNoteSplashes.ID = 0;
 		noteGroup.add(grpNoteSplashes);
 
 		var splash:NoteSplash = new NoteSplash();
@@ -1542,8 +1534,8 @@ class PlayState extends MusicBeatState
 		{
 			inCutscene = true;
 
-			precacheList.set('dialogue', 'sound');
-			precacheList.set('dialogueClose', 'sound');
+			Paths.getSound('dialogue');
+			Paths.getSound('dialogueClose');
 
 			psychDialogue = new DialogueBoxPsych(dialogueFile, song);
 			psychDialogue.scrollFactor.set();
@@ -1739,9 +1731,9 @@ class PlayState extends MusicBeatState
 		cutsceneHandler.endTime = 12 / playbackRate;
 		cutsceneHandler.music = 'DISTORTO';
 
-		precacheList.set('wellWellWell', 'sound');
-		precacheList.set('killYou', 'sound');
-		precacheList.set('bfBeep', 'sound');
+		Paths.getSound('wellWellWell');
+		Paths.getSound('killYou');
+		Paths.getSound('bfBeep');
 
 		var wellWellWell:FlxSound = new FlxSound();
 		wellWellWell.loadEmbedded(Paths.getSound('wellWellWell'));
@@ -1795,7 +1787,7 @@ class PlayState extends MusicBeatState
 		tankman.x += 40;
 		tankman.y += 10;
 
-		precacheList.set('tankSong2', 'sound');
+		Paths.getSound('tankSong2');
 
 		var tightBars:FlxSound = new FlxSound();
 		tightBars.loadEmbedded(Paths.getSound('tankSong2'));
@@ -1847,7 +1839,7 @@ class PlayState extends MusicBeatState
 			spr.y += 100;
 		});
 
-		precacheList.set('stressCutscene', 'sound');
+		Paths.getSound('stressCutscene');
 
 		tankman2.frames = Paths.getSparrowAtlas('cutscenes/stress2');
 		addBehindDad(tankman2);
@@ -2329,10 +2321,10 @@ class PlayState extends MusicBeatState
 
 	public dynamic function fullComboFunction():Void
 	{
-		var sicks:Int = ratingsData[0].hits;
-		var goods:Int = ratingsData[1].hits;
-		var bads:Int = ratingsData[2].hits;
-		var shits:Int = ratingsData[3].hits;
+		final sicks:Int = ratingsData[0].hits;
+		final goods:Int = ratingsData[1].hits;
+		final bads:Int = ratingsData[2].hits;
+		final shits:Int = ratingsData[3].hits;
 
 		ratingFC = 'Clear';
 
@@ -2554,7 +2546,7 @@ class PlayState extends MusicBeatState
 
 				if (!ClientPrefs.flashingLights) phillyGlowGradient.intendedAlpha = 0.7;
 
-				precacheList.set('philly/particle', 'image'); //precache philly glow particle image
+				Paths.getSound('philly/particle'); // precache philly glow particle image
 
 				phillyGlowParticles = new FlxTypedGroup<PhillyGlowParticle>();
 				phillyGlowParticles.visible = false;
@@ -2622,11 +2614,7 @@ class PlayState extends MusicBeatState
 				var newCharacter:String = event.value2;
 				addCharacterToList(newCharacter, charType);
 			}
-			case 'Play Sound':
-			{
-				precacheList.set(event.value1, 'sound');
-				Paths.getSound(event.value1);
-			}
+			case 'Play Sound': Paths.getSound(event.value1);
 		}
 	}
 
@@ -2754,18 +2742,13 @@ class PlayState extends MusicBeatState
 			paused = false;
 			callOnScripts('onResume');
 
-			#if DISCORD_ALLOWED
 			if (autoUpdateRPC) resetRPC(startTimer != null && startTimer.finished);
-			#end
 		}
 	}
 
 	override public function onFocus():Void
 	{
-		#if DISCORD_ALLOWED
 		if (health > 0 && !paused) resetRPC(Conductor.songPosition > 0.0);
-		#end
-
 		super.onFocus();
 	}
 	
@@ -2778,19 +2761,19 @@ class PlayState extends MusicBeatState
 		super.onFocusLost();
 	}
 
-	#if DISCORD_ALLOWED
 	public var autoUpdateRPC:Bool = true; // performance setting for custom RPC things
 
 	function resetRPC(?showTime:Bool = false):Void
 	{
+		#if DISCORD_ALLOWED
 		if (!autoUpdateRPC) return;
 
 		if (showTime)
-			DiscordClient.changePresence(detailsText, SONG.songName + " - " + storyDifficultyText, iconP2.character, true, songLength - Conductor.songPosition);
+			DiscordClient.changePresence(detailsText, SONG.songName + " - " + storyDifficultyText, iconP2.character, true, songLength - Conductor.songPosition - ClientPrefs.noteOffset);
 		else
 			DiscordClient.changePresence(detailsText, SONG.songName + " - " + storyDifficultyText, iconP2.character);
+		#end
 	}
-	#end
 
 	function resyncVocals():Void
 	{
@@ -3287,11 +3270,8 @@ class PlayState extends MusicBeatState
 		persistentUpdate = false;
 		paused = true;
 
-		if (FlxG.sound.music != null) {
-			FlxG.sound.music.stop();
-		}
-
 		cancelMusicFadeTween();
+		stopMusic();
 
 		chartingMode = true;
 
@@ -3310,11 +3290,8 @@ class PlayState extends MusicBeatState
 		persistentUpdate = false;
 		paused = true;
 
-		if (FlxG.sound.music != null) {
-			FlxG.sound.music.stop();
-		}
-
 		cancelMusicFadeTween();
+		stopMusic();
 
 		#if DISCORD_ALLOWED
 		DiscordClient.resetClientID();
@@ -3356,6 +3333,8 @@ class PlayState extends MusicBeatState
 				#end
 
 				openSubState(new GameOverSubState());
+
+				makeOperationsActive();
 
 				#if DISCORD_ALLOWED
 				DiscordClient.changePresence("Game Over - " + detailsText, SONG.songName + " - " + storyDifficultyText, iconP2.character); // Game Over doesn't get his own variable because it's only used here
@@ -4083,13 +4062,7 @@ class PlayState extends MusicBeatState
 
 		updateTime = false;
 
-		FlxG.sound.music.pause();
-		FlxG.sound.music.stop();
-		FlxG.sound.music.volume = 0;
-
-		vocals.pause();
-		vocals.stop();
-		vocals.volume = 0;
+		stopMusic();
 
 		if (ClientPrefs.noteOffset <= 0 || ignoreNoteOffset) {
 			finishCallback();
@@ -4100,6 +4073,17 @@ class PlayState extends MusicBeatState
 				finishCallback();
 			});
 		}
+	}
+
+	public function stopMusic():Void
+	{
+		FlxG.sound.music.pause();
+		FlxG.sound.music.stop();
+		FlxG.sound.music.volume = 0;
+
+		vocals.pause();
+		vocals.stop();
+		vocals.volume = 0;
 	}
 
 	public var transitioning:Bool = false;
@@ -4337,10 +4321,6 @@ class PlayState extends MusicBeatState
 		eventNotes = [];
 	}
 
-	var lastRating:RatingSprite; // stores the last judgement object
-	var lastCombo:ComboSprite; // stores the last combo sprite object
-	var lastScore:Array<ComboNumberSprite> = []; // stores the last combo score objects in an array
-
 	public var ratingSuffix:String = '';
 	public var comboSuffix:String = '';
 
@@ -4440,18 +4420,15 @@ class PlayState extends MusicBeatState
 						health += daRating.health * healthGain;
 					}
 
-					var rating:RatingSprite = new RatingSprite(580, daRating.image, ratingSuffix);
-
-					if (!ClientPrefs.comboStacking)
+					if (!ClientPrefs.comboStacking && grpRatings.members.length > 0)
 					{
-						if (lastRating != null)
-						{
-							lastRating.kill();
-							grpRatings.remove(lastRating, true);
+						for (rating in grpRatings) {
+							grpRatings.remove(rating);
 						}
-
-						lastRating = rating;
 					}
+
+					var rating:RatingSprite = new RatingSprite(580, 224, daRating.image, ratingSuffix);
+					rating.reoffset();
 
 					if (showRating) {
 						grpRatings.add(rating);
@@ -4473,6 +4450,13 @@ class PlayState extends MusicBeatState
 
 	private function displayCombo():Void
 	{
+		if (!ClientPrefs.comboStacking && grpComboNumbers.members.length > 0)
+		{
+			for (i in grpComboNumbers) {
+				grpComboNumbers.remove(i);
+			}
+		}
+
 		var stringCombo:String = Std.string(combo);
 
 		if (stringCombo.length > lastComboTen)
@@ -4486,49 +4470,29 @@ class PlayState extends MusicBeatState
 		final seperatedScore:Array<Int> = [for (i in 0...lastComboTen) Math.floor(combo / Math.pow(10, i)) % 10];
 		seperatedScore.reverse();
 
-		if (lastScore != null)
-		{
-			while (lastScore.length > 0)
-			{
-				var ndumb:ComboNumberSprite = lastScore[0];
-
-				if (ndumb != null)
-				{
-					ndumb.kill();
-					lastScore.remove(ndumb);
-					grpComboNumbers.remove(ndumb, true);
-				}
-			}
-		}
-
 		for (i in 0...seperatedScore.length)
 		{
 			var int:Int = i - _lastComboTenDiffs;
-			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, seperatedScore[i], comboSuffix, i);
+
+			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i], comboSuffix);
+			numScore.reoffset();
 
 			if (showComboNum) {
 				grpComboNumbers.add(numScore);
 			}
 
 			numScore.disappear();
-
-			if (!ClientPrefs.comboStacking) {
-				lastScore.push(numScore);
-			}
 		}
 
-		var comboSpr:ComboSprite = new ComboSprite(comboSuffix);
-
-		if (!ClientPrefs.comboStacking)
+		if (!ClientPrefs.comboStacking && grpCombo.members.length > 0)
 		{
-			if (lastCombo != null)
-			{
-				lastCombo.kill();
-				grpCombo.remove(lastCombo);
+			for (combo in grpCombo) {
+				grpCombo.remove(combo);
 			}
-
-			lastCombo = comboSpr;
 		}
+
+		var comboSpr:ComboSprite = new ComboSprite(705, 350, comboSuffix);
+		comboSpr.reoffset();
 
 		if (showCombo) {
 			grpCombo.add(comboSpr);
@@ -5020,11 +4984,9 @@ class PlayState extends MusicBeatState
 
 	public function spawnNoteSplash(x:Float, y:Float, data:Int, ?note:Note = null):Void
 	{
-		final splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
+		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.setupNoteSplash(x, y, data, note);
-		splash.ID = grpNoteSplashes.ID++;
 		grpNoteSplashes.add(splash);
-		grpNoteSplashes.sort(CoolUtil.sortByID);
 	}
 
 	override public function destroy():Void
@@ -6472,6 +6434,10 @@ class PlayState extends MusicBeatState
 		{
 			case 'camhud' | 'hud': return instance.camHUD;
 			case 'camother' | 'other': return instance.camOther;
+		}
+
+		if (instance.isDead) {
+			return GameOverSubState.instance.camDeath;
 		}
 
 		return instance.camGame;

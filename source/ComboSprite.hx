@@ -10,9 +10,9 @@ class ComboSprite extends Sprite
 {
 	public var group:FlxTypedGroup<ComboSprite>;
 
-	public function new(x:Float = 705, suffix:String = null):Void
+	public function new(x:Float = 0, y:Float = 0, ?suffix:String):Void
 	{
-		super(x);
+		super(x, y);
 
 		var ourPath:String = 'ui/combo';
 
@@ -39,17 +39,19 @@ class ComboSprite extends Sprite
 		}
 
 		loadGraphic(Paths.getImage(ourPath));
-		y = (FlxG.height - height) / 2;
 
 		antialiasing = ClientPrefs.globalAntialiasing && !PlayState.isPixelStage;
 
 		setGraphicSize(Std.int(width * (PlayState.isPixelStage ? PlayState.daPixelZoom * 0.85 : 0.7)));
 		updateHitbox();
 
-		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
-		setPosition(x + offset[2], y - offset[3] + 60);
-
 		visible = ClientPrefs.showCombo;
+	}
+
+	public function reoffset():Void
+	{
+		var offset:Array<Int> = ClientPrefs.comboOffset.copy();
+		setPosition(x + offset[2], y - offset[3]);
 	}
 
 	public var disappearTween:FlxTween = null;

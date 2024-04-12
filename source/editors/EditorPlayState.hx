@@ -145,12 +145,11 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		add(notes);
 
 		grpNoteSplashes = new FlxTypedGroup<NoteSplash>();
-		grpNoteSplashes.ID = 0;
 		add(grpNoteSplashes);
 
 		var splash:NoteSplash = new NoteSplash(100, 100);
-		splash.alpha = FlxMath.EPSILON; // cant make it invisible or it won't allow precaching
 		grpNoteSplashes.add(splash);
+		splash.alpha = FlxMath.EPSILON; // cant make it invisible or it won't allow precaching
 		
 		generateStaticArrows(0);
 		generateStaticArrows(1);
@@ -496,10 +495,6 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		}
 	}
 
-	var lastRating:RatingSprite;
-	var lastCombo:ComboSprite;
-	var lastScore:Array<ComboNumberSprite> = [];
-
 	var showRating:Bool = true;
 
 	private function popUpScore(daNote:Note):Void
@@ -520,18 +515,15 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 				if (!daNote.ratingDisabled) daRating.hits++;
 				daNote.ratingMod = daRating.ratingMod;
 
-				var rating:RatingSprite = new RatingSprite(580, daRating.image);
-
-				if (!ClientPrefs.comboStacking)
+				if (!ClientPrefs.comboStacking && grpRatings.members.length > 0)
 				{
-					if (lastRating != null)
-					{
-						lastRating.kill();
-						grpRatings.remove(lastRating, true);
+					for (rating in grpRatings) {
+						grpRatings.remove(rating);
 					}
-
-					lastRating = rating;
 				}
+
+				var rating:RatingSprite = new RatingSprite(580, 224, daRating.image);
+				rating.reoffset();
 
 				if (showRating) {
 					grpRatings.add(rating);
@@ -552,6 +544,13 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 	private function displayCombo():Void
 	{
+		if (!ClientPrefs.comboStacking && grpComboNumbers.members.length > 0)
+		{
+			for (i in grpComboNumbers) {
+				grpComboNumbers.remove(i);
+			}
+		}
+
 		var stringCombo:String = Std.string(combo);
 
 		if (stringCombo.length > lastComboTen)
@@ -565,49 +564,29 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		final seperatedScore:Array<Int> = [for (i in 0...lastComboTen) Math.floor(combo / Math.pow(10, i)) % 10];
 		seperatedScore.reverse();
 
-		if (lastScore != null)
-		{
-			while (lastScore.length > 0)
-			{
-				var ndumb:ComboNumberSprite = lastScore[0];
-
-				if (ndumb != null)
-				{
-					ndumb.kill();
-					lastScore.remove(ndumb);
-					grpComboNumbers.remove(ndumb, true);
-				}
-			}
-		}
-
 		for (i in 0...seperatedScore.length)
 		{
 			var int:Int = i - _lastComboTenDiffs;
-			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, seperatedScore[i], null, i);
+
+			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i]);
+			numScore.reoffset();
 
 			if (showComboNum) {
 				grpComboNumbers.add(numScore);
 			}
 
 			numScore.disappear();
-
-			if (!ClientPrefs.comboStacking) {
-				lastScore.push(numScore);
-			}
 		}
 
-		var comboSpr:ComboSprite = new ComboSprite();
-
-		if (!ClientPrefs.comboStacking)
+		if (!ClientPrefs.comboStacking && grpCombo.members.length > 0)
 		{
-			if (lastCombo != null)
-			{
-				lastCombo.kill();
-				grpCombo.remove(lastCombo);
+			for (combo in grpCombo) {
+				grpCombo.remove(combo);
 			}
-
-			lastCombo = comboSpr;
 		}
+
+		var comboSpr:ComboSprite = new ComboSprite(705, 350);
+		comboSpr.reoffset();
 
 		if (showCombo) {
 			grpCombo.add(comboSpr);
@@ -846,13 +825,11 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 
 	public function spawnNoteSplash(x:Float, y:Float, data:Int, ?note:Note = null):Void
 	{
-		final splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
+		var splash:NoteSplash = grpNoteSplashes.recycle(NoteSplash);
 		splash.setupNoteSplash(x, y, data, note);
-		splash.ID = grpNoteSplashes.ID++;
 		grpNoteSplashes.add(splash);
-		grpNoteSplashes.sort(CoolUtil.sortByID);
 	}
-	
+
 	function resyncVocals():Void
 	{
 		if (finishTimer != null) return;

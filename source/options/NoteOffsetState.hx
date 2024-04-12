@@ -24,7 +24,7 @@ class NoteOffsetState extends MusicBeatState
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
 
-	var rating:Sprite;
+	var rating:RatingSprite;
 	var comboNums:FlxTypedSpriteGroup<Sprite>;
 	var dumbTexts:FlxTypedGroup<FlxText>;
 
@@ -95,18 +95,8 @@ class NoteOffsetState extends MusicBeatState
 		boyfriend.y += boyfriend.positionArray[1];
 		add(boyfriend);
 
-		rating = new Sprite();
-
-		if (Paths.fileExists('images/sick.png', IMAGE)) {
-			rating.loadGraphic(Paths.getImage('sick'));
-		}
-		else {
-			rating.loadGraphic(Paths.getImage('ui/sick'));
-		}
-
+		rating = new RatingSprite('sick');
 		rating.cameras = [camHUD];
-		rating.setGraphicSize(Std.int(rating.width * 0.7));
-		rating.updateHitbox();
 		add(rating);
 
 		comboNums = new FlxTypedSpriteGroup<Sprite>();
@@ -118,19 +108,13 @@ class NoteOffsetState extends MusicBeatState
 		for (i in 0...seperatedScore.length)
 		{
 			var num:Int = seperatedScore[i];
-			var numScore:Sprite = new Sprite(43 * (i + 1));
 
-			if (Paths.fileExists('images/num' + num + '.png', IMAGE)) {
-				numScore.loadGraphic(Paths.getImage('num' + num));
-			}
-			else {
-				numScore.loadGraphic(Paths.getImage('ui/num' + num));
-			}
-
-			numScore.setGraphicSize(Std.int(numScore.width * 0.5));
-			numScore.updateHitbox();
+			var numScore:ComboNumberSprite = new ComboNumberSprite(43 * i, 12, num);
 			comboNums.add(numScore);
 		}
+
+		var comboSpr:ComboSprite = new ComboSprite(175, -7);
+		comboNums.add(comboSpr);
 
 		dumbTexts = new FlxTypedGroup<FlxText>();
 		dumbTexts.cameras = [camHUD];
