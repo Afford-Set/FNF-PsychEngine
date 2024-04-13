@@ -4,7 +4,7 @@
 Psych Engine originally used on [Mind Games Mod](https://gamebanana.com/mods/301107), intended to be a fix for the vanilla version's many issues while keeping the casual play aspect of it. Also aiming to be an easier alternative to newbie coders.
 
 ## Installation:
-1. Download [Haxe version 4.2.5](https://haxe.org/download/version/4.2.5/), seriously, stop using older or newer versions, it won't work!
+1. Download [Haxe](https://haxe.org/download/).
 2. Download [git-scm](https://git-scm.com/downloads). Works for Windows, Mac, and Linux, just select your build.
 Install Visual Studio Community 2022.
 3. Install [Visual Studio Community 2022](https://visualstudio.microsoft.com/vs/community/).
