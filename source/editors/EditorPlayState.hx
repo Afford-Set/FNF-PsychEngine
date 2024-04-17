@@ -522,7 +522,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 					}
 				}
 
-				var rating:RatingSprite = new RatingSprite(580, 224, daRating.image);
+				var rating:RatingSprite = grpRatings.recycle(RatingSprite, true);
+				rating.resetSprite(580, 224, daRating.image);
 				rating.reoffset();
 
 				if (showRating) {
@@ -568,7 +569,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 		{
 			var int:Int = i - _lastComboTenDiffs;
 
-			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i]);
+			var numScore:ComboNumberSprite = grpComboNumbers.recycle(ComboNumberSprite, true);
+			numScore.resetSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i]);
 			numScore.reoffset();
 
 			if (showComboNum) {
@@ -585,7 +587,8 @@ class EditorPlayState extends MusicBeatSubState // Borrowed from original PlaySt
 			}
 		}
 
-		var comboSpr:ComboSprite = new ComboSprite(705, 350);
+		var comboSpr:ComboSprite = grpCombo.recycle(ComboSprite, true);
+		comboSpr.resetSprite(705, 350);
 		comboSpr.reoffset();
 
 		if (showCombo) {

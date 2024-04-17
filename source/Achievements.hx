@@ -8,8 +8,11 @@ import sys.FileSystem;
 
 import haxe.Json;
 
+import openfl.Lib;
 import flixel.FlxG;
 import flixel.util.FlxSave;
+import openfl.errors.Error;
+import flixel.util.FlxColor;
 
 using StringTools;
 
@@ -21,6 +24,7 @@ typedef Achievement =
 	var save_tag:String;
 	var hidden:Bool;
 	var ?misses:Int;
+	var ?maxScore:Float;
 	var ?folder:String;
 	var ?song:String;
 	var ?week_nomiss:String;
@@ -34,42 +38,49 @@ typedef Achievement =
 class Achievements
 {
 	public static var achievementList:Array<String> = [];
-	public static var achievementsStuff:Array<Achievement> = [];
+	public static var achievements:Map<String, Achievement> = [];
 
-	public static var achievementsMap:Map<String, Bool> = new Map<String, Bool>();
-	public static var henchmenDeath(default, set):Int = 0;
+	public static var _save:FlxSave = null;
+	public static var achievementsUnlocked:Array<String> = [];
+	public static var variables:Map<String, Float> = [];
 
-	inline static function set_henchmenDeath(value:Int):Int
+	private static var _firstLoad:Bool = true;
+
+	public static function get(name:String):Achievement
 	{
-		henchmenDeath = value;
-
-		var save:FlxSave = new FlxSave();
-		save.bind('achievements', CoolUtil.getSavePath());
-		save.data.henchmenDeath = henchmenDeath;
-		save.flush();
-
-		return value;
+		return achievements.get(name);
 	}
 
-	public static function unlockAchievement(name:String, ?playSound:Bool = true):Void
+	public static function exists(name:String):Bool
 	{
-		Debug.logInfo('Completed achievement "' + name +'"');
-		achievementsMap.set(name, true);
+		return achievements.exists(name);
+	}
 
-		var save:FlxSave = new FlxSave();
-		save.bind('achievements', CoolUtil.getSavePath());
-		save.data.achievementsMap = achievementsMap;
-		save.flush();
+	public static function isUnlocked(name:String):Bool
+	{
+		return achievementsUnlocked.contains(name);
+	}
 
-		if (playSound) {
-			FlxG.sound.play(Paths.getSound('confirmMenu'), 0.7);
+	public static function getFile(path:String):Achievement
+	{
+		var rawJson:String = null;
+
+		if (Paths.fileExists(path, TEXT)) {
+			rawJson = Paths.getTextFromFile(path);
 		}
+
+		if (rawJson != null && rawJson.length > 0) {
+			return cast Json.parse(rawJson);
+		}
+
+		return null;
 	}
 
 	public static function dummy():Achievement
 	{
 		return {
 			misses: 0,
+			maxScore: 0,
 			diff: 'hard',
 			color: [255, 228, 0],
 			name: 'Your Achievement',
@@ -84,50 +95,9 @@ class Achievements
 		};
 	}
 
-	public static function exists(name:String):Bool
+	public static function load():Void
 	{
-		return achievementList.contains(name);
-	}
-
-	public static function getAchievement(name:String):Achievement
-	{
-		for (i in achievementsStuff) {
-			if (i.save_tag == name) return i;
-		}
-
-		return null;
-	}
-
-	public static function isAchievementUnlocked(name:String):Bool
-	{
-		return achievementsMap.exists(name) && achievementsMap.get(name);
-	}
-
-	public static function getAchievementIndex(name:String):Int
-	{
-		return achievementList.indexOf(name);
-	}
-
-	public static function onLoadJson(i:Achievement):Achievement
-	{
-		if (i.misses == null) {
-			i.misses = 0;
-		}
-
-		if (i.color == null) {
-			i.color = [255, 228, 0];
-		}
-
-		if (i.diff == null) {
-			i.diff = 'hard';
-		}
-
-		return i;
-	}
-
-	public static function loadAchievements():Void
-	{
-		achievementsStuff = [];
+		achievements.clear();
 		achievementList = [];
 
 		#if MODS_ALLOWED
@@ -183,23 +153,18 @@ class Achievements
 			
 				if (!awardsLoaded.contains(sexList[i]))
 				{
-					var award:Achievement = getAchievementFile(fileToCheck);
+					var award:Achievement = getFile(fileToCheck);
 
 					if (award != null)
 					{
-						award = onLoadJson(award);
-
-						if (award.index < 0)
-						{
+						if (award.index < 0) {
 							achievementList.push(award.save_tag);
-							achievementsStuff.push(award);
 						}
-						else
-						{
+						else {
 							achievementList.insert(award.index, award.save_tag);
-							achievementsStuff.insert(award.index, award);
 						}
 
+						achievements.set(award.save_tag, award);
 						awardsLoaded.push(sexList[i]);
 					}
 				}
@@ -239,18 +204,27 @@ class Achievements
 		}
 		#end
 
-		var save:FlxSave = new FlxSave();
-		save.bind('achievements', CoolUtil.getSavePath());
+		if (!_firstLoad) return;
 
-		if (save != null && save.data != null)
+		if (_save == null) _save = new FlxSave();
+		_save.bind('achievements_v2', CoolUtil.getSavePath());
+
+		if (_save != null && _save.data != null)
 		{
-			if (save.data.achievementsMap != null) {
-				achievementsMap = save.data.achievementsMap;
+			if (_save.data.achievementsUnlocked != null) {
+				achievementsUnlocked = _save.data.achievementsUnlocked;
 			}
 
-			if (save.data.henchmenDeath != null) {
-				henchmenDeath = save.data.henchmenDeath;
+			var savedMap:Map<String, Float> = cast _save.data.achievementsVariables;
+
+			if (savedMap != null)
+			{
+				for (key => value in savedMap) {
+					variables.set(key, value);
+				}
 			}
+
+			_firstLoad = false;
 		}
 	}
 
@@ -258,12 +232,10 @@ class Achievements
 	{
 		if (!awardsLoaded.contains(awardToCheck))
 		{
-			var award:Achievement = getAchievementFile(path);
+			var award:Achievement = getFile(path);
 
 			if (award != null)
 			{
-				award = onLoadJson(award);
-
 				if (i >= originalLength)
 				{
 					#if MODS_ALLOWED
@@ -271,35 +243,189 @@ class Achievements
 					#end
 				}
 
-				if (award.index < 0)
-				{
+				if (award.index < 0) {
 					achievementList.push(award.save_tag);
-					achievementsStuff.push(award);
 				}
-				else
-				{
+				else {
 					achievementList.insert(award.index, award.save_tag);
-					achievementsStuff.insert(award.index, award);
 				}
 
+				achievements.set(award.save_tag, award);
 				awardsLoaded.push(awardToCheck);
 			}
 		}
 	}
 
-	public static function getAchievementFile(path:String):Achievement
+	public static function save():Void
 	{
-		var rawJson:String = null;
-
-		if (Paths.fileExists(path, TEXT)) {
-			rawJson = Paths.getTextFromFile(path);
-		}
-
-		if (rawJson != null && rawJson.length > 0) {
-			return cast Json.parse(rawJson);
-		}
-
-		return null;
+		_save.data.achievementsUnlocked = achievementsUnlocked;
+		_save.data.achievementsVariables = variables;
 	}
+
+	public static function getScore(name:String):Float
+	{
+		return _scoreFunc(name, 0);
+	}
+
+	public static function setScore(name:String, value:Float, saveIfNotUnlocked:Bool = true):Float
+	{
+		return _scoreFunc(name, 1, value, saveIfNotUnlocked);
+	}
+
+	public static function addScore(name:String, value:Float = 1, saveIfNotUnlocked:Bool = true):Float
+	{
+		return _scoreFunc(name, 2, value, saveIfNotUnlocked);
+	}
+
+	private static function _scoreFunc(name:String, mode:Int = 0, addOrSet:Float = 1, saveIfNotUnlocked:Bool = true):Float // mode 0 = get, 1 = set, 2 = add
+	{
+		if (!variables.exists(name)) {
+			variables.set(name, 0);
+		}
+
+		if (exists(name))
+		{
+			var achievement:Achievement = get(name);
+			if (achievement.maxScore == null || achievement.maxScore < 1) throw new Error('Achievement has score disabled or is incorrectly configured: $name');
+
+			if (achievementsUnlocked.contains(name)) return achievement.maxScore;
+
+			var val:Float = addOrSet;
+
+			switch (mode)
+			{
+				case 0: return variables.get(name); // get
+				case 2: val += variables.get(name); // add
+			}
+
+			if (val >= achievement.maxScore)
+			{
+				unlock(name);
+				val = achievement.maxScore;
+			}
+
+			variables.set(name, val);
+
+			save();
+			if (saveIfNotUnlocked || val >= achievement.maxScore) _save.flush();
+
+			return val;
+		}
+
+		return -1;
+	}
+
+	private static var _lastUnlock:Int = -999;
+
+	public static function unlock(name:String, playSound:Bool = true, autoStartPopup:Bool = true):String
+	{
+		if (exists(name))
+		{
+			if (isUnlocked(name)) return null;
+
+			Debug.logInfo('Completed achievement "' + name +'"');
+			achievementsUnlocked.push(name);
+
+			var time:Int = Lib.getTimer();
+
+			if (Math.abs(time - _lastUnlock) >= 100 && playSound) // If last unlocked happened in less than 100 ms (0.1s) ago, then don't play sound
+			{
+				FlxG.sound.play(Paths.getSound('confirmMenu'), 0.5);
+				_lastUnlock = time;
+			}
+
+			save();
+			_save.flush();
+
+			if (autoStartPopup) startPopup(name);
+			return name;
+		}
+		else {
+			throw new Error('Achievement "' + name + '" not exists!');
+		}
+	}
+
+	@:allow(AchievementPopup)
+	private static var _popups:Array<AchievementPopup> = [];
+	public static var showingPopups(get, never):Bool;
+
+	public static function get_showingPopups():Bool
+	{
+		return _popups.length > 0;
+	}
+
+	public static function startPopup(achieve:String, endFunc:Void->Void = null):Void
+	{
+		for (popup in _popups)
+		{
+			if (popup == null) continue;
+			popup.intendedY += 150;
+		}
+
+		var newPop:AchievementPopup = new AchievementPopup(get(achieve), endFunc);
+		_popups.push(newPop);
+	}
+
+	#if LUA_ALLOWED
+	public static function implementForLua(funk:FunkinLua):Void
+	{
+		funk.set("getAchievementScore", function(name:String):Float
+		{
+			if (!exists(name))
+			{
+				PlayState.debugTrace('getAchievementScore: Couldnt find achievement: $name', false, 'error', FlxColor.RED);
+				return -1;
+			}
+
+			return getScore(name);
+		});
+
+		funk.set("setAchievementScore", function(name:String, value:Float = 1, saveIfNotUnlocked:Bool = true):Float
+		{
+			if (!exists(name))
+			{
+				PlayState.debugTrace('setAchievementScore: Couldnt find achievement: $name', false, 'error', FlxColor.RED);
+				return -1;
+			}
+
+			return setScore(name, value, saveIfNotUnlocked);
+		});
+
+		funk.set("addAchievementScore", function(name:String, value:Float = 1, saveIfNotUnlocked:Bool = true):Float
+		{
+			if (!exists(name))
+			{
+				PlayState.debugTrace('addAchievementScore: Couldnt find achievement: $name', false, 'error', FlxColor.RED);
+				return -1;
+			}
+
+			return addScore(name, value, saveIfNotUnlocked);
+		});
+
+		funk.set("unlockAchievement", function(name:String):String
+		{
+			if (!exists(name))
+			{
+				PlayState.debugTrace('unlockAchievement: Couldnt find achievement: $name', false, 'error', FlxColor.RED);
+				return null;
+			}
+
+			return unlock(name);
+		});
+
+		funk.set("isAchievementUnlocked", function(name:String):Null<Bool>
+		{
+			if (!exists(name))
+			{
+				PlayState.debugTrace('isAchievementUnlocked: Couldnt find achievement: $name', false, 'error', FlxColor.RED);
+				return null;
+			}
+
+			return isUnlocked(name);
+		});
+
+		funk.set("achievementExists", exists);
+	}
+	#end
 }
 #end

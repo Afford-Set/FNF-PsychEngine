@@ -133,6 +133,7 @@ class AchievementEditorState extends MusicBeatState
 	var hiddenCheckbox:FlxUICheckBox = null;
 	var songInputText:FlxUIInputText = null;
 	var missesStepper:FlxUINumericStepper = null;
+	var maxScoreStepper:FlxUINumericStepper = null;
 
 	var loadButton:FlxButton = null;
 	var saveButton:FlxButton = null;
@@ -149,10 +150,10 @@ class AchievementEditorState extends MusicBeatState
 		tagInputText = new FlxUIInputText(10, awardNameInputText.y + 40, 75, award.save_tag, 8);
 		blockPressWhileTypingOn.push(tagInputText);
 
-		descInputText = new FlxUIInputText(10, tagInputText.y + 40, 230, award.desc, 8);
+		descInputText = new FlxUIInputText(10, tagInputText.y + 40, 150, award.desc, 8);
 		blockPressWhileTypingOn.push(descInputText);
 
-		luaFileInputText = new FlxUIInputText(10, descInputText.y + 40, 75, award.lua_code, 8);
+		luaFileInputText = new FlxUIInputText(10, descInputText.y + 40, 70, award.lua_code, 8);
 		blockPressWhileTypingOn.push(luaFileInputText);
 
 		weekInputText = new FlxUIInputText(10, luaFileInputText.y + 40, 100, award.week_nomiss, 8);
@@ -191,12 +192,16 @@ class AchievementEditorState extends MusicBeatState
 		missesStepper = new FlxUINumericStepper(tagInputText.x + tagInputText.width + 96, tagInputText.y + 15, 1, award.misses, -1);
 		blockPressWhileTypingOnStepper.push(missesStepper);
 
-		hxFileInputText = new FlxUIInputText(songInputText.x, luaFileInputText.y, 75, award.hx_code, 8);
+		hxFileInputText = new FlxUIInputText(luaFileInputText.x + luaFileInputText.width + 10, luaFileInputText.y, 70, award.hx_code, 8);
 		blockPressWhileTypingOn.push(hxFileInputText);
+
+		maxScoreStepper = new FlxUINumericStepper(missesStepper.x, indexStepper.y + 40, 0.01, award.maxScore, 0, 999, 2);
+		blockPressWhileTypingOnStepper.push(maxScoreStepper);
 
 		tab_group.add(awardNameInputText);
 		tab_group.add(tagInputText);
 		tab_group.add(descInputText);
+		tab_group.add(maxScoreStepper);
 		tab_group.add(luaFileInputText);
 		tab_group.add(hxFileInputText);
 		tab_group.add(weekInputText);
@@ -216,14 +221,15 @@ class AchievementEditorState extends MusicBeatState
 		tab_group.add(new FlxText(awardNameInputText.x, awardNameInputText.y - 18, 0, 'Achievement name:'));
 		tab_group.add(new FlxText(tagInputText.x, tagInputText.y - 18, 0, 'Achievement save tag:'));
 		tab_group.add(new FlxText(descInputText.x, descInputText.y - 18, 0, 'Achievement description:'));
-		tab_group.add(new FlxText(luaFileInputText.x, luaFileInputText.y - 18, 0, 'Lua file\'s path:'));
-		tab_group.add(new FlxText(hxFileInputText.x, hxFileInputText.y - 18, 0, 'HX file\'s path:'));
+		tab_group.add(new FlxText(luaFileInputText.x, luaFileInputText.y - 18, 0, 'Lua file:'));
+		tab_group.add(new FlxText(hxFileInputText.x, hxFileInputText.y - 18, 0, 'HX file:'));
 		tab_group.add(new FlxText(weekInputText.x, weekInputText.y - 18, 0, 'Week ID to unlock:'));
 		tab_group.add(new FlxText(indexStepper.x, indexStepper.y - 18, 0, 'Index:'));
 		tab_group.add(new FlxText(10, bgColorStepperR.y - 18, 0, 'Selected background Color R/G/B:'));
 		tab_group.add(new FlxText(songInputText.x, songInputText.y - 18, 0, 'Song ID to unlock:'));
 		tab_group.add(new FlxText(diffInputText.x - 25, diffInputText.y - 18, 0, 'Difficulty ID to unlock:'));
 		tab_group.add(new FlxText(missesStepper.x - 10, missesStepper.y - 26, 0, 'Minimal Misses\n(-1 to disable):'));
+		tab_group.add(new FlxText(maxScoreStepper.x - 10, maxScoreStepper.y - 26, 0, 'Max Score\n(0 to disable):'));
 
 		UI_box.addGroup(tab_group);
 	}
@@ -239,6 +245,7 @@ class AchievementEditorState extends MusicBeatState
 		weekInputText.text = award.week_nomiss;
 		indexStepper.value = award.index;
 		missesStepper.value = award.misses;
+		maxScoreStepper.value = award.maxScore;
 		bgColorStepperR.value = award.color[0];
 		bgColorStepperG.value = award.color[1];
 		bgColorStepperB.value = award.color[2];
@@ -349,6 +356,9 @@ class AchievementEditorState extends MusicBeatState
 			else if (sender == missesStepper) {
 				award.misses = Math.round(missesStepper.value);
 			}
+			else if (sender == missesStepper) {
+				award.maxScore = maxScoreStepper.value;
+			}
 		}
 	}
 
@@ -439,7 +449,7 @@ class AchievementEditorState extends MusicBeatState
 
 			if (rawJson != null)
 			{
-				var loadedAchievement:Achievement = Achievements.getAchievementFile(fullPath);
+				var loadedAchievement:Achievement = Achievements.getFile(fullPath);
 				var cutName:String = _file.name.substr(0, _file.name.length - 5);
 
 				try

@@ -8,47 +8,58 @@ using StringTools;
 
 class RatingSprite extends Sprite
 {
-	public var group:FlxTypedGroup<RatingSprite>;
 	public var rating:String = 'sick';
+	public var group:FlxTypedGroup<RatingSprite>;
 
-	public function new(x:Float = 0, y:Float = 0, rating:String, ?suffix:String):Void
+	public function new(x:Float = 0, y:Float = 0):Void
 	{
 		super(x, y);
+	}
+
+	public function resetSprite(x:Float = 0, y:Float = 0, rating:String = 'sick', ?suffix:String):Void
+	{
+		setPosition(x, y);
 
 		this.rating = rating;
-
-		if (suffix == null && PlayState.isPixelStage) suffix = '-pixel';
-
-		var ourPath:String = 'ui/' + rating;
-
-		if (suffix != null && suffix.length > 0)
-		{
-			ourPath += suffix;
-			var pathShit:String = rating + suffix;
-
-			if (Paths.fileExists('images/pixelUI/' + pathShit + '.png', IMAGE) && PlayState.isPixelStage) {
-				ourPath = 'pixelUI/' + pathShit;
-			}
-			else if (Paths.fileExists('images/' + pathShit + '.png', IMAGE)) {
-				ourPath = pathShit;
-			}
-		}
-		else
-		{
-			if (Paths.fileExists('images/pixelUI/' + rating + '.png', IMAGE) && PlayState.isPixelStage) {
-				ourPath = 'pixelUI/' + rating;
-			}
-			else if (Paths.fileExists('images/' + rating + '.png', IMAGE)) {
-				ourPath = rating;
-			}
-		}
-
-		loadGraphic(Paths.getImage(ourPath));
+		reloadImage(rating, suffix);
 
 		antialiasing = ClientPrefs.globalAntialiasing && !PlayState.isPixelStage;
 
 		setGraphicSize(Std.int(width * (PlayState.isPixelStage ? PlayState.daPixelZoom * 0.85 : 0.7)));
 		updateHitbox();
+
+		visible = ClientPrefs.showRatings;
+	}
+
+	public function reloadImage(rating:String, ?suffix:String):Void
+	{
+		if ((suffix == null || suffix.trim().length < 1) && PlayState.isPixelStage) suffix = '-pixel';
+
+		var path:String = 'ui/' + rating;
+
+		if (suffix != null && suffix.length > 0)
+		{
+			path += suffix;
+			var pathShit:String = rating + suffix;
+
+			if (Paths.fileExists('images/pixelUI/' + pathShit + '.png', IMAGE) && PlayState.isPixelStage) {
+				path = 'pixelUI/' + pathShit;
+			}
+			else if (Paths.fileExists('images/' + pathShit + '.png', IMAGE)) {
+				path = pathShit;
+			}
+		}
+		else
+		{
+			if (Paths.fileExists('images/pixelUI/' + rating + '.png', IMAGE) && PlayState.isPixelStage) {
+				path = 'pixelUI/' + rating;
+			}
+			else if (Paths.fileExists('images/' + rating + '.png', IMAGE)) {
+				path = rating;
+			}
+		}
+
+		loadGraphic(Paths.getImage(path));
 	}
 
 	public function reoffset():Void
@@ -57,7 +68,7 @@ class RatingSprite extends Sprite
 		setPosition(x + offset[0], y - offset[1]);
 	}
 
-	public var disappearTween:FlxTween = null;
+	var _disappearTween:FlxTween;
 
 	public function disappear():Void
 	{
@@ -70,7 +81,7 @@ class RatingSprite extends Sprite
 		acceleration.y = 550 * playbackRate * playbackRate;
 		velocity.set(velocity.x - (FlxG.random.int(0, 10) * playbackRate), velocity.y - (FlxG.random.int(140, 175) * playbackRate));
 
-		disappearTween = FlxTween.tween(this, {alpha: 0}, 0.2 / playbackRate,
+		_disappearTween = FlxTween.tween(this, {alpha: 0}, 0.2 / playbackRate,
 		{
 			startDelay: Conductor.crochet * 0.001 / playbackRate,
 			onComplete: function(twn:FlxTween):Void
@@ -91,10 +102,10 @@ class RatingSprite extends Sprite
 	{
 		if (!destroyed)
 		{
-			if (disappearTween != null)
+			if (_disappearTween != null)
 			{
-				disappearTween.cancel();
-				disappearTween = null;
+				_disappearTween.cancel();
+				_disappearTween = null;
 			}
 
 			super.destroy();
@@ -103,7 +114,7 @@ class RatingSprite extends Sprite
 
 	override function set_active(value:Bool):Bool
 	{
-		if (disappearTween != null) disappearTween.active = value;
+		if (_disappearTween != null) _disappearTween.active = value;
 		return super.set_active(value);
 	}
 }

@@ -204,6 +204,7 @@ class PlayState extends MusicBeatState
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
+	public var camCustom:FlxCamera;
 	public var cameraSpeed:Float = 1;
 
 	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
@@ -275,6 +276,10 @@ class PlayState extends MusicBeatState
 		FreeplayMenuState.destroyFreeplayVocals();
 
 		camGame = initSwagCamera();
+
+		camCustom = new FlxCamera();
+		camCustom.bgColor.alpha = 0;
+		FlxG.cameras.add(camCustom, false);
 
 		camHUD = new FlxCamera();
 		camHUD.bgColor.alpha = 0;
@@ -436,6 +441,12 @@ class PlayState extends MusicBeatState
 		noteTypes = null;
 		eventsPushed = null;
 
+		if (eventNotes.length > 1)
+		{
+			for (event in eventNotes) event.strumTime -= eventEarlyTrigger(event);
+			eventNotes.sort(sortByTime);
+		}
+
 		#if sys
 		var foldersToCheck:Array<String> = Paths.directoriesWithFile([Paths.getPreloadPath()], 'data/' + SONG.songID + '/');
 
@@ -459,16 +470,18 @@ class PlayState extends MusicBeatState
 		#end
 
 		#if ACHIEVEMENTS_ALLOWED
-		for (award in Achievements.achievementsStuff)
+		Achievements.load();
+
+		for (award in Achievements.achievements)
 		{
 			#if LUA_ALLOWED
-			startLuasNamed('achivements/' + award.save_tag);
-			startLuasNamed('achivements/' + award.lua_code);
+			startLuasNamed('achievements/' + award.save_tag);
+			startLuasNamed('achievements/' + award.lua_code);
 			#end
 
 			#if HSCRIPT_ALLOWED
-			startHScriptsNamed('achivements/' + award.save_tag);
-			startHScriptsNamed('achivements/' + award.hx_code);
+			startHScriptsNamed('achievements/' + award.save_tag);
+			startHScriptsNamed('achievements/' + award.hx_code);
 			#end
 		}
 		#end
@@ -1164,6 +1177,7 @@ class PlayState extends MusicBeatState
 		add(boyfriendGroup);
 	}
 
+	public var comboGroup:FlxGroup; // Stores Ratings and Combo Sprites in a group
 	public var uiGroup:FlxSpriteGroup; // Stores HUD Objects in a Group
 	public var noteGroup:FlxGroup; // Stores Note Objects in a Group
 
@@ -1193,6 +1207,10 @@ class PlayState extends MusicBeatState
 
 	private function createHud():Void
 	{
+		comboGroup = new FlxGroup();
+		comboGroup.cameras = [camHUD];
+		add(comboGroup);
+
 		noteGroup = new FlxGroup();
 		noteGroup.cameras = [camHUD];
 		add(noteGroup);
@@ -1208,7 +1226,7 @@ class PlayState extends MusicBeatState
 		grpRatings.memberRemoved.add(function(spr:RatingSprite):Void {
 			spr.destroy();
 		});
-		add(grpRatings);
+		comboGroup.add(grpRatings);
 
 		grpCombo = new FlxTypedGroup<ComboSprite>();
 		grpCombo.memberAdded.add(function(spr:ComboSprite):Void {
@@ -1217,7 +1235,7 @@ class PlayState extends MusicBeatState
 		grpCombo.memberRemoved.add(function(spr:ComboSprite):Void {
 			spr.destroy();
 		});
-		add(grpCombo);
+		comboGroup.add(grpCombo);
 
 		grpComboNumbers = new FlxTypedGroup<ComboNumberSprite>();
 		grpComboNumbers.memberAdded.add(function(spr:ComboNumberSprite):Void {
@@ -1226,7 +1244,7 @@ class PlayState extends MusicBeatState
 		grpComboNumbers.memberRemoved.add(function(spr:ComboNumberSprite):Void {
 			spr.destroy();
 		});
-		add(grpComboNumbers);
+		comboGroup.add(grpComboNumbers);
 
 		strumLineNotes = new FlxTypedGroup<StrumNote>();
 		noteGroup.add(strumLineNotes);
@@ -2651,8 +2669,6 @@ class PlayState extends MusicBeatState
 			value2: event[1][i][2]
 		};
 
-		subEvent.strumTime -= eventEarlyTrigger(subEvent);
-
 		eventNotes.push(subEvent);
 		eventPushed(subEvent);
 
@@ -3203,6 +3219,11 @@ class PlayState extends MusicBeatState
 
 	private function makeOperationsActive(value:Bool = false):Void
 	{
+		camGame.active = value;
+		camCustom.active = value;
+		camHUD.active = value;
+		camOther.active = value;
+
 		FlxTimer.globalManager.forEach(function(tmr:FlxTimer):Void
 		{
 			if (!tmr.finished) tmr.active = value;
@@ -3317,9 +3338,7 @@ class PlayState extends MusicBeatState
 				deathCounter++;
 
 				paused = true;
-
-				FlxG.sound.music.stop();
-				vocals.stop();
+				stopMusic();
 
 				persistentUpdate = false;
 				persistentDraw = false;
@@ -4126,19 +4145,7 @@ class PlayState extends MusicBeatState
 		allowPlayCutscene = mode.contains(gameMode) || ClientPrefs.cutscenesOnMode == 'Everywhere';
 
 		#if ACHIEVEMENTS_ALLOWED
-		if (achievementObj != null) {
-			return false;
-		}
-		else
-		{
-			var achieve:String = checkForAchievement([], ['friday_night_play']);
-
-			if (achieve != null)
-			{
-				startAchievement(achieve);
-				return false;
-			}
-		}
+		checkForAchievement([], ['friday_night_play']);
 		#end
 
 		var ret:Dynamic = callOnScripts('onEndSong', null, true);
@@ -4280,26 +4287,6 @@ class PlayState extends MusicBeatState
 		return true;
 	}
 
-	#if ACHIEVEMENTS_ALLOWED
-	var achievementObj:AchievementPopup = null;
-
-	public function startAchievement(achieve:String):Void
-	{
-		achievementObj = new AchievementPopup(achieve, camOther);
-		achievementObj.onFinish = achievementEnd;
-		add(achievementObj);
-	}
-
-	function achievementEnd():Void
-	{
-		achievementObj = null;
-
-		if (endingSong && !inCutscene) {
-			endSong();
-		}
-	}
-	#end
-
 	public function killNotes():Void
 	{
 		while (notes.length > 0)
@@ -4427,7 +4414,8 @@ class PlayState extends MusicBeatState
 						}
 					}
 
-					var rating:RatingSprite = new RatingSprite(580, 224, daRating.image, ratingSuffix);
+					var rating:RatingSprite = grpRatings.recycle(RatingSprite, true);
+					rating.resetSprite(580, 224, daRating.image, ratingSuffix);
 					rating.reoffset();
 
 					if (showRating) {
@@ -4474,7 +4462,8 @@ class PlayState extends MusicBeatState
 		{
 			var int:Int = i - _lastComboTenDiffs;
 
-			var numScore:ComboNumberSprite = new ComboNumberSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i], comboSuffix);
+			var numScore:ComboNumberSprite = grpComboNumbers.recycle(ComboNumberSprite, true);
+			numScore.resetSprite(705 + (43 * (int)) - 175, 380, seperatedScore[i], comboSuffix);
 			numScore.reoffset();
 
 			if (showComboNum) {
@@ -4491,7 +4480,8 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		var comboSpr:ComboSprite = new ComboSprite(705, 350, comboSuffix);
+		var comboSpr:ComboSprite = grpCombo.recycle(ComboSprite, true);
+		comboSpr.resetSprite(705, 350, comboSuffix);
 		comboSpr.reoffset();
 
 		if (showCombo) {
@@ -4689,14 +4679,7 @@ class PlayState extends MusicBeatState
 				playerDance();
 			}
 			#if ACHIEVEMENTS_ALLOWED
-			else
-			{
-				var achieve:String = checkForAchievement(['oversinging']);
-
-				if (achieve != null) {
-					startAchievement(achieve);
-				}
-			}
+			else checkForAchievement(['oversinging']);
 			#end
 		}
 
@@ -4710,6 +4693,9 @@ class PlayState extends MusicBeatState
 
 	function noteMiss(daNote:Note):Void // You didn't hit the key and let it go offscreen, also used by Hurt Notes
 	{
+		var result:Dynamic = callOnLuas('noteMissPre', [notes.members.indexOf(daNote), daNote.noteData, daNote.noteType, daNote.isSustainNote]);
+		if (result != Function_Stop && result != Function_StopHScript && result != Function_StopAll) callOnHScript('noteMissPre', [daNote]);
+
 		notes.forEachAlive(function(note:Note):Void //Dupe note remove
 		{
 			if (daNote != note && daNote.mustPress && daNote.noteData == note.noteData && daNote.isSustainNote == note.isSustainNote && Math.abs(daNote.strumTime - note.strumTime) < 1) {
@@ -4760,19 +4746,39 @@ class PlayState extends MusicBeatState
 
 		RecalculateRating(true);
 
+		var charName:String = 'bf';
 		var char:Character = boyfriend; // play character anims
-		if ((note != null && note.gfNote) || (SONG.notes[curSection] != null && SONG.notes[curSection].gfSection)) char = gf;
 
-		if (char != null && char.hasMissAnimations)
+		if ((note != null && note.gfNote) || (SONG.notes[curSection] != null && SONG.notes[curSection].gfSection))
+		{
+			char = gf;
+			charName = 'gf';
+		}
+
+		if (char != null && (note == null || !note.noMissAnimation) && char.hasMissAnimations)
 		{
 			var suffix:String = '';
 			if (note != null) suffix = note.animSuffix;
 
 			var animToPlay:String = singAnimations[Std.int(Math.abs(Math.min(singAnimations.length - 1, direction)))] + 'miss' + suffix;
-			var ret:Dynamic = callOnScripts('onCharMiss', [char.curCharacter, animToPlay]);
+			var ret:Dynamic = callOnLuas('onCharMissPress', [charName, char.curCharacter, animToPlay]);
+
+			if (note != null) {
+				ret = callOnLuas('onCharMissNote', [notes.members.indexOf(note), Math.abs(note.noteData), note.noteType, note.isSustainNote, charName, char.curCharacter, animToPlay]);
+			}
 
 			if (ret != Function_Stop)
 			{
+				if (ret != Function_StopHScript && ret != Function_StopAll)
+				{
+					if (note != null) {
+						callOnHScript('onCharMissNote', [note, charName, char.curCharacter, animToPlay]);
+					}
+					else {
+						callOnHScript('onCharMissPress', [charName, char.curCharacter, animToPlay]);
+					}
+				}
+
 				char.playAnim(animToPlay, true);
 
 				if (char != gf && lastCombo > 5 && (note == null || !note.isSustainNote) && gf != null && gf.animOffsets.exists('sad'))
@@ -5147,15 +5153,8 @@ class PlayState extends MusicBeatState
 				limoKillingState = 'KILLING';
 
 				#if ACHIEVEMENTS_ALLOWED
-				Achievements.henchmenDeath++;
-
-				var achieve:String = checkForAchievement(['roadkill_enthusiast']);
-
-				if (achieve != null) {
-					startAchievement(achieve);
-				}
-
-				Debug.logInfo('Deaths: ' + Achievements.henchmenDeath);
+				var kills:Float = Achievements.addScore("roadkill_enthusiast");
+				Debug.logInfo('Henchmen kills: $kills');
 				#end
 			}
 		}
@@ -5646,24 +5645,26 @@ class PlayState extends MusicBeatState
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
-	public function checkForAchievement(?include:Array<String>, ?exclude:Array<String>):String
+	public function checkForAchievement(?include:Array<String>, ?exclude:Array<String>):Void
 	{
-		if (chartingMode) return null;
+		if (chartingMode) return;
 
 		if (include == null || include.length < 1) include = Achievements.achievementList.copy();
 		if (exclude == null) exclude = [];
 
-		for (i in exclude) include.remove(i);
+		if (exclude.length > 0) {
+			for (i in exclude) include.remove(i);
+		}
 
-		var achievesToCheck:Array<Achievement> = [for (i in include) Achievements.getAchievement(i)];
+		var achievesToCheck:Array<Achievement> = [for (i in include) Achievements.get(i)];
 
 		for (award in achievesToCheck)
 		{
 			if (award != null)
 			{
-				var achievementName:String = award.save_tag;
+				var name:String = award.save_tag;
 
-				if (!Achievements.isAchievementUnlocked(achievementName) && !cpuControlled && Achievements.exists(achievementName))
+				if (!Achievements.isUnlocked(name) && !cpuControlled && Achievements.exists(name))
 				{
 					var unlock:Bool = false;
 
@@ -5688,28 +5689,21 @@ class PlayState extends MusicBeatState
 						}
 					}
 
-					switch (achievementName)
+					switch (name)
 					{
 						case 'ur_bad': unlock = songAccuracy < 0.2 && !practiceMode;
 						case 'ur_good': unlock = songAccuracy >= 1 && !usedPractice;
-						case 'roadkill_enthusiast': unlock = Achievements.henchmenDeath >= 50;
 						case 'oversinging': unlock = boyfriend.holdTimer >= 10 && !usedPractice;
 						case 'hype': unlock = !boyfriendIdled && !usedPractice;
 						case 'two_keys': unlock = !usedPractice && keysPressed.length <= 2;
-						case 'toastie': unlock = ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing && !ClientPrefs.shadersEnabled;
+						case 'toastie': unlock = !ClientPrefs.cacheOnGPU && ClientPrefs.lowQuality && !ClientPrefs.globalAntialiasing && !ClientPrefs.shadersEnabled;
 						case 'debugger': unlock = SONG.songID == 'test' && !usedPractice;
 					}
 
-					if (unlock)
-					{
-						Achievements.unlockAchievement(achievementName);
-						return achievementName;
-					}
+					if (unlock) Achievements.unlock(name);
 				}
 			}
 		}
-
-		return null;
 	}
 	#end
 
@@ -6434,6 +6428,7 @@ class PlayState extends MusicBeatState
 		{
 			case 'camhud' | 'hud': return instance.camHUD;
 			case 'camother' | 'other': return instance.camOther;
+			case 'camcustom' | 'custom': return instance.camCustom;
 		}
 
 		if (instance.isDead) {

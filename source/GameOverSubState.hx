@@ -81,9 +81,6 @@ class GameOverSubState extends MusicBeatSubState
 	override function create():Void
 	{
 		instance = this;
-		PlayState.instance.callOnScripts('onGameOverStart', []);
-
-		PlayState.instance.setOnScripts('inGameOver', true);
 
 		Conductor.bpm = bpm;
 		Conductor.songPosition = 0;
@@ -144,6 +141,9 @@ class GameOverSubState extends MusicBeatSubState
 				}
 			});
 		}
+
+		PlayState.instance.callOnScripts('onGameOverStart', []);
+		PlayState.instance.setOnScripts('inGameOver', true);
 
 		randomGameover = FlxG.random.int(1, 25);
 

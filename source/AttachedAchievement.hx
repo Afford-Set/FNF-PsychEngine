@@ -23,9 +23,16 @@ class AttachedAchievement extends Sprite
 
 	public function reloadAchievementImage(disableLock:Bool = false):Void
 	{
+		var antialias:Bool = true;
+
 		if (disableLock)
 		{
-			if (Paths.fileExists('images/achievements/' + tag + '.png', IMAGE)){
+			if (Paths.fileExists('images/achievements/' + tag + '-pixel.png', IMAGE))
+			{
+				loadGraphic(Paths.getImage('achievements/' + tag + '-pixel'));
+				antialias = false;
+			}
+			else if (Paths.fileExists('images/achievements/' + tag + '.png', IMAGE)){
 				loadGraphic(Paths.getImage('achievements/' + tag));
 			}
 			else {
@@ -34,9 +41,14 @@ class AttachedAchievement extends Sprite
 		}
 		else
 		{
-			if (Achievements.isAchievementUnlocked(tag))
+			if (Achievements.isUnlocked(tag))
 			{
-				if (Paths.fileExists('images/achievements/' + tag + '.png', IMAGE)){
+				if (Paths.fileExists('images/achievements/' + tag + '-pixel.png', IMAGE))
+				{
+					loadGraphic(Paths.getImage('achievements/' + tag + '-pixel'));
+					antialias = false;
+				}
+				else if (Paths.fileExists('images/achievements/' + tag + '.png', IMAGE)){
 					loadGraphic(Paths.getImage('achievements/' + tag));
 				}
 				else {
@@ -47,6 +59,8 @@ class AttachedAchievement extends Sprite
 				loadGraphic(Paths.getImage('achievements/lockedachievement'));
 			}
 		}
+
+		antialiasing = ClientPrefs.globalAntialiasing && antialias;
 
 		scale.set(0.7, 0.7);
 		updateHitbox();

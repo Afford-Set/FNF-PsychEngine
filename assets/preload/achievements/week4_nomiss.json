@@ -12,6 +12,7 @@
 		215
 	],
 	"song": "",
+	"maxScore": 50,
 	"hidden": false,
 	"misses": 0
 }

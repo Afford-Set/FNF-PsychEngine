@@ -95,7 +95,8 @@ class NoteOffsetState extends MusicBeatState
 		boyfriend.y += boyfriend.positionArray[1];
 		add(boyfriend);
 
-		rating = new RatingSprite('sick');
+		rating = new RatingSprite();
+		rating.resetSprite(0, 0, 'sick');
 		rating.cameras = [camHUD];
 		add(rating);
 
@@ -109,11 +110,13 @@ class NoteOffsetState extends MusicBeatState
 		{
 			var num:Int = seperatedScore[i];
 
-			var numScore:ComboNumberSprite = new ComboNumberSprite(43 * i, 12, num);
+			var numScore:ComboNumberSprite = new ComboNumberSprite();
+			numScore.resetSprite(43 * i, 12, num);
 			comboNums.add(numScore);
 		}
 
-		var comboSpr:ComboSprite = new ComboSprite(175, -7);
+		var comboSpr:ComboSprite = new ComboSprite();
+		comboSpr.resetSprite(175, -7);
 		comboNums.add(comboSpr);
 
 		dumbTexts = new FlxTypedGroup<FlxText>();

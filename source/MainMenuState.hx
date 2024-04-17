@@ -28,9 +28,6 @@ class MainMenuState extends MusicBeatState
 {
 	private static var curSelected:Int = -1;
 
-	private var camGame:FlxCamera;
-	private var camAchievement:FlxCamera;
-
 	var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
@@ -58,11 +55,7 @@ class MainMenuState extends MusicBeatState
 			FlxG.sound.playMusic(Paths.getMusic('freakyMenu'));
 		}
 
-		camGame = initSwagCamera();
-
-		camAchievement = new FlxCamera();
-		camAchievement.bgColor.alpha = 0;
-		FlxG.cameras.add(camAchievement, false);
+		initSwagCamera();
 
 		persistentUpdate = persistentDraw = true;
 
@@ -133,39 +126,24 @@ class MainMenuState extends MusicBeatState
 		super.create();
 
 		#if ACHIEVEMENTS_ALLOWED
-		Achievements.loadAchievements();
+		Achievements.load();
 
-		final leDate:Date = Date.now();
+		var leDate:Date = Date.now();
 
-		if (leDate.getDay() == 5 && leDate.getHours() >= 18)
-		{
-			var achievement:Achievement = Achievements.getAchievement('friday_night_play');
-
-			if (!Achievements.isAchievementUnlocked(achievement.save_tag)) // It's a friday night. WEEEEEEEEEEEEEEEEEE
-			{
-				Achievements.unlockAchievement(achievement.save_tag, false);
-				giveAchievement();
-			}
+		if (leDate.getDay() == 5 && leDate.getHours() >= 18) {
+			Achievements.unlock('friday_night_play');
 		}
 		#end
 
 		FlxG.camera.focusOn(FlxPoint.get(camFollow.x, camFollow.y));
 	}
 
-	#if ACHIEVEMENTS_ALLOWED
-	function giveAchievement():Void
-	{
-		add(new AchievementPopup('friday_night_play', camAchievement));
-		FlxG.sound.play(Paths.getSound('confirmMenu'), 0.7);
-	}
-	#end
-
 	var holdTime:Float = 0;
 	var selectedSomethin:Bool = false;
 
-	override function update(elapsed:Float)
+	override function update(elapsed:Float):Void
 	{
-		if (FlxG.sound.music.volume < 0.8)
+		if (FlxG.sound.music != null && FlxG.sound.music.volume < 0.8)
 		{
 			FlxG.sound.music.volume += 0.5 * elapsed;
 			if (FreeplayMenuState.vocals != null) FreeplayMenuState.vocals.volume += 0.5 * elapsed;

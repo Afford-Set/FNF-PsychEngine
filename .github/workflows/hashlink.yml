@@ -10,7 +10,7 @@ jobs:
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
-          haxe-version: lastet
+          haxe-version: 4.2.5
       - name: Setup Hashlink
         uses: cedx/setup-hashlink@main
       - name: Install Haxe Libraries

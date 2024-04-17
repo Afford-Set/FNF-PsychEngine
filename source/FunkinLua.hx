@@ -715,28 +715,6 @@ class FunkinLua
 			}
 		});
 
-		set("unlockAchievement", function(save_tag:String = null):Bool
-		{
-			#if ACHIEVEMENTS_ALLOWED
-			if (save_tag != null && save_tag.length > 0 && Achievements.exists(save_tag))
-			{
-				if (!Achievements.isAchievementUnlocked(save_tag))
-				{
-					Achievements.unlockAchievement(save_tag);
-					PlayState.instance.startAchievement(save_tag);
-				}
-
-				return true;
-			}
-
-			PlayState.debugTrace("unlockAchievement: Invalid save tag.", false, 'error', FlxColor.RED);
-			#else
-			PlayState.debugTrace("unlockAchievement: Platform unsupported for Achievements!", false, 'error', FlxColor.RED);
-			#end
-
-			return false;
-		});
-
 		set("loadSong", function(?name:String = null, ?difficultyNum:Int = -1):Void
 		{
 			if (name == null || name.length < 1) name = PlayState.SONG.songID;
@@ -1562,6 +1540,11 @@ class FunkinLua
 			}
 
 			game.modchartSprites.set(tag, leSprite);
+
+			if (game.isDead) {
+				leSprite.cameras = [GameOverSubState.instance.camDeath];
+			}
+
 			leSprite.active = true;
 		});
 
@@ -1573,6 +1556,11 @@ class FunkinLua
 			final leSprite:Sprite = new Sprite(x, y);
 
 			PlayState.loadSpriteFrames(leSprite, image, spriteType);
+
+			if (game.isDead) {
+				leSprite.cameras = [GameOverSubState.instance.camDeath];
+			}
+
 			game.modchartSprites.set(tag, leSprite);
 		});
 
@@ -2884,6 +2872,10 @@ class FunkinLua
 
 		#if HSCRIPT_ALLOWED
 		HScript.implementForLua(this);
+		#end
+
+		#if ACHIEVEMENTS_ALLOWED
+		Achievements.implementForLua(this);
 		#end
 
 		CustomSubState.implementForLua(this);

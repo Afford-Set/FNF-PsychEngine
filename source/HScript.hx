@@ -124,6 +124,9 @@ class HScript extends Interp
 		setVar('Paths', Paths);
 		setVar('Conductor', Conductor);
 		setVar('ClientPrefs', ClientPrefs);
+		#if ACHIEVEMENTS_ALLOWED
+		setVar('Achievements', Achievements);
+		#end
 		setVar('Character', Character);
 		setVar('Alphabet', Alphabet);
 		setVar('Note', Note);

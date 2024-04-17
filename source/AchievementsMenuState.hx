@@ -67,13 +67,13 @@ class AchievementsMenuState extends MusicBeatState
 		grpAchievements = new FlxTypedGroup<AttachedAchievement>();
 		add(grpAchievements);
 
-		Achievements.loadAchievements();
+		Achievements.load();
 
-		for (i in 0...Achievements.achievementsStuff.length)
+		for (i in 0...Achievements.achievementList.length)
 		{
-			var daAchieve:Achievement = Achievements.achievementsStuff[i];
+			var daAchieve:Achievement = Achievements.get(Achievements.achievementList[i]);
 
-			if (!daAchieve.hidden || Achievements.achievementsMap.exists(daAchieve.save_tag)) {
+			if (!daAchieve.hidden || Achievements.isUnlocked(daAchieve.save_tag)) {
 				achievements.push(daAchieve);
 			}
 		}
@@ -81,7 +81,7 @@ class AchievementsMenuState extends MusicBeatState
 		for (i in 0...achievements.length)
 		{
 			var daAchieve:Achievement = achievements[i];
-			var unlocked:Bool = Achievements.isAchievementUnlocked(daAchieve.save_tag);
+			var unlocked:Bool = Achievements.isUnlocked(daAchieve.save_tag);
 
 			if (daAchieve.folder != null) {
 				Paths.currentModDirectory = daAchieve.folder;
@@ -188,7 +188,7 @@ class AchievementsMenuState extends MusicBeatState
 		{
 			var newColor:FlxColor = 0xFF1B1B41;
 
-			if (Achievements.isAchievementUnlocked(curAchieve.save_tag))
+			if (Achievements.isUnlocked(curAchieve.save_tag))
 			{
 				var col:Array<Int> = curAchieve.color;
 				newColor = FlxColor.fromRGB(col[0], col[1], col[2]);
@@ -244,7 +244,7 @@ class AchievementsMenuState extends MusicBeatState
 		{
 			var newColor:FlxColor = 0xFF1B1B41;
 
-			if (Achievements.isAchievementUnlocked(curAchieve.save_tag))
+			if (Achievements.isUnlocked(curAchieve.save_tag))
 			{
 				var col:Array<Int> = curAchieve.color;
 				newColor = FlxColor.fromRGB(col[0], col[1], col[2]);

@@ -111,6 +111,10 @@ class TitleState extends MusicBeatState
 		ClientPrefs.loadNoteColors();
 		ClientPrefs.loadGameplaySettings();
 
+		#if ACHIEVEMENTS_ALLOWED
+		Achievements.load();
+		#end
+
 		Highscore.load();
 
 		if (FlxG.save.data.weekCompleted != null) {
