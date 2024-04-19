@@ -726,7 +726,7 @@ class NotesSubState extends MusicBeatSubState
 		bigNote.rgbShader.parent = Note.globalRgbShaders[curSelectedNote];
 		bigNote.shader = Note.globalRgbShaders[curSelectedNote].shader;
 
-		for (i in 0...Note.colArray.length)
+		for (i in 0...Note.pointers.length)
 		{
 			if (!onPixel) {
 				bigNote.animation.addByPrefix('note$i', Note.colArray[i] + '0', 24, true);

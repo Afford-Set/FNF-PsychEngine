@@ -10,6 +10,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.text.FlxText;
 import flixel.math.FlxMath;
+import openfl.errors.Error;
 import flixel.util.FlxColor;
 import flixel.group.FlxGroup;
 import flixel.addons.ui.FlxInputText;
@@ -28,7 +29,8 @@ class NoteSplashDebugState extends MusicBeatState
 	var selection:FlxSprite;
 	var notes:FlxTypedGroup<StrumNote>;
 	var splashes:FlxTypedGroup<FlxSprite>;
-	
+
+	var imageInputText:FlxInputText;
 	var nameInputText:FlxInputText;
 	var stepperMinFps:FlxUINumericStepper;
 	var stepperMaxFps:FlxUINumericStepper;
@@ -38,6 +40,8 @@ class NoteSplashDebugState extends MusicBeatState
 	var curAnimText:FlxText;
 	var savedText:FlxText;
 	var selecArr:Array<Float> = null;
+
+	public static inline final defaultTexture:String = 'noteSplashes';
 
 	override function create():Void
 	{
@@ -74,6 +78,36 @@ class NoteSplashDebugState extends MusicBeatState
 		var txtx:Float = 60;
 		var txty:Float = 640;
 
+		var imageName:FlxText = new FlxText(txtx, txty - 120, 'Image Name:', 16);
+		add(imageName);
+
+		imageInputText = new FlxInputText(txtx, txty - 100, 360, defaultTexture, 16);
+		imageInputText.callback = function(text:String, action:String):Void
+		{
+			switch (action)
+			{
+				case 'enter':
+				{
+					imageInputText.hasFocus = false;
+					textureName = text;
+
+					try {
+						loadFrames();
+					}
+					catch (e:Error)
+					{
+						Debug.logError('ERROR! $e');
+
+						textureName = defaultTexture;
+						loadFrames();
+					}
+				}
+				default: Debug.logInfo('changed image to $text');
+			}
+		};
+
+		add(imageInputText);
+
 		var animName:FlxText = new FlxText(txtx, txty, 'Animation name:', 16);
 		add(animName);
 
@@ -85,6 +119,8 @@ class NoteSplashDebugState extends MusicBeatState
 				case 'enter': nameInputText.hasFocus = false;
 				default:
 				{
+					Debug.logInfo('changed anim name to $text');
+
 					config.anim = text;
 					curAnim = 1;
 					reloadAnims();
@@ -96,11 +132,11 @@ class NoteSplashDebugState extends MusicBeatState
 
 		add(new FlxText(txtx, txty - 84, 0, 'Min/Max Framerate:', 16));
 
-		stepperMinFps = new FlxUINumericStepper(txtx, txty - 60, 1, 22, 1, 60, 0);
+		stepperMinFps = new FlxUINumericStepper(txtx, txty - 30, 1, 22, 1, 60, 0);
 		stepperMinFps.name = 'min_fps';
 		add(stepperMinFps);
 
-		stepperMaxFps = new FlxUINumericStepper(txtx + 60, txty - 60, 1, 26, 1, 60, 0);
+		stepperMaxFps = new FlxUINumericStepper(txtx + 60, txty - 30, 1, 26, 1, 60, 0);
 		stepperMaxFps.name = 'max_fps';
 		add(stepperMaxFps);
 
@@ -279,7 +315,6 @@ class NoteSplashDebugState extends MusicBeatState
 		if (updatedFrame)
 		{
 			forceFrame = FlxMath.wrap(forceFrame, 0, maxFrame - 1);
-			
 			curFrameText.text = 'Force Frame: ${forceFrame+1} / $maxFrame\n(Press Q/E to change)';
 
 			splashes.forEachAlive(function(spr:FlxSprite):Void
@@ -296,13 +331,13 @@ class NoteSplashDebugState extends MusicBeatState
 		offsetsText.text = selecArr.toString();
 	}
 
+	var textureName:String = defaultTexture;
 	var texturePath:String = '';
 	var copiedArray:Array<Float> = null;
 
 	function loadFrames():Void
 	{
-		texturePath = NoteSplash.defaultNoteSplash + NoteSplash.getSplashSkinPostfix();
-
+		texturePath = 'noteSplashes/' + textureName;
 		splashes.forEachAlive(function(spr:FlxSprite):Void {
 			spr.frames = Paths.getSparrowAtlas(texturePath);
 		});
@@ -322,7 +357,7 @@ class NoteSplashDebugState extends MusicBeatState
 	function saveFile():Void
 	{
 		#if sys
-		var maxLen:Int = maxAnims * Note.colArray.length;
+		var maxLen:Int = maxAnims * Note.pointers.length;
 		var curLen:Int = config.offsets.length;
 
 		while (curLen > maxLen)
@@ -394,7 +429,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 			splashes.forEachAlive(function(spr:FlxSprite):Void
 			{
-				for (i in 0...Note.colArray.length)
+				for (i in 0...Note.pointers.length)
 				{
 					var animName:String = 'note$i-$animID';
 
@@ -461,7 +496,7 @@ class NoteSplashDebugState extends MusicBeatState
 
 	function changeSelection(change:Int = 0):Void
 	{
-		var max:Int = Note.colArray.length;
+		var max:Int = Note.pointers.length;
 		curSelected = FlxMath.wrap(curSelected + change, 0, max - 1);
 
 		selection.x = curSelected * 220 + 220;
@@ -471,7 +506,7 @@ class NoteSplashDebugState extends MusicBeatState
 	function selectedArray(sel:Int = -1):Array<Float>
 	{
 		if (sel < 0) sel = curSelected;
-		var animID:Int = sel + ((curAnim - 1) * Note.colArray.length);
+		var animID:Int = sel + ((curAnim - 1) * Note.pointers.length);
 
 		if (config.offsets[animID] == null)
 		{

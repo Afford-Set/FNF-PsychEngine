@@ -8,6 +8,7 @@ import flixel.math.FlxRect;
 import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.graphics.FlxGraphic;
+import flixel.graphics.frames.FlxFrame;
 
 using StringTools;
 
@@ -460,7 +461,7 @@ class Note extends FlxSprite
 
 		if (isSustainNote)
 		{
-			animation.addByPrefix('purpleholdend', 'pruple end hold'); // this fixes some retarded typo from the original note .FLA
+			attemptToAddAnimationByPrefix('purpleholdend', 'pruple end hold'); // this fixes some retarded typo from the original note .FLA
 
 			animation.addByPrefix(ourCol + 'holdend', ourCol + ' hold end');
 			animation.addByPrefix(ourCol + 'hold', ourCol + ' hold piece');
@@ -480,6 +481,16 @@ class Note extends FlxSprite
 		else {
 			animation.add(colArray[noteData] + 'Scroll', [noteData + 4], 24, true);
 		}
+	}
+
+	function attemptToAddAnimationByPrefix(name:String, prefix:String, framerate:Float = 24, doLoop:Bool = true):Void
+	{
+		var animFrames:Array<FlxFrame> = [];
+
+		@:privateAccess animation.findByPrefix(animFrames, prefix); // adds valid frames to animFrames
+		if (animFrames.length < 1) return;
+
+		animation.addByPrefix(name, prefix, framerate, doLoop);
 	}
 
 	override function update(elapsed:Float):Void

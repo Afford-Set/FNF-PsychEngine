@@ -1271,17 +1271,16 @@ class PlayState extends MusicBeatState
 		timeBar = new Bar(0, (ClientPrefs.downScroll ? FlxG.height - 30 : 8), path, function():Float return songPercent, 0, 1);
 		timeBar.screenCenter(X);
 		timeBar.scrollFactor.set();
-		timeBar.alpha = 0;
+		timeBar.alpha = FlxMath.EPSILON;
 		timeBar.visible = updateTime;
 		uiGroup.add(timeBar);
 
-		timeTxt = new FlxText(0, timeBar.y + 1, FlxG.width, '', 20);
+		timeTxt = new FlxText(0, timeBar.y + 1, FlxG.width, SONG.songName + ' - ' + CoolUtil.difficultyStuff[lastDifficulty][1], 20);
 		timeTxt.setFormat(Paths.getFont('vcr.ttf'), 16, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		timeTxt.scrollFactor.set();
 		timeTxt.borderSize = 1.25;
-		timeTxt.alpha = 0;
+		timeTxt.alpha = FlxMath.EPSILON;
 		timeTxt.visible = showTime;
-		timeTxt.text = SONG.songName + ' - ' + CoolUtil.difficultyStuff[lastDifficulty][1];
 		uiGroup.add(timeTxt);
 
 		var path:String = 'ui/healthBar';
@@ -2391,15 +2390,12 @@ class PlayState extends MusicBeatState
 		callOnScripts('onSkipDialogue', [dialogueCount]);
 	}
 
-	var previousFrameTime:Int = 0;
 	var songTime:Float = 0;
 
 	function startSong():Void
 	{
 		startingSong = false;
 		cameraMovementSection();
-
-		previousFrameTime = FlxG.game.ticks;
 
 		@:privateAccess
 		FlxG.sound.playMusic(inst._sound, 1, false);
@@ -2468,7 +2464,20 @@ class PlayState extends MusicBeatState
 		var diffSuffix:String = CoolUtil.difficultyStuff[lastDifficulty][2];
 
 		inst = new FlxSound();
-		inst.loadEmbedded(Paths.getInst(songData.songID, diffSuffix));
+
+		if (Paths.fileExists(Paths.getInst(songData.songID, diffSuffix, true), SOUND))
+		{
+			try {
+				inst.loadEmbedded(Paths.getInst(songData.songID, diffSuffix));
+			}
+			catch (e:Error) {
+				Debug.logError('Error in loading inst of song "' + songData.songName + '": ' + e.toString());
+			}
+		}
+		else {
+			Debug.logError('File with inst of song "' + songData.songName + '" not found!');
+		}
+		
 		FlxG.sound.list.add(inst);
 
 		vocals = new FlxSound();
@@ -5033,8 +5042,8 @@ class PlayState extends MusicBeatState
 		#if FLX_PITCH
 		FlxG.sound.music.pitch = 1;
 		#end
-		Note.globalRgbShaders = [];
 
+		Note.globalRgbShaders = [];
 		NoteTypesConfig.clearNoteTypesData();
 
 		instance = null;

@@ -52,7 +52,7 @@ class ChartParser
 				swagNote.scrollFactor.set();
 				unspawnNotes.push(swagNote);
 
-				var floorSus:Int = Math.floor(swagNote.sustainLength / Conductor.stepCrochet);
+				final floorSus:Int = Math.floor(swagNote.sustainLength / Conductor.stepCrochet);
 
 				if (floorSus > 0)
 				{

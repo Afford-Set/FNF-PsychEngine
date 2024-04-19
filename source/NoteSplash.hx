@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxMath;
 import flixel.system.FlxAssets;
+import flixel.graphics.frames.FlxFrame;
 
 using StringTools;
 
@@ -127,7 +128,7 @@ class NoteSplash extends FlxSprite
 
 		if (config != null)
 		{
-			var animID:Int = direction + ((animNum - 1) * Note.colArray.length);
+			var animID:Int = direction + ((animNum - 1) * Note.pointers.length);
 			var offs:Array<Float> = config.offsets[FlxMath.wrap(animID, 0, config.offsets.length - 1)];
 
 			offset.x += offs[0];
@@ -188,7 +189,7 @@ class NoteSplash extends FlxSprite
 		{
 			var animID:Int = maxAnims + 1;
 
-			for (i in 0...Note.colArray.length)
+			for (i in 0...Note.pointers.length)
 			{
 				if (!addAnimAndCheck('note$i-$animID', '$animName ${Note.colArray[i]} $animID', 24, false)) {
 					return config;
@@ -233,8 +234,13 @@ class NoteSplash extends FlxSprite
 
 	function addAnimAndCheck(name:String, anim:String, ?framerate:Int = 24, ?loop:Bool = false):Bool
 	{
+		var animFrames:Array<FlxFrame> = [];
+		@:privateAccess animation.findByPrefix(animFrames, anim); // adds valid frames to animFrames
+
+		if (animFrames.length < 1) return false;
+
 		animation.addByPrefix(name, anim, framerate, loop);
-		return animation.getByName(name) != null;
+		return true;
 	}
 
 	static var aliveTime:Float = 0;

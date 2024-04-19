@@ -25,7 +25,6 @@ import lime.utils.Assets as LimeAssets;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.graphics.frames.FlxFramesCollection;
-import openfl.display3D.textures.RectangleTexture;
 
 using StringTools;
 
@@ -78,13 +77,7 @@ class Paths
 		}
 	}
 
-	public static var dumpExclusions:Array<String> =
-	[
-		'assets/music/freakyMenu.$SOUND_EXT',
-		'assets/shared/music/breakfast.$SOUND_EXT',
-		'assets/shared/music/tea-time.$SOUND_EXT',
-	];
-
+	public static var dumpExclusions:Array<String> = ['assets/shared/music/freakyMenu.$SOUND_EXT'];
 	public static var localTrackedAssets:Array<String> = []; // define the locally tracked assets
 
 	public static function clearUnusedMemory():Void /// haya I love you for the base cache dump I took to the max

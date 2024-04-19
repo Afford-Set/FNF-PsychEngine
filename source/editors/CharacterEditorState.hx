@@ -40,6 +40,13 @@ import flixel.system.debug.interaction.tools.Pointer;
 
 using StringTools;
 
+#if (FLX_DEBUG || flixel < version("5.7.0"))
+typedef PointerGraphic = GraphicCursorCross;
+#else
+@:bitmap('assets/images/debugger/cursorCross.png')
+class PointerGraphic extends openfl.display.BitmapData {}
+#end
+
 class CharacterEditorState extends MusicBeatState
 {
 	private var blockPressWhileTypingOn:Array<FlxUIInputText> = [];
@@ -105,7 +112,7 @@ class CharacterEditorState extends MusicBeatState
 		charLayer = new FlxTypedGroup<Character>();
 		add(charLayer);
 
-		var pointer:FlxGraphic = FlxGraphic.fromClass(GraphicCursorCross);
+		var pointer:FlxGraphic = FlxGraphic.fromClass(PointerGraphic);
 
 		cameraFollowPointer = new Sprite();
 		cameraFollowPointer.loadGraphic(pointer);
