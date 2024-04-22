@@ -346,7 +346,7 @@ class PreferencesSubState extends MusicBeatSubState
 			"What mode should cutscenes be in?",
 			'cutscenesOnMode',
 			'string',
-			['Story', #if REPLAYS_ALLOWED 'Story and Freeplay', #end 'Freeplay', #if REPLAYS_ALLOWED 'Freeplay and Replay', 'Replay', 'Replay and Story', #end 'Everywhere', 'Nowhere']);
+			['Story', 'Freeplay', 'Everywhere', 'Nowhere']);
 		addOption(option);
 
 		var option:Option = new Option('Pause Screen Song:',

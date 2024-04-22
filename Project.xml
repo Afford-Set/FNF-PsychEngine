@@ -22,19 +22,17 @@
 
 	<define name="PSYCH_WATERMARKS"/> <!-- DELETE THIS TO REMOVE WATERMARKS -->
 
-	<define name="CRASH_HANDLER" if="desktop release || html5 release" />
+	<define name="CRASH_HANDLER" if="desktop release" />
 	<define name="CHECK_FOR_UPDATES" if="officialBuild"/>
 
 	<define name="ACHIEVEMENTS_ALLOWED" />
 
-	<define name="LUA_ALLOWED" if="cpp" />
-	<define name="MP3_ALLOWED" if="cpp || html5 || flash" />
+	<define name="LUA_ALLOWED" if="desktop" />
 	<define name="MODS_ALLOWED" if="desktop" />
-	<define name="VIDEOS_ALLOWED" if="desktop cpp || android || web" unless="32bits"/>
+	<define name="VIDEOS_ALLOWED" if="desktop || android" unless="32bits"/>
 	<define name="HSCRIPT_ALLOWED" />
 	<define name="RUNTIME_SHADERS_ALLOWED" if="desktop" unless="flash"/>
-	<define name="DISCORD_ALLOWED" if="desktop cpp" />
-	<define name="REPLAYS_ALLOWED" if="desktop" />
+	<define name="DISCORD_ALLOWED" if="desktop" />
 	<define name="TITLE_SCREEN_EASTER_EGG" if="officialBuild"/> <!-- DELETE THE if="officialBuild" for enabling this on an unofficial build -->
 
 	<!-- ____________________________ Window Settings ___________________________ -->
@@ -65,12 +63,10 @@
 	<define name="PRELOAD_ALL" unless="web" />
 	<define name="NO_PRELOAD_ALL" unless="PRELOAD_ALL"/>
 
-	<assets path="assets/preload" rename="assets" exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/preload" rename="assets" exclude="*.mp3" unless="MP3_ALLOWED"/>
+	<assets path="assets/preload" rename="assets" exclude="*.ogg"/>
 
 	<section if="TITLE_SCREEN_EASTER_EGG">
-		<assets path="assets/secrets" rename="assets" exclude="*.ogg" if="MP3_ALLOWED"/>
-		<assets path="assets/secrets" rename="assets" exclude="*.mp3" unless="MP3_ALLOWED"/>
+		<assets path="assets/secrets" rename="assets" exclude="*.ogg"/>
 	</section>
 
 	<section if="PRELOAD_ALL">
@@ -95,27 +91,18 @@
 		<library name="week7"         preload="false" />
 	</section>
 
-	<assets path="assets/songs"         library="songs"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/songs"         library="songs"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/shared"        library="shared"        exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/shared"        library="shared"        exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week2"         library="week2"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week2"         library="week2"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week3"         library="week3"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week3"         library="week3"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week4"         library="week4"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week4"         library="week4"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week5"         library="week5"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week5"         library="week5"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week6"         library="week6"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week6"         library="week6"         exclude="*.mp3" unless="MP3_ALLOWED"/>
-	<assets path="assets/week7"         library="week7"         exclude="*.ogg" if="MP3_ALLOWED"/>
-	<assets path="assets/week7"         library="week7"         exclude="*.mp3" unless="MP3_ALLOWED"/>
+	<assets path="assets/songs"         library="songs"         exclude="*.ogg"/>
+	<assets path="assets/shared"        library="shared"        exclude="*.ogg"/>
+	<assets path="assets/week2"         library="week2"         exclude="*.ogg"/>
+	<assets path="assets/week3"         library="week3"         exclude="*.ogg"/>
+	<assets path="assets/week4"         library="week4"         exclude="*.ogg"/>
+	<assets path="assets/week5"         library="week5"         exclude="*.ogg"/>
+	<assets path="assets/week6"         library="week6"         exclude="*.ogg"/>
+	<assets path="assets/week7"         library="week7"         exclude="*.ogg"/>
 
 	<section if="MODS_ALLOWED">
 		<assets path='example_mods' rename='mods'/>
-		<assets path='art/mod_audioinfo/mp3' rename='mods' if="MP3_ALLOWED"/>
-		<assets path='art/mod_audioinfo/ogg' rename='mods' unless="MP3_ALLOWED"/>
+		<assets path='art/mod_audioinfo/mp3' rename='mods'/>
 	</section>
 
 	<assets path='art/readme.txt' rename='do NOT readme.txt' />

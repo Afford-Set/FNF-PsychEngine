@@ -143,7 +143,6 @@ class ChartingState extends MusicBeatState
 	var zoomTxt:FlxText;
 	var curZoom:Int = 1;
 
-	#if !html5
 	var zoomList:Array<Float> = [
 		0.5,
 		1,
@@ -154,16 +153,6 @@ class ChartingState extends MusicBeatState
 		16,
 		24
 	];
-	#else // The grid gets all black when over 1/12 snap
-	var zoomList:Array<Float> = [
-		0.5,
-		1,
-		2,
-		4,
-		8,
-		12
-	];
-	#end
 
 	var camPos:FlxObject;
 

@@ -1,5 +1,9 @@
 package;
 
+#if (html5 || hl)
+#error "HTML5 and Hashlink no more supported."
+#end
+
 import haxe.io.Path;
 
 #if android
@@ -17,14 +21,9 @@ import llua.State;
 import llua.Convert;
 #end
 
-#if CRASH_HANDLER
-#if desktop
+#if (sys && CRASH_HANDLER)
 import sys.io.File;
 import sys.FileSystem;
-#elseif html5
-import js.Browser;
-import js.Lib as JSLib;
-#end
 import haxe.CallStack;
 import haxe.EnumFlags;
 import haxe.Exception;
@@ -157,12 +156,8 @@ class Main extends Sprite
 		FlxG.stage.window.setIcon(icon);
 		#end
 
-		#if CRASH_HANDLER
-		#if hl
-		hl.Api.setErrorHandler(onCrash);
-		#else
+		#if (sys && CRASH_HANDLER)
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);
-		#end
 		#end
 
 		#if DISCORD_ALLOWED
@@ -259,14 +254,14 @@ class Main extends Sprite
 	}
 
 
-	#if CRASH_HANDLER
+	#if (sys && CRASH_HANDLER)
 	/**
 	 * Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	 * very cool person for real they don't get enough credit for their work
 	 */
-	function onCrash(e:Dynamic):Void
+	function onCrash(e:UncaughtErrorEvent):Void
 	{
-		var message:String = Std.isOfType(e, UncaughtErrorEvent) ? e.error : try Std.string(e) catch (_:Exception) "Unknown";
+		var message:String = e.error;
 
 		var errMsg:String = '';
 		var path:String;
@@ -276,7 +271,7 @@ class Main extends Sprite
 		dateNow = dateNow.replace(' ', '_');
 		dateNow = dateNow.replace(':', "'");
 
-		path = './crash/' + 'NullEngine_' + dateNow + '.txt';
+		path = './crash/' + 'PsychEngine_' + dateNow + '.txt';
 
 		for (stackItem in callStack)
 		{
@@ -289,7 +284,6 @@ class Main extends Sprite
 
 		errMsg += '\nUncaught Error: ' + message + '\nPlease report this error to the GitHub page: https://github.com/Afford-Set/FNF-PsychEngine\n\n> Crash Handler written by: sqirra-rng';
 
-		#if (sys && desktop)
 		if (!FileSystem.exists('./crash/')) {
 			FileSystem.createDirectory('./crash/');
 		}
@@ -299,24 +293,13 @@ class Main extends Sprite
 		Sys.println(errMsg);
 		Sys.println('Crash dump saved in ' + Path.normalize(path));
 
-		#if hl
-		var flags:EnumFlags<hl.UI.DialogFlags> = new EnumFlags<hl.UI.DialogFlags>();
-		flags.set(IsError);
-		hl.UI.dialog("Error!", errMsg, flags);
-		#else
 		Debug.displayAlert('Error!', errMsg);
-		#end
-		#elseif html5
-		Browser.alert('Error!\n\n' + errMsg);
-		#end
 
 		#if DISCORD_ALLOWED
 		DiscordClient.shutdown();
 		#end
 
-		#if (sys && desktop)
 		Sys.exit(1);
-		#end
 	}
 	#end
 }

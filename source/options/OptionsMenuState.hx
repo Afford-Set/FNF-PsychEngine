@@ -16,7 +16,7 @@ class OptionsMenuState extends MusicBeatState
 {
 	public static var curSelected:Int = 0;
 
-	private var options:Array<String> = ['Preferences', 'Controls', 'Note Colors', 'Adjust Delay and Combo', #if REPLAYS_ALLOWED 'Replays', #end 'Exit'];
+	private var options:Array<String> = ['Preferences', 'Controls', 'Note Colors', 'Adjust Delay and Combo', 'Exit'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 
 	var selectorLeft:Alphabet;
@@ -41,15 +41,6 @@ class OptionsMenuState extends MusicBeatState
 
 				return;
 			}
-			#if REPLAYS_ALLOWED
-			case 'Replays':
-			{
-				FlxG.sound.play(Paths.getSound('cancelMenu'));
-				FlxG.switchState(new ReplaysMenuState());
-
-				return;
-			}
-			#end
 			case 'Exit':
 			{
 				FlxG.sound.play(Paths.getSound('cancelMenu'));

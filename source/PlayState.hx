@@ -28,10 +28,6 @@ import DialogueBoxPsych;
 import Achievements;
 #end
 
-#if REPLAYS_ALLOWED
-import Replay;
-#end
-
 #if RUNTIME_SHADERS_ALLOWED
 import flixel.addons.display.FlxRuntimeShader;
 #end
@@ -240,11 +236,6 @@ class PlayState extends MusicBeatState
 	var keysPressed:Array<Int> = [];
 	var boyfriendIdleTime:Float = 0.0;
 	var boyfriendIdled:Bool = false;
-
-	#if REPLAYS_ALLOWED
-	var keyPresses:Array<KeySaveEvent> = [];
-	var keyReleases:Array<KeySaveEvent> = [];
-	#end
 
 	private var keysArray:Array<String>;
 
@@ -521,7 +512,7 @@ class PlayState extends MusicBeatState
 					camHUD.visible = false;
 					FlxG.camera.zoom = 2.1;
 
-					FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5,
+					FlxTween.tween(FlxG.camera, {zoom: defaultCamZoom}, 2.5 / playbackRate,
 					{
 						ease: FlxEase.quadInOut,
 						onComplete: function(twn:FlxTween):Void
@@ -711,7 +702,6 @@ class PlayState extends MusicBeatState
 		{
 			case 'story': detailsText = "Story Mode: " + WeekData.getCurrentWeek().weekName;
 			case 'freeplay': detailsText = "Freeplay";
-			case 'replay': detailsText = "Replay";
 			default: detailsText = "Unknown";
 		}
 
@@ -2436,27 +2426,16 @@ class PlayState extends MusicBeatState
 
 	private function generateSong(songData:SwagSong):Void
 	{
-		switch (gameMode)
-		{
-			case 'replay':
-			{
-				songSpeed = Replay.current.speed;
-				cpuControlled = true;
-			}
-			default:
-			{
-				songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
+		songSpeedType = ClientPrefs.getGameplaySetting('scrolltype');
 
-				switch (songSpeedType)
-				{
-					case 'multiplicative':
-						songSpeed = songData.speed * ClientPrefs.getGameplaySetting('scrollspeed');
-					case 'constant':
-						songSpeed = ClientPrefs.getGameplaySetting('scrollspeed');
-					default:
-						songSpeed = songData.speed;
-				}
-			}
+		switch (songSpeedType)
+		{
+			case 'multiplicative':
+				songSpeed = songData.speed * ClientPrefs.getGameplaySetting('scrollspeed');
+			case 'constant':
+				songSpeed = ClientPrefs.getGameplaySetting('scrollspeed');
+			default:
+				songSpeed = songData.speed;
 		}
 
 		Conductor.bpm = songData.bpm;
@@ -2647,13 +2626,11 @@ class PlayState extends MusicBeatState
 
 	function eventEarlyTrigger(event:EventNote):Float
 	{
-		#if !hl
 		var returnedValue:Null<Float> = callOnScripts('eventEarlyTrigger', [event.event, event.value1, event.value2, event.strumTime], true, [], [0]);
 
 		if (returnedValue != null && returnedValue != 0 && returnedValue != Function_Continue) {
 			return returnedValue;
 		}
-		#end
 
 		switch (event.event)
 		{
@@ -3226,7 +3203,7 @@ class PlayState extends MusicBeatState
 		return health;
 	}
 
-	private function makeOperationsActive(value:Bool = false):Void
+	private function makeOperationsActive(value:Bool = true):Void
 	{
 		camGame.active = value;
 		camCustom.active = value;
@@ -4170,13 +4147,6 @@ class PlayState extends MusicBeatState
 				if (Math.isNaN(percent)) percent = 0;
 
 				Highscore.saveScore(SONG.songID, storyDifficulty, songScore, percent);
-
-				#if REPLAYS_ALLOWED
-				Replay.saveReplay(SONG, songSpeed, storyWeek, lastDifficulty, CoolUtil.difficultyStuff.copy(), keyPresses.copy(), keyReleases.copy());
-
-				keyPresses = null;
-				keyReleases = null;
-				#end
 			}
 			#end
 
@@ -4263,18 +4233,6 @@ class PlayState extends MusicBeatState
 					firstSong = null;
 
 					FlxG.switchState(new FreeplayMenuState());
-				}
-				case 'replay':
-				{
-					Paths.loadTopMod(); #if DISCORD_ALLOWED
-					DiscordClient.resetClientID();
-					#end
-
-					cancelMusicFadeTween();
-
-					firstSong = null;
-
-					FlxG.switchState(new options.ReplaysMenuState());
 				}
 				default:
 				{
@@ -4576,16 +4534,6 @@ class PlayState extends MusicBeatState
 			spr.resetAnim = 0;
 		}
 
-		#if REPLAYS_ALLOWED
-		if (keyPresses != null)
-		{
-			keyPresses.push({
-				time: Conductor.songPosition,
-				key: key
-			});
-		}
-		#end
-
 		callOnScripts('onKeyPress', [key]);
 	}
 
@@ -4623,16 +4571,6 @@ class PlayState extends MusicBeatState
 				spr.playAnim('static');
 				spr.resetAnim = 0;
 			}
-
-			#if REPLAYS_ALLOWED
-			if (keyReleases != null)
-			{
-				keyReleases.push({
-					time: Conductor.songPosition,
-					key: key
-				});
-			}
-			#end
 
 			callOnScripts('onKeyRelease', [key]);
 		}

@@ -87,12 +87,6 @@ class TitleState extends MusicBeatState
 		FlxG.mouse.useSystemCursor = true;
 		#end
 
-		#if (sys && REPLAYS_ALLOWED)
-		if (!FileSystem.exists(Paths.getPreloadPath('replays'))) {
-			FileSystem.createDirectory(Paths.getPreloadPath('replays'));
-		}
-		#end
-
 		FlxG.fixedTimestep = false;
 		FlxG.game.focusLostFramerate = 60;
 		FlxG.keys.preventDefaultKeys = [TAB];

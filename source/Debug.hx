@@ -5,10 +5,6 @@ import haxe.PosInfos;
 
 import Song;
 
-#if (html5 && js)
-import js.Browser;
-#end
-
 #if (sys && desktop)
 import sys.io.File;
 import sys.FileSystem;
@@ -101,11 +97,7 @@ class Debug // stolen from kade engine
 	 */
 	public static function displayAlert(title:String, description:String):Void
 	{
-		#if (html5 && js)
-		Browser.alert(title + '\n\n' + description);
-		#else
 		FlxG.stage.application.window.alert(description, title);
-		#end
 	}
 
 	/**

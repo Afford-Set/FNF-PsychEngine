@@ -42,34 +42,6 @@
 			"args": [
 				"-release"
 			]
-		},
-		{
-			"label": "Build HTML5 (Debug)",
-			"target": "html5",
-			"args": [
-				"-debug"
-			]
-		},
-		{
-			"label": "Build HTML5 (Release)",
-			"target": "html5",
-			"args": [
-				"-release"
-			]
-		},
-		{
-			"label": "Build Hashlink (Debug)",
-			"target": "hl",
-			"args": [
-				"-debug"
-			]
-		},
-		{
-			"label": "Build Hashlink (Release)",
-			"target": "hl",
-			"args": [
-				"-release"
-			]
 		}
 	]
 }

@@ -16,20 +16,6 @@
 			"program": "${workspaceFolder}/export/release/windows/bin/Psych Engine.exe"
 		},
 		{
-			"name": "HTML5 (Debug)",
-			"request": "launch",
-			"preLaunchTask": "Build HTML5 (Debug)",
-			"type": "node-terminal",
-			"command": "npx live-server \"${workspaceFolder}/export/debug/html5/bin/\""
-		},
-		{
-			"name": "HTML5 (Release)",
-			"request": "launch",
-			"preLaunchTask": "Build HTML5 (Release)",
-			"type": "node-terminal",
-			"command": "npx live-server \"${workspaceFolder}/export/release/html5/bin/\""
-		},
-		{
 			"name": "Linux (Debug)",
 			"type": "hxcpp",
 			"preLaunchTask": "Build Linux (Debug)",

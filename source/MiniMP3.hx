@@ -1,7 +1,5 @@
 package;
 
-#if MP3_ALLOWED
-#if cpp
 import cpp.NativeArray;
 import cpp.Int8;
 import cpp.Char;
@@ -1826,5 +1824,3 @@ typedef MP3Data =
 	var sampleRate:Int;
 	var channels:Int;
 }
-#end
-#end

@@ -37,7 +37,7 @@ typedef ModsList =
 
 class Paths
 {
-	public static var SOUND_EXT:Dynamic = #if MP3_ALLOWED 'mp3' #else 'ogg' #end;
+	public static var SOUND_EXT:Dynamic = 'mp3';
 	public static var VIDEO_EXT:Dynamic = 'mp4';
 
 	public static var globalMods(default, null):Array<String> = [];
@@ -556,18 +556,13 @@ class Paths
 				if (getFileLocation) return file;
 
 				if (!currentTrackedSounds.exists(file))
-				{	#if (MP3_ALLOWED && cpp)
-					if (StringTools.endsWith(file, '.mp3'))
-					{
-						var bytes:ByteArray = ByteArray.fromFile(file);
-						var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
-			
-						var sound:Sound = new Sound();
-						sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
-						currentTrackedSounds.set(file, sound);
-					}
-					else #end
-						currentTrackedSounds.set(file, Sound.fromFile(file));
+				{
+					var bytes:ByteArray = ByteArray.fromFile(file);
+					var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+		
+					var sound:Sound = new Sound();
+					sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+					currentTrackedSounds.set(file, sound);
 				}
 
 				localTrackedAssets.push(file);
@@ -586,18 +581,13 @@ class Paths
 			var cutPath:String = gottenPath.substr(gottenPath.indexOf(':') + 1);
 
 			if (!currentTrackedSounds.exists(cutPath))
-			{	#if (MP3_ALLOWED && cpp)
-				if (StringTools.endsWith(gottenPath, '.mp3'))
-				{
-					var bytes:ByteArray = OpenFlAssets.getBytes(gottenPath);
-					var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
-		
-					var sound:Sound = new Sound();
-					sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
-					currentTrackedSounds.set(cutPath, sound);
-				}
-				else #end
-					currentTrackedSounds.set(cutPath, OpenFlAssets.getSound(gottenPath));
+			{
+				var bytes:ByteArray = OpenFlAssets.getBytes(gottenPath);
+				var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
+
+				var sound:Sound = new Sound();
+				sound.loadCompressedDataFromByteArray(decodedBytes, decodedBytes.length);
+				currentTrackedSounds.set(cutPath, sound);
 			}
 
 			localTrackedAssets.push(cutPath);
@@ -627,7 +617,6 @@ class Paths
 			{
 				if (FileSystem.exists(cutPath) && !OpenFlAssets.exists(path))
 				{
-					#if (MP3_ALLOWED && cpp)
 					return ByteArray.loadFromFile(cutPath).then(function(bytes:ByteArray):Future<Sound>
 					{
 						var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
@@ -639,20 +628,12 @@ class Paths
 						localTrackedAssets.push(cutPath);
 						return Future.withValue(sound);
 					});
-					#else
-					return Sound.loadFromFile(cutPath).onComplete(function(snd:Sound):Void
-					{
-						currentTrackedSounds.set(cutPath, snd);
-						localTrackedAssets.push(cutPath);
-					});
-					#end
 				}
 			}
 			#end
 
 			if (OpenFlAssets.exists(path, SOUND))
 			{
-				#if (MP3_ALLOWED && cpp)
 				return OpenFlAssets.loadBytes(path).then(function(bytes:ByteArray):Future<Sound>
 				{
 					var decodedBytes:ByteArray = MiniMP3.encodeWav(MiniMP3.decodeMP3(bytes));
@@ -664,13 +645,6 @@ class Paths
 					localTrackedAssets.push(cutPath);
 					return Future.withValue(sound);
 				});
-				#else
-				return OpenFlAssets.loadSound(path).onComplete(function(snd:Sound):Void
-				{
-					currentTrackedSounds.set(cutPath, snd);
-					localTrackedAssets.push(cutPath);
-				});
-				#end
 			}
 		}
 

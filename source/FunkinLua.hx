@@ -1388,8 +1388,6 @@ class FunkinLua
 					FlxG.switchState(new StoryMenuState());
 				case 'freeplay':
 					FlxG.switchState(new FreeplayMenuState());
-				case 'replay':
-					FlxG.switchState(new options.ReplaysMenuState());
 				default:
 					FlxG.switchState(new MainMenuState());
 			}

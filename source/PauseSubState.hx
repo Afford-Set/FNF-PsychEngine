@@ -46,7 +46,7 @@ class PauseSubState extends MusicBeatSubState
 
 	override function create():Void
 	{
-		if (CoolUtil.difficultyStuff.length < 2 || PlayState.gameMode == 'replay') pauseOG.remove('Change Difficulty'); // No need to change difficulty if there is only one!
+		if (CoolUtil.difficultyStuff.length < 2) pauseOG.remove('Change Difficulty'); // No need to change difficulty if there is only one!
 
 		if (PlayState.chartingMode)
 		{
@@ -450,8 +450,6 @@ class PauseSubState extends MusicBeatSubState
 							FlxG.switchState(new StoryMenuState());
 						case 'freeplay':
 							FlxG.switchState(new FreeplayMenuState());
-						case 'replay':
-							FlxG.switchState(new options.ReplaysMenuState());
 						default:
 							FlxG.switchState(new MainMenuState());
 					}
