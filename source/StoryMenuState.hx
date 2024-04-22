@@ -113,8 +113,7 @@ class StoryMenuState extends MusicBeatState
 				weeksArray.push(weekFile);
 				WeekData.setDirectoryFromWeek(weekFile);
 
-				var weekThing:MenuItem = new MenuItem(0, bgYellow.y + 396, weekFile.itemFile);
-				weekThing.y += ((weekThing.height + 20) * num);
+				var weekThing:MenuItem = new MenuItem(0, (num * 120) + 465, weekFile.itemFile);
 				weekThing.targetY = num;
 				grpWeekText.add(weekThing);
 
@@ -199,6 +198,11 @@ class StoryMenuState extends MusicBeatState
 		curDifficulty = Math.round(Math.max(0, CoolUtil.getDifficultyIndex(lastDifficultyName)));
 
 		changeSelection();
+
+		for (item in grpWeekText.members) {
+			item.snapToPosition();
+		}
+
 		super.create();
 	}
 

@@ -338,7 +338,7 @@ class PlayState extends MusicBeatState
 			{
 				#if LUA_ALLOWED
 				if (file.toLowerCase().endsWith('.lua')) {
-					luaArray.push(new FunkinLua(folder + file));
+					new FunkinLua(folder + file);
 				}
 				#end
 
@@ -456,7 +456,7 @@ class PlayState extends MusicBeatState
 			{
 				#if LUA_ALLOWED
 				if (file.toLowerCase().endsWith('.lua')) {
-					luaArray.push(new FunkinLua(folder + file));
+					new FunkinLua(folder + file);
 				}
 				#end
 
@@ -1459,7 +1459,7 @@ class PlayState extends MusicBeatState
 				if (script.scriptName == luaFile + '.lua') return;
 			}
 
-			luaArray.push(new FunkinLua(replacePath));
+			new FunkinLua(replacePath);
 		}
 		#end
 
@@ -2977,7 +2977,7 @@ class PlayState extends MusicBeatState
 						}
 						case 'STOPPING':
 						{
-							bgLimo.x = FlxMath.lerp(bgLimo.x, -150, Math.exp(-elapsed * 9 * playbackRate));
+							bgLimo.x = FlxMath.lerp(-150, bgLimo.x, Math.exp(-elapsed * 9 * playbackRate));
 
 							if (Math.round(bgLimo.x) == -150)
 							{
@@ -5370,8 +5370,6 @@ class PlayState extends MusicBeatState
 			}
 
 			var lua:FunkinLua = new FunkinLua(luaToLoad);
-			luaArray.push(lua);
-
 			return !lua.closed;
 		}
 

@@ -101,6 +101,7 @@ class FunkinLua
 		this.scriptName = scriptName;
 
 		final game:PlayState = PlayState.instance;
+		game.luaArray.push(this);
 
 		#if MODS_ALLOWED
 		final myFolder:Array<String> = this.scriptName.split('/');
@@ -390,7 +391,7 @@ class FunkinLua
 					}
 				}
 
-				game.luaArray.push(new FunkinLua(foundScript));
+				new FunkinLua(foundScript);
 			}
 			else {
 				PlayState.debugTrace("addLuaScript: Script doesn't exist!", false, 'error', FlxColor.RED);

@@ -29,7 +29,6 @@ class LoadingState extends MusicBeatState
 	var callbacks:MultiCallback;
 
 	var loadBar:Sprite;
-	var funkay:Sprite;
 
 	function new(target:FlxState, stopMusic:Bool, directory:String):Void
 	{
@@ -46,7 +45,7 @@ class LoadingState extends MusicBeatState
 		bg.makeGraphic(FlxG.width, FlxG.height, 0xFFcaff4d);
 		add(bg);
 
-		funkay = new Sprite();
+		var funkay:Sprite = new Sprite();
 		funkay.loadGraphic(Paths.getImage('bg/funkay'));
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
@@ -141,15 +140,6 @@ class LoadingState extends MusicBeatState
 	override function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
-
-		funkay.setGraphicSize(Std.int(FlxMath.lerp(FlxG.width * 0.88, funkay.width, 0.9)));
-		funkay.updateHitbox();
-
-		if (controls.ACCEPT_P)
-		{
-			funkay.setGraphicSize(Std.int(funkay.width + 60));
-			funkay.updateHitbox();
-		}
 
 		if (callbacks != null)
 		{

@@ -319,30 +319,30 @@ class Achievements
 
 	public static function unlock(name:String, playSound:Bool = true, autoStartPopup:Bool = true):String
 	{
-		if (exists(name))
+		if (!exists(name))
 		{
-			if (isUnlocked(name)) return null;
-
-			Debug.logInfo('Completed achievement "' + name +'"');
-			achievementsUnlocked.push(name);
-
-			var time:Int = Lib.getTimer();
-
-			if (Math.abs(time - _lastUnlock) >= 100 && playSound) // If last unlocked happened in less than 100 ms (0.1s) ago, then don't play sound
-			{
-				FlxG.sound.play(Paths.getSound('confirmMenu'), 0.5);
-				_lastUnlock = time;
-			}
-
-			save();
-			_save.flush();
-
-			if (autoStartPopup) startPopup(name);
-			return name;
+			throw new Error('Achievement "' + name + '" does not exists!');
+			return null;
 		}
-		else {
-			throw new Error('Achievement "' + name + '" not exists!');
+
+		if (isUnlocked(name)) return null;
+
+		Debug.logInfo('Completed achievement "' + name +'"');
+		achievementsUnlocked.push(name);
+
+		var time:Int = Lib.getTimer();
+
+		if (Math.abs(time - _lastUnlock) >= 100 && playSound) // If last unlocked happened in less than 100 ms (0.1s) ago, then don't play sound
+		{
+			FlxG.sound.play(Paths.getSound('confirmMenu'), 0.5);
+			_lastUnlock = time;
 		}
+
+		save();
+		_save.flush();
+
+		if (autoStartPopup) startPopup(name);
+		return name;
 	}
 
 	@:allow(AchievementPopup)
