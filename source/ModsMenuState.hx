@@ -272,13 +272,26 @@ class ModsMenuState extends MusicBeatState
 				button.enabled = false;
 		}
 
+		settingsButton = new MenuButton(buttonsX + 300, buttonsY, 80, 80, Paths.getImage('modsMenuButtons'), function():Void // Settings
+		{
+			var curMod:ModItem = modsGroup.members[curSelectedMod];
+
+			if (curMod != null && curMod.settings != null && curMod.settings.length > 0) {
+				openSubState(new options.ModSettingsSubState(curMod.settings, curMod.folder, curMod.name));
+			}
+		}, 54, 54);
+
 		settingsButton.icon.animation.add('icon', [3]);
 		settingsButton.icon.animation.play('icon', true);
 		add(settingsButton);
 
 		buttons.push(settingsButton);
 
-		var button:MenuButton = new MenuButton(buttonsX + 400, buttonsY, 80, 80, Paths.getImage('modsMenuButtons'), function():Void //On/Off
+		if (modsGroup.members[curSelectedMod].settings == null || modsGroup.members[curSelectedMod].settings.length < 1) {
+			settingsButton.enabled = false;
+		}
+
+		var button:MenuButton = new MenuButton(buttonsX + 400, buttonsY, 80, 80, Paths.getImage('modsMenuButtons'), function():Void // On/Off
 		{
 			var curMod:ModItem = modsGroup.members[curSelectedMod];
 			var mod:String = curMod.folder;
@@ -371,7 +384,7 @@ class ModsMenuState extends MusicBeatState
 			persistentUpdate = false;
 
 			FlxG.autoPause = ClientPrefs.autoPause;
-			FlxG.mouse.visible = false;
+			FlxG.mouse.visible = !controls.controllerMode;
 
 			return;
 		}
@@ -379,10 +392,10 @@ class ModsMenuState extends MusicBeatState
 		if (Math.abs(FlxG.mouse.deltaX) > 10 || Math.abs(FlxG.mouse.deltaY) > 10)
 		{
 			controls.controllerMode = false;
-			if (!FlxG.mouse.visible) FlxG.mouse.visible = true;
+			FlxG.mouse.visible = !controls.controllerMode;
 		}
-		
-		if(controls.controllerMode != _lastControllerMode)
+
+		if (controls.controllerMode != _lastControllerMode)
 		{
 			if (controls.controllerMode) FlxG.mouse.visible = false;
 			_lastControllerMode = controls.controllerMode;
@@ -778,6 +791,7 @@ class ModsMenuState extends MusicBeatState
 		modDesc.text = curMod.desc;
 
 		for (button in buttons) if (button.focusChangeCallback != null) button.focusChangeCallback(button.onFocus);
+		settingsButton.enabled = (curMod.settings != null && curMod.settings.length > 0);
 	}
 
 	var centerMod:Int = 2;
@@ -898,6 +912,7 @@ class ModItem extends FlxSpriteGroup
 	public var pack:Dynamic = null;
 	public var folder:String = 'ui/unknownMod';
 	public var mustRestart:Bool = false;
+	public var settings:Array<Dynamic> = null;
 
 	public function new(folder:String):Void
 	{
@@ -905,6 +920,28 @@ class ModItem extends FlxSpriteGroup
 
 		this.folder = folder;
 		pack = Paths.getModPack(folder);
+
+		var path:String = Paths.mods('$folder/data/settings.json');
+
+		if (FileSystem.exists(path))
+		{
+			var data:String = File.getContent(path);
+
+			try {
+				settings = Json.parse(data);
+			}
+			catch (e:Dynamic)
+			{
+				var errorTitle:String = 'Mod name: ' + Paths.currentModDirectory;
+				var errorMsg:String = 'An error occurred: $e';
+
+				#if windows
+				Debug.displayAlert(errorTitle, errorMsg);
+				#end
+
+				Debug.logError('$errorTitle - $errorMsg');
+			}
+		}
 
 		selectBg = new FlxSprite();
 		selectBg.makeGraphic(1, 1, FlxColor.WHITE);

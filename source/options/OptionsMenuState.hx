@@ -16,7 +16,7 @@ class OptionsMenuState extends MusicBeatState
 {
 	public static var curSelected:Int = 0;
 
-	private var options:Array<String> = ['Preferences', 'Controls', 'Note Colors', 'Adjust Delay and Combo', 'Exit'];
+	private var options:Array<String> = ['Note Colors', 'Controls', 'Adjust Delay and Combo', 'Graphics', 'Visuals and UI', 'Gameplay'];
 	private var grpOptions:FlxTypedGroup<Alphabet>;
 
 	var selectorLeft:Alphabet;
@@ -28,9 +28,8 @@ class OptionsMenuState extends MusicBeatState
 	{
 		switch (label)
 		{
-			case 'Preferences': openSubState(new PreferencesSubState());
-			case 'Controls': openSubState(new ControlsSubState());
 			case 'Note Colors': openSubState(new NotesSubState());
+			case 'Controls': openSubState(new ControlsSubState());
 			case 'Adjust Delay and Combo':
 			{
 				FlxG.sound.music.pause();
@@ -41,21 +40,9 @@ class OptionsMenuState extends MusicBeatState
 
 				return;
 			}
-			case 'Exit':
-			{
-				FlxG.sound.play(Paths.getSound('cancelMenu'));
-
-				if (onPlayState)
-				{
-					StageData.loadDirectory(PlayState.SONG);
-					LoadingState.loadAndSwitchState(new PlayState(), true);
-	
-					FlxG.sound.music.volume = 0;
-				}
-				else FlxG.switchState(new MainMenuState());
-
-				return;
-			}
+			case 'Graphics': openSubState(new GraphicsSettingsSubState());
+			case 'Visuals and UI': openSubState(new VisualsUISubState());
+			case 'Gameplay': openSubState(new GameplaySettingsSubState());
 			default:
 			{
 				flickering = false;

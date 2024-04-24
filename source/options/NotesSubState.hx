@@ -6,6 +6,10 @@ import Note;
 import StrumNote;
 import shaderslmfao.RGBPalette;
 
+#if DISCORD_ALLOWED
+import Discord.DiscordClient;
+#end
+
 import flixel.FlxG;
 import flixel.FlxBasic;
 import flixel.FlxSprite;
@@ -63,6 +67,10 @@ class NotesSubState extends MusicBeatSubState
 	public function new():Void
 	{
 		super();
+
+		#if DISCORD_ALLOWED
+		DiscordClient.changePresence("Note Colors Menu", null);
+		#end
 
 		modeBG = new Sprite(215, 85);
 		modeBG.makeGraphic(315, 115, FlxColor.BLACK);

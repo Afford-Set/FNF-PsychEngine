@@ -54,6 +54,8 @@ class NoteSplash extends FlxSprite
 
 		_configLoaded = skin;
 		scrollFactor.set();
+
+		setupNoteSplash(x, y, 0);
 	}
 
 	override function destroy():Void
@@ -72,19 +74,25 @@ class NoteSplash extends FlxSprite
 
 		var texture:String = null;
 
-		if (note != null && note.noteSplashData.texture != null) {
-			texture = note.noteSplashData.texture;
-		}
-		else if (note.mustPress && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.trim().length > 0) {
-			texture = PlayState.SONG.splashSkin;
-		}
-		else if (!note.mustPress && PlayState.SONG.splashSkin2 != null && PlayState.SONG.splashSkin2.trim().length > 0) {
-			texture = PlayState.SONG.splashSkin2;
+		if (note != null)
+		{
+			if (note.noteSplashData.texture != null) {
+				texture = note.noteSplashData.texture;
+			}
+			else if (note.mustPress && PlayState.SONG.splashSkin != null && PlayState.SONG.splashSkin.trim().length > 0) {
+				texture = PlayState.SONG.splashSkin;
+			}
+			else if (!note.mustPress && PlayState.SONG.splashSkin2 != null && PlayState.SONG.splashSkin2.trim().length > 0) {
+				texture = PlayState.SONG.splashSkin2;
+			}
+			else {
+				texture = defaultNoteSplash + getSplashSkinPostfix();
+			}
 		}
 		else {
 			texture = defaultNoteSplash + getSplashSkinPostfix();
 		}
-		
+
 		var config:NoteSplashConfig = null;
 
 		if (_textureLoaded != texture) {
