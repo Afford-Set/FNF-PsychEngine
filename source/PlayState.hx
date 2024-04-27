@@ -401,17 +401,26 @@ class PlayState extends MusicBeatState
 		generateSong(SONG);
 
 		camFollow = new FlxObject(0, 0, 1, 1);
-		moveCameraToGF(true);
 
 		if (prevCamFollow != null) {
 			camFollow = prevCamFollow;
+		}
+		else
+		{
+			if (gf != null && SONG.gfVersion != 'none') {
+				moveCameraToGF(true);
+			}
+			else
+			{
+				moveCameraToGF(true);
+				cameraMovementSection();
+			}
 		}
 
 		add(camFollow);
 
 		FlxG.camera.follow(camFollow, null, 0);
 		FlxG.camera.zoom = defaultCamZoom;
-		FlxG.camera.snapToTarget();
 
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
 
@@ -4033,7 +4042,7 @@ class PlayState extends MusicBeatState
 	public function snapCamFollowToPos(x:Float, y:Float):Void
 	{
 		camFollow.setPosition(x, y);
-		FlxG.camera.focusOn(FlxPoint.get(x, y));
+		FlxG.camera.snapToTarget();
 	}
 
 	public function finishSong(?ignoreNoteOffset:Bool = false):Void

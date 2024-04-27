@@ -2011,6 +2011,8 @@ class FunkinLua
 
 		set("playSound", function(sound:String, volume:Float = 1, ?tag:String = null):Void
 		{
+			if (!Paths.fileExists('sounds/' + sound + '.' + Paths.SOUND_EXT, SOUND)) return;
+
 			if (tag != null && tag.length > 0)
 			{
 				tag = tag.replace('.', '');
