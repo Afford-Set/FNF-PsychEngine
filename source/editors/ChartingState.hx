@@ -90,6 +90,8 @@ class ChartingState extends MusicBeatState
 		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"],
 		['Set Camera Zoom', "Value 1: New camera zoom\n(Default: Stage Camera Zoom)"],
 		['Set Camera Speed', "Value 1: New camera speed\n(Default: Stage Camera Speed)"],
+		['Camera Tween Pos', "Tweens the position of the GAME CAMERA and LOCKS it. You can use this event and the \"Camera Follow Pos\" one after another respectively.\n\nValue 1: x, y, Duration (with a ', ' between the values)\nValue 2: ease"],
+		['Camera Tween Zoom', "Tweens the game camera's zoom to a specific value in a specific duration in a specific ease\n\nValue 1: TargetZoom, Duration (with a ', ' between the values)\nValue 2: ease"],
 		['Move Camera', "Value 1: Target (Dad, GF, BF)\n\nIf empty, camera moves to\ncharacter by current section."],
 		['Camera Flash', "Value 1: Arguments - Camera, Duration\nExample: \"game, 1\"\n\nValue 2: Color"],
 		['Camera Fade', "Value 1: Arguments - Camera, Duration, Fade in (boolean value)\nExample: \"game, 1, true\"\n\nValue 2: Color"]
@@ -135,7 +137,6 @@ class ChartingState extends MusicBeatState
 	var curEventSelected:Int = 0;
 	var curSelectedNote:Array<Dynamic> = null;
 
-	var tempBpm:Float = 0;
 	var playbackSpeed:Float = 1;
 
 	var vocals:FlxSound;
@@ -282,7 +283,6 @@ class ChartingState extends MusicBeatState
 
 		FlxG.mouse.visible = !controls.controllerMode;
 
-		tempBpm = _song.bpm;
 		addSection();
 
 		currentSongName = Paths.formatToSongPath(_song.songID);
@@ -1740,10 +1740,14 @@ class ChartingState extends MusicBeatState
 				case 'song_speed': _song.speed = nums.value;
 				case 'song_bpm':
 				{
-					tempBpm = nums.value;
+					_song.bpm = nums.value;
 
 					Conductor.mapBPMChanges(_song);
 					Conductor.bpm = nums.value;
+
+					stepperSusLength.stepSize = Math.ceil(Conductor.stepCrochet / 2);
+
+					updateGrid();
 				}
 				case 'note_susLength':
 				{

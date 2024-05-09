@@ -159,9 +159,7 @@ class Paths
 
 	public static function getPath(file:String, type:AssetType, ?library:Null<String> = null):String
 	{
-		if (library != null) {
-			return getLibraryPath(file, library);
-		}
+		if (library != null) return getLibraryPath(file, library);
 
 		if (currentLevel != null)
 		{
@@ -170,17 +168,11 @@ class Paths
 			if (currentLevel != 'shared')
 			{
 				levelPath = getLibraryPath(file, currentLevel);
-
-				if (OpenFlAssets.exists(levelPath, type)) {
-					return levelPath;
-				}
+				if (OpenFlAssets.exists(levelPath, type)) return levelPath;
 			}
 
 			levelPath = getLibraryPath(file, 'shared');
-
-			if (OpenFlAssets.exists(levelPath, type)) {
-				return levelPath;
-			}
+			if (OpenFlAssets.exists(levelPath, type)) return levelPath;
 		}
 
 		return getPreloadPath(file);

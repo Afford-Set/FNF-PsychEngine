@@ -3394,6 +3394,9 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+	public var cameraPosTweenEvent:FlxTween;
+	public var cameraZoomTweenEvent:FlxTween;
+
 	public function triggerEvent(eventName:String, value1:String, value2:String, ?strumTime:Float):Void
 	{
 		var flValue1:Null<Float> = Std.parseFloat(value1);
@@ -3670,6 +3673,12 @@ class PlayState extends MusicBeatState
 			}
 			case 'Camera Follow Pos':
 			{
+				if (cameraPosTweenEvent != null)
+				{
+					cameraPosTweenEvent.cancel();
+					cameraPosTweenEvent = null;
+				}
+
 				if (camFollow != null)
 				{
 					isCameraOnForcedPos = false;
@@ -3878,6 +3887,12 @@ class PlayState extends MusicBeatState
 			}
 			case 'Set Camera Zoom':
 			{
+				if (cameraZoomTweenEvent != null)
+				{
+					cameraZoomTweenEvent.cancel();
+					cameraZoomTweenEvent = null;
+				}
+
 				if (flValue1 == null) flValue1 = stageData.defaultZoom;
 				defaultCamZoom = flValue1;
 			}
@@ -3885,6 +3900,86 @@ class PlayState extends MusicBeatState
 			{
 				if (flValue1 == null) flValue1 = stageData.camera_speed;
 				cameraSpeed = flValue1;
+			}
+			case 'Camera Tween Pos':
+			{
+				if (cameraPosTweenEvent != null)
+				{
+					cameraPosTweenEvent.cancel();
+					cameraPosTweenEvent = null;
+				}
+
+				if ((value1 == null || value1.length < 1) && (value2 == null || value2.length < 1)) {
+					isCameraOnForcedPos = false;
+				}
+				else
+				{
+					var split:Array<String> = [for (i in value1.trim().split(',')) i = i.trim()];
+
+					var x:Float = ((split[0] == null || split[0].length < 1) ? 0 : Std.parseFloat(split[0]));
+					if (Math.isNaN(x)) x = 0;
+
+					var y:Float = ((split[1] == null || split[1].length < 1) ? 0 : Std.parseFloat(split[1]));
+					if (Math.isNaN(y)) y = 0;
+
+					var duration:Float = ((split[2] == null || split[2].length < 1) ? 1 : Std.parseFloat(split[2]));
+					if (Math.isNaN(duration)) duration = 1;
+
+					cameraPosTweenEvent = FlxTween.tween(FlxG.camera.scroll, {x: x - (FlxG.width / 2), y: y - (FlxG.height / 2)}, duration,
+					{
+						ease: getTweenEaseByString(value2),
+						onComplete: function(twn:FlxTween):Void
+						{
+							if (!isCameraOnForcedPos) return;
+
+							camFollow.x = x;
+							camFollow.y = y;
+
+							cameraPosTweenEvent = null;
+						}
+					});
+
+					isCameraOnForcedPos = true;
+				}
+			}
+			case 'Camera Tween Zoom':
+			{
+				if (cameraZoomTweenEvent != null)
+				{
+					cameraZoomTweenEvent.cancel();
+					cameraZoomTweenEvent = null;
+				}
+
+				if ((value1 == null || value1.length < 1) && (value2 == null || value2.length < 1))
+				{
+					camZooming = false;
+					defaultCamZoom = stageData.defaultZoom;
+				}
+				else
+				{
+					var split:Array<String> = [for (i in value1.trim().split(',')) i = i.trim()];
+
+					var zoom:Float = ((split[0] == null || split[0].length < 1) ? stageData.defaultZoom : Std.parseFloat(split[0]));
+					if (Math.isNaN(zoom)) zoom = 0;
+
+					var duration:Float = ((split[2] == null || split[2].length < 1) ? 1 : Std.parseFloat(split[2]));
+					if (Math.isNaN(duration)) duration = 1;
+
+					cameraZoomTweenEvent = FlxTween.tween(FlxG.camera, {zoom: zoom}, duration,
+					{
+						ease: getTweenEaseByString(value2),
+						onComplete: function(twn:FlxTween):Void
+						{
+							if (camZooming) return;
+							camZooming = true;
+
+							cameraZoomTweenEvent = null;
+						}
+					});
+
+					defaultCamZoom = zoom;
+					camZooming = false;
+				}
 			}
 			case 'Move Camera':
 			{
@@ -3969,8 +4064,8 @@ class PlayState extends MusicBeatState
 		if (target == 'dad' || target == 'opponent' || target == true)
 		{
 			final mid:FlxPoint = dad.getMidpoint();
-			camFollow.setPosition(mid.x + 150, mid.y - 100);
 
+			camFollow.setPosition(mid.x + 150, mid.y - 100);
 			camFollow.x += dad.cameraPosition[0] + opponentCameraOffset[0];
 			camFollow.y += dad.cameraPosition[1] + opponentCameraOffset[1];
 
@@ -4042,7 +4137,7 @@ class PlayState extends MusicBeatState
 	public function snapCamFollowToPos(x:Float, y:Float):Void
 	{
 		camFollow.setPosition(x, y);
-		FlxG.camera.snapToTarget();
+		FlxG.camera.focusOn(FlxPoint.get(x, y));
 	}
 
 	public function finishSong(?ignoreNoteOffset:Bool = false):Void
